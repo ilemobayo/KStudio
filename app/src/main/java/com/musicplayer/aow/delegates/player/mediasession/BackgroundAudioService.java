@@ -36,7 +36,6 @@ import java.util.List;
 public class BackgroundAudioService extends MediaBrowserServiceCompat implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener  {
 
     public static final String COMMAND_EXAMPLE = "command_";
-
     private MediaPlayer mMediaPlayer;
     private MediaSessionCompat mMediaSessionCompat;
     private ArrayList<Song> mPlaylist = new ArrayList<>();

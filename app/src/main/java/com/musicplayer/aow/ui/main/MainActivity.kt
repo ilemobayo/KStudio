@@ -30,6 +30,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import com.github.nisrulz.sensey.Sensey
 import com.google.firebase.auth.FirebaseAuth
 import com.karumi.dexter.Dexter
@@ -115,6 +116,10 @@ class MainActivity : BaseActivity(),
         tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
         // set a custom status bar drawable
         tintManager.setStatusBarTintResource(R.color.black)
+
+        //mediasession
+        mMediaBrowserCompat = MediaBrowserCompat(this, ComponentName(this, BackgroundAudioService::class.java),
+                mMediaBrowserCompatConnectionCallback, null)
 
         namePlayback = findViewById(R.id.text_view_name)
         artistPlayback = findViewById(R.id.text_view_artist)
@@ -430,6 +435,8 @@ class MainActivity : BaseActivity(),
         } else {
             audioFocus!!.play()
             mPlayer!!.play()
+            //test MediaSession
+            testMediaSession()
         }
     }
 
@@ -729,17 +736,16 @@ class MainActivity : BaseActivity(),
     }
 
     fun testMediaSession(){
-        //mMediaBrowserCompat = MediaBrowserCompat(applicationContext, ComponentName(applicationContext, BackgroundAudioService::class.java),
-        //        mMediaBrowserCompatConnectionCallback, null)
-
-        //mMediaBrowserCompat?.connect()
 
         if (mMediaBrowserCompat?.isConnected!!) {
+            Toast.makeText(applicationContext, "i am connected to ms", Toast.LENGTH_SHORT).show()
             MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
             if (mCurrentState == STATE_PAUSED) {
+                Toast.makeText(applicationContext, "i am playing ms", Toast.LENGTH_SHORT).show()
                 MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.play()
                 mCurrentState = STATE_PLAYING
             } else {
+                Toast.makeText(applicationContext, "i am plaused ms", Toast.LENGTH_SHORT).show()
                 if (MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
                     MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.pause()
                 }
@@ -748,7 +754,7 @@ class MainActivity : BaseActivity(),
             }
             mMediaControllerCompat!!.registerCallback(mMediaControllerCompatCallback)
         } else {
-            Log.e(this.javaClass.name, "not connected")
+            Toast.makeText(applicationContext, "i am not connected to ms", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -758,18 +764,11 @@ class MainActivity : BaseActivity(),
             mHandler.removeCallbacks(mProgressCallback)
             mHandler.post(mProgressCallback)
         }
-        //mediasession
-        mMediaBrowserCompat = MediaBrowserCompat(this, ComponentName(this, BackgroundAudioService::class.java),
-                mMediaBrowserCompatConnectionCallback, null)
+        
         //mediasession connect
         mMediaBrowserCompat!!.connect()
 
-        while(mMediaBrowserCompat!!.isConnected){
-            Log.e(this.javaClass.name, "connected")
-        }
 
-        //test MediaSession
-        testMediaSession()
     }
 
     override fun onResume() {

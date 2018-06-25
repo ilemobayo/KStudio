@@ -1,0 +1,23 @@
+package com.musicplayer.aow.delegates.softcode.adapters.placeholder
+
+data class AddOns(val country: String = "",
+                  val distanceUnit: String = "",
+                  val lastName: String = "",
+                  val gender: String = "",
+                  val city: String = "",
+                  val displayName: String = "",
+                  val accountType: String = "",
+                  val verified: Boolean = false,
+                  val connectIp: String = "",
+                  val fullName: String = "",
+                  val dateOfBirth: String = "",
+                  val avatar: String = "",
+                  val locale: String = "",
+                  val encodedId: String = "",
+                  val aboutMe: String = "",
+                  val firstName: String = "",
+                  val memberSince: String = "",
+                  val phone: String = "",
+                  val state: String = "",
+                  val email: String = "",
+                  val height: Int = 0)

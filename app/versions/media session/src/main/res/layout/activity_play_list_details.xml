@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    >
+
+    <android.support.v7.widget.Toolbar
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        xmlns:local="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        style="@style/MP.Theme.Widget.Toolbar"
+        android:background="@color/white"
+        toolbar:layout_scrollFlags="enterAlways"
+        local:titleTextColor="@color/black"/>
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <Button
+        android:id="@+id/play_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/button_gradient"
+        android:text="Play all"
+        android:textColor="@color/black"/>
+
+    <android.support.v7.widget.RecyclerView
+        tools:listitem="@layout/item_local_music"
+        android:id="@+id/playlist_songs_recycler_views"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clipToPadding="false"
+        />
+
+    <TextView
+        style="@style/MP.Theme.TextAppearance.List.Empty"
+        android:text="@string/mp.play_list.details.empty"
+        tools:visibility="visible"
+        />
+
+    <ProgressBar
+        style="@style/MP.Theme.Widget.ProgressBar"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+</LinearLayout>

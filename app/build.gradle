@@ -1,0 +1,187 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+
+    //Enable java 8
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId "com.musicplayer.aow"
+        minSdkVersion 22
+        targetSdkVersion 26
+        versionCode getVersionCode("$BUILD")
+        versionName "$VERSION"
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        renderscriptTargetApi 26
+        renderscriptSupportModeEnabled true
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+        playstore {
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            renderscriptOptimLevel 3
+            minifyEnabled false
+            zipAlignEnabled true
+        }
+    }
+    lintOptions {
+        // TODO: fix errors and reenable.
+        abortOnError false
+    }
+}
+
+dependencies {
+    //noinspection GradleCompatible
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.android.gms:play-services-identity:15.0.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.volley:volley:1.0.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    // Dexter runtime permissions
+    implementation 'com.karumi:dexter:4.2.0'
+    //...
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'io.reactivex:rxjava:1.1.9'
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'com.amitshekhar.android:rx-android-networking:1.0.0'
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+    implementation 'com.jakewharton:butterknife:8.5.1'
+    implementation 'uk.co.chrisjenx:calligraphy:2.2.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    androidTestImplementation 'junit:junit:4.12'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    //switch design
+    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
+    implementation 'com.google.firebase:firebase-auth:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-config:16.0.0'
+    implementation 'com.google.firebase:firebase-messaging:17.0.0'
+    implementation 'org.jsoup:jsoup:1.8.3'
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.2'
+    //Shake and gesture detection
+    implementation 'com.github.nisrulz:sensey:1.7.0'
+    //shake with sensitivity
+    implementation 'com.github.tbouron.shakedetector:library:1.0.0@aar'
+    //loading
+    implementation 'com.github.ybq:Android-SpinKit:1.1.0'
+    implementation 'org.jetbrains.anko:anko-common:0.9'
+    //Edit Music Tag Library
+    implementation 'com.mpatric:mp3agic:0.9.1'
+    //search
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+    //text drawable
+    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    //recyclerview
+    implementation 'com.l4digital.fastscroll:fastscroll:1.0.4'
+    implementation 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    implementation 'com.andkulikov:transitionseverywhere:1.7.4'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    //slider
+    implementation 'com.ss.bannerslider:bannerslider:1.8.0'
+    //searchview
+    implementation 'com.github.mancj:MaterialSearchBar:0.7.6'
+    //status
+    implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+    //spinner
+    implementation 'com.jaredrummler:material-spinner:1.2.4'
+    //ticket
+    implementation 'com.github.santalu:ticket-view:1.0.1'
+    //segmented tab
+    implementation 'info.hoang8f:android-segmented:1.0.6'
+
+    //RxLifecycle
+    implementation 'com.trello:rxlifecycle:0.6.1'
+    implementation 'com.trello:rxlifecycle-components:0.6.1'
+
+    //Palette  color from image
+    implementation 'com.android.support:palette-v7:26.1.0'
+
+    //shimmer from facebook
+    implementation 'com.facebook.shimmer:shimmer:0.2.0'
+    kapt "com.facebook.shimmer:shimmer:0.2.0"
+
+    //App Updater
+    implementation 'com.github.javiersantos:AppUpdater:2.6.5'
+
+    //Room
+    def room_version = "1.1.0"
+
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
+
+    //LifeData
+    def lifecycle_version = "1.1.1"
+
+    // ViewModel and LiveData
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+
+    annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
+    // alternately - if using Java8, use the following instead of compiler
+    //implementation "android.arch.lifecycle:common-java8:$lifecycle_version"
+
+    // optional - ReactiveStreams support for LiveData
+    implementation "android.arch.lifecycle:reactivestreams:$lifecycle_version"
+
+    // optional - Test helpers for LiveData
+    androidTestImplementation "android.arch.core:core-testing:$lifecycle_version"
+
+    //music identification
+    implementation files('libs/acrcloud-android-sdk-1.5.7.3.jar')
+
+
+
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+}
+repositories {
+    mavenCentral()
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url 'http://dl.bintray.com/amulyakhare/maven'
+    }
+    jcenter()
+}
+
+//ButterKnife For Kotlin
+kapt {
+    generateStubs = true
+}
+
+def getVersionCode(build) {
+    String date = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date())
+    return Integer.parseInt(date + build)
+}
+
+apply plugin: 'com.google.gms.google-services'

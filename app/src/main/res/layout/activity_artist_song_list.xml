@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.library.activities.ArtistSongs"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    >
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:fitsSystemWindows="true"
+        android:elevation="0dp">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@color/white"
+            style="@style/AppTheme.toolbar"
+            app:titleEnabled="false"
+            app:collapsedTitleTextAppearance="@style/AppTheme.toolbar">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.75"
+                android:fitsSystemWindows="true">
+                <ImageView
+                    android:id="@+id/image_view_artist_art_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/gradient_danger"
+                    />
+            </FrameLayout>
+
+            <android.support.v7.widget.Toolbar
+                xmlns:local="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                local:navigationIcon="@drawable/ic_arrow_back_black"
+                local:titleTextColor="@color/black"
+                app:layout_collapseMode="pin"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:orientation="vertical">
+
+        <info.hoang8f.android.segmented.SegmentedGroup
+            xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/segmented2"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            segmentedgroup:sc_border_width="2dp"
+            segmentedgroup:sc_corner_radius="5dp"
+            segmentedgroup:sc_tint_color="@color/red_dim"
+            android:visibility="gone">
+
+            <RadioButton
+                android:id="@+id/button21"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="My Music"
+                style="@style/RadioButton" />
+
+            <RadioButton
+                android:id="@+id/button22"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Browse"
+                android:buttonTint="@color/red_dim"
+                style="@style/RadioButton" />
+        </info.hoang8f.android.segmented.SegmentedGroup>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_marginBottom="5dp"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/fab_play_artist"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/button_gradient"
+                android:text="@string/play" />
+
+            <FrameLayout
+                android:id="@+id/item_options_action"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                >
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/item_button_action"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_list_item_action"
+                    android:background="@color/transparent"
+                    android:rotation="90"
+                    />
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            xmlns:recyclerView="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/artist_songs_recycler_views"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_local_music"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            />
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

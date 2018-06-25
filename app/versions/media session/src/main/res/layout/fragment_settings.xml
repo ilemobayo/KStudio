@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        toolbar:titleTextAppearance="@style/MP.Theme.TextAppearance.Light.Toolbar.Title"
+        toolbar:title="@string/settings"/>
+    <View
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="50dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/audio_search_settings_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/transparent"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Search for local audio files:"/>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                android:layout_below="@+id/create_playlist"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                <TextView
+                    android:id="@+id/search_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="6dp"
+                    android:text="Search Audio"
+                    android:layout_alignParentLeft="true"/>
+
+                <Button
+                    android:id="@+id/search_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_margin="2dp"
+                    android:layout_alignParentRight="true"
+                    android:text="search"
+                    android:textColor="@color/black"
+                    android:background="@drawable/button_gradient"/>
+
+            </RelativeLayout>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                android:layout_below="@+id/create_playlist"
+                />
+
+            <TextView
+                android:id="@+id/gesture_settings_label"
+                android:layout_below="@+id/card_view_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="8dp"
+                android:background="@color/transparent"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Gesture control settings:"/>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:id="@+id/shake_section"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="@color/white">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_toLeftOf="@+id/shake_btn"
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/shake"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/black"
+                                android:layout_alignParentTop="true"
+                                android:text="Enable shake detection"
+                                android:layout_alignParentLeft="true"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/black"
+                                android:layout_alignParentTop="true"
+                                android:text="Shake your device to change the current playback song."
+                                android:textSize="8dp"
+                                android:layout_alignParentLeft="true"/>
+                        </LinearLayout>
+
+                        <com.suke.widget.SwitchButton
+                            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/shake_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="0dp"
+                            android:layout_alignParentRight="true"
+                            android:orientation="horizontal"
+                            card_view:sb_show_indicator="false"/>
+                </RelativeLayout>
+                <View
+                    android:id="@+id/divider"
+                    style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                    android:layout_below="@+id/create_playlist"
+                    />
+                <RelativeLayout
+                    android:id="@+id/flip_section"
+                    android:layout_below="@+id/shake_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="@color/white">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@+id/flip_btn"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/flip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="Enable flip detection"
+                            android:layout_alignParentLeft="true"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="Turn your device face down to pause current playback."
+                            android:textSize="8dp"
+                            android:layout_alignParentLeft="true"/>
+                    </LinearLayout>
+
+                    <com.suke.widget.SwitchButton
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/flip_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:layout_alignParentRight="true"
+                        android:orientation="horizontal"
+                        card_view:sb_show_indicator="false"/>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <View
+                    style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                    />
+
+                <TextView
+                    android:layout_below="@+id/card_view_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@color/transparent"
+                    android:textSize="12dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:text="Cache settings:"/>
+
+                <View
+                    style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                    />
+
+                <RelativeLayout
+                    android:id="@+id/cache_section"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="@color/white">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@+id/cache_btn"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/cache"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="Enable caching of stream track"
+                            android:layout_alignParentLeft="true"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="Enable if you want to cache tracks you stream, requires additional data."
+                            android:textSize="8dp"
+                            android:layout_alignParentLeft="true"/>
+                    </LinearLayout>
+
+                    <com.suke.widget.SwitchButton
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/cache_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:layout_alignParentRight="true"
+                        android:orientation="horizontal"
+                        card_view:sb_show_indicator="false"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <View
+                    style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                    />
+
+                <TextView
+                    android:layout_below="@+id/card_view_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@color/transparent"
+                    android:textSize="12dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:text="File server settings:"/>
+
+                <View
+                    style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                    />
+
+                <RelativeLayout
+                    android:id="@+id/server_section"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:background="@color/white">
+                    <LinearLayout
+                        android:id="@+id/file_server_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentRight="true"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/file_server"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="File server"
+                            android:layout_alignParentLeft="true"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_alignParentTop="true"
+                            android:text="Serve local files to other device through network."
+                            android:textSize="8dp"
+                            android:layout_alignParentLeft="true"/>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                >
+
+
+                <Button
+                    android:id="@+id/scheduler_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentRight="true"
+                    android:text="set scheduler"
+                    android:padding="5dp"
+                    android:textColor="@color/green_start_gradient"
+                    android:textSize="10dp"
+                    android:background="@drawable/button_gradient"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

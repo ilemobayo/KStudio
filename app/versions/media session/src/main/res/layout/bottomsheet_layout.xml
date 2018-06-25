@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:elevation="40dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet_tab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider">
+        <android.support.design.widget.TabLayout
+            android:id="@+id/library_tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            app:tabPaddingTop="5dp"
+            app:tabIndicatorColor="@color/transparent"
+            app:tabTextAppearance="@style/MyTextAppearanceTablayout"
+            app:tabTextColor="@color/black"
+            app:tabSelectedTextColor="@color/red_dim"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            android:elevation="40dp"/>
+    </LinearLayout>
+</LinearLayout>

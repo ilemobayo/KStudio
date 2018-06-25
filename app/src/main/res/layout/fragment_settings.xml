@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        toolbar:titleTextAppearance="@style/MP.Theme.TextAppearance.Light.Toolbar.Title"
+        toolbar:title="@string/settings"
+        android:fitsSystemWindows="true"/>
+
+    <View
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:elevation="50dp"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/gesture_settings_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/transparent"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="@string/gesture_control_settings"/>
+
+        <View
+            style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:id="@+id/shake_section"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/shake_btn"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/shake"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:text="@string/enable_shake_detection"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:text="@string/shake_your_device_to_change_the_current_playback_song"
+                            android:textSize="8dp"/>
+                    </LinearLayout>
+
+                    <com.suke.widget.SwitchButton
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/shake_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:layout_alignParentRight="true"
+                        android:orientation="horizontal"
+                        card_view:sb_show_indicator="false"/>
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/divider"
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <RelativeLayout
+                android:id="@+id/flip_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/flip_btn"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/flip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:text="@string/enable_flip_detection"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:text="@string/turn_your_device_face_down_to_pause_current_playback"
+                        android:textSize="8dp"/>
+                </LinearLayout>
+
+                <com.suke.widget.SwitchButton
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/flip_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    card_view:sb_show_indicator="false"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="8dp"
+                android:background="@color/transparent"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Data Usage:"/>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <RelativeLayout
+                android:id="@+id/cache_section"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/cache_btn"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/cache"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Reduce data usage"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Audio quality will be reduced."
+                        android:textSize="8dp"
+                        android:layout_alignParentLeft="true"/>
+                </LinearLayout>
+
+                <com.suke.widget.SwitchButton
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/cache_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal"
+                    card_view:sb_show_indicator="false"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="8dp"
+                android:background="@color/transparent"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Notification:"/>
+
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
+
+            <RelativeLayout
+                android:id="@+id/notification_section"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/notification_btn"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/notification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Subscribe for update notification"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Get new and fresh updates as it happens."
+                        android:textSize="8dp"
+                        android:layout_alignParentLeft="true"/>
+                </LinearLayout>
+
+                <com.suke.widget.SwitchButton
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/notification_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal"
+                    card_view:sb_show_indicator="false"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+            />
+
+
+
+
+
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.search.SearchActivity"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleTextColor="@color/black"
+        app:title="Search"
+        android:title="@string/search"
+        android:fitsSystemWindows="true"/>
+    <View
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <RelativeLayout
+        android:id="@+id/init"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/search_image"
+            android:layout_width="200dp"
+            android:layout_height="150dp"
+            android:src="@drawable/search_img"
+            android:layout_above="@id/search_label"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/search_text_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/search_image"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:text="Search Our Repository"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/search_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/search_text_label"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:text=""
+            android:textColor="@color/red_dim"
+            android:textSize="12dp"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/search_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/list_single_card_linear"
+        />
+
+</LinearLayout>

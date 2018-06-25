@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/network_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:textAlignment="center"
+                        android:gravity="center"
+                        android:text="Network connection error."
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:shadowColor="@color/grey_light"
+                        android:shadowRadius="1"
+                        android:shadowDy="0"
+                        android:shadowDx="0"
+                        android:drawableStart="@android:drawable/presence_offline"
+                        android:visibility="invisible"/>
+                </ScrollView>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/music_update_recycler_view_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom|start|end"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:clipToPadding="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:isScrollContainer="true"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingBottom="50dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    tools:listitem="@layout/list_item"
+                    android:visibility="visible"/>
+    </RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

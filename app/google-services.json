@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "112509586388",
+    "firebase_url": "https://kstudio-c3031.firebaseio.com",
+    "project_id": "kstudio-c3031",
+    "storage_bucket": "kstudio-c3031.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112509586388:android:32001d658ab31c5f",
+        "android_client_info": {
+          "package_name": "com.musicplayer.aow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112509586388-ampiq93i0laec3vb2411p80sul8bsvdl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.musicplayer.aow",
+            "certificate_hash": "45585d4fa2413d17d94307a17b1299b099fe14a5"
+          }
+        },
+        {
+          "client_id": "112509586388-eip7cin193t9dspatqsehv7a5s5mt0s2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.musicplayer.aow",
+            "certificate_hash": "9b9f80ab67f72df475d259dd5a91096eae7bbc7a"
+          }
+        },
+        {
+          "client_id": "112509586388-6m2ntdkitku8cj73rglg68bg0p73a5q0.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "112509586388-6m2ntdkitku8cj73rglg68bg0p73a5q0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIbQaUeGd0Ddl346Aq8YKDTYa4RKWRBQw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112509586388-6m2ntdkitku8cj73rglg68bg0p73a5q0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

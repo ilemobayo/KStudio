@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!--toolbar-->
+        <item name="colorPrimary">@color/mp.theme.dark_blue.colorPrimary</item>
+        <item name="colorAccent">@color/mp.theme.dark_blue.colorAccent</item>
+
+        <item name="android:textColorPrimary">@color/mp.theme.dark_blue.textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/mp.theme.dark_blue.textColorSecondary</item>
+
+        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlActivated">@color/mp.theme.dark_blue.colorControlActivated</item>
+        <item name="colorControlHighlight">@color/mp.theme.dark_blue.colorControlHighlight</item>
+
+        <!-- ActionMode -->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/MP.Theme.Widget.ActionMode</item>
+        <item name="actionModeCloseButtonStyle">@style/MP.Theme.Widget.ActionMode.CloseButton</item>
+
+        <!-- AlertDialog -->
+        <item name="alertDialogTheme">@style/MP.Theme.Widget.AlertDialog</item>
+
+        <!-- PopupMenu -->
+        <item name="popupMenuStyle">@style/MP.Theme.Widget.PopupMenu</item>
+        <item name="textAppearanceLargePopupMenu">@style/MP.Theme.TextAppearance.LargePopupMenu
+        </item>
+        <item name="textAppearanceSmallPopupMenu">@style/MP.Theme.TextAppearance.SmallPopupMenu
+        </item>
+
+        <!--Activity Transmission-->
+        <item name="android:windowContentTransitions">true</item>
+        <!-- enable window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- specify enter and exit transitions -->
+        <!--<item name="android:windowEnterTransition">@transition/explode</item>-->
+        <!--<item name="android:windowExitTransition">@transition/explode</item>-->
+    </style>
+</resources>

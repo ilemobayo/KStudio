@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/song_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingLeft="5dp"
+    android:paddingRight="@dimen/mp.padding.large"
+    android:layout_marginBottom="1dp"
+    android:layout_marginTop="1dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/mp.divider.line"
+        />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/image_details"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:layout_marginRight="0dp"
+        android:padding="3dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_container"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:cardCornerRadius="5dp"
+            android:layout_margin="5dp"
+            app:cardElevation="0dp"
+            app:cardMaxElevation="0dp"
+            app:cardPreventCornerOverlap="true">
+            <ImageView
+                android:id="@+id/image_view_file"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
+                />
+            <TextView
+                android:id="@+id/text_view_duration"
+                style="@style/MP.Theme.TextAppearance.List.Hint"
+                android:layout_marginTop="@dimen/mp.margin.small"
+                tools:text="03:22"
+                android:textSize="10sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="bottom|center_horizontal|right"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textStyle="bold"
+                android:visibility="invisible"/>
+        </android.support.v7.widget.CardView>
+    </android.support.design.widget.CoordinatorLayout>
+
+    <LinearLayout
+        android:id="@+id/details"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/image_details"
+        android:layout_toEndOf="@+id/image_details"
+        android:layout_toLeftOf="@+id/item_options_action"
+        android:layout_toStartOf="@+id/item_options_action"
+        android:layout_marginRight="@dimen/mp.margin.normal"
+        android:layout_marginEnd="@dimen/mp.margin.normal"
+        android:paddingLeft="10dp"
+        >
+
+    <!--<LinearLayout-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toLeftOf="@+id/item_options_action"-->
+        <!--android:layout_toStartOf="@+id/item_options_action"-->
+        <!--android:layout_marginLeft="@dimen/mp.material.marginLeft"-->
+        <!--android:layout_marginStart="@dimen/mp.material.marginLeft"-->
+        <!--android:layout_marginRight="@dimen/mp.margin.normal"-->
+        <!--android:layout_marginEnd="@dimen/mp.margin.normal"-->
+        <!--&gt;-->
+
+        <TextView
+            style="@style/MP.Theme.TextAppearance.List.Title"
+            android:id="@+id/text_view_name"
+            tools:text="A little bit longer"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true">
+            <TextView
+                android:id="@+id/text_view_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/mp.margin.small"
+                tools:text="A little bit longer"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/equalizer_view"
+                android:layout_toStartOf="@+id/equalizer_view"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+            <ImageView
+                android:id="@+id/equalizer_view"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="invisible"
+                android:src="@drawable/ic_play"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/item_options_action"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        >
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/item_button_action"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_list_item_action"
+            android:background="@color/transparent"
+            android:rotation="90"
+            />
+    </FrameLayout>
+
+</RelativeLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    app:ignore="NamespaceTypo">
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:local="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@color/green_start_gradient"
+            local:titleTextColor="@color/white"
+            local:theme="@style/AppTheme"
+            local:popupTheme="@style/AppTheme.Overlay.PopUp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share files on wifi"
+                android:textSize="16dp"
+                android:textColor="@color/white"
+                android:layout_gravity="left"
+                android:id="@+id/toolbar_title"
+                app:popupTheme="@style/AppTheme.PopActivities"
+                />
+
+        </android.support.v7.widget.Toolbar>
+        <!--<View-->
+        <!--android:id="@+id/divider"-->
+        <!--style="@style/MP.Theme.Widget.Divider.Line.Vertical"-->
+        <!--android:layout_below="@+id/toolbar"-->
+        <!--android:elevation="45dp"-->
+        <!--/>-->
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/linearLayout1"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <fragment
+            class="com.musicplayer.aow.delegates.sharedata.wifidirect.DeviceListFragment"
+            android:id="@+id/frag_list"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+             <!--Preview: layout=@layout/row_devices-->
+        </fragment>
+        <fragment
+            class="com.musicplayer.aow.delegates.sharedata.wifidirect.DeviceDetailFragment"
+            android:id="@+id/frag_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- Preview: layout=@layout/device_detail -->
+        </fragment>
+    </LinearLayout>
+</LinearLayout>

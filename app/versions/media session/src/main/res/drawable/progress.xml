@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+
+        <shape>
+            <gradient android:useLevel="true"
+                android:startColor="@color/red"
+                android:endColor="@color/blue"/>
+            <corners
+                android:radius="10dp"
+                />
+        </shape>
+    </item>
+</layer-list>

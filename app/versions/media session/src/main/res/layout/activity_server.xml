@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.settings.ServerActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        toolbar:titleTextAppearance="@style/MP.Theme.TextAppearance.Light.Toolbar.Title"
+        toolbar:title="Connect device"
+        />
+
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        android:layout_below="@+id/toolbar"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/divider"
+        android:gravity="center"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/phone_android"/>
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="110dp"
+                android:layout_marginRight="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/phone_iphone"/>
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="150dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/computer_laptop"
+                />
+        </RelativeLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:text=" 1. Connect your device to the Wi-Fi network 'MusixCity_Play'. \n 2. Open your web browser. \n 3. Enter the following web address:"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="10dp"/>
+           <TextView
+               android:id="@+id/server_ip"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="8dp"
+               android:layout_marginBottom="8dp"
+               android:layout_marginLeft="8dp"
+               android:layout_marginRight="8dp"
+               android:text="http://127.0.0.1:7000"
+               android:textAllCaps="false"
+               android:textAlignment="center"
+               android:textColor="@color/red_dim"
+               android:textSize="10dp"/>
+        <Button
+            android:id="@+id/reset_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/button_gradient"
+            android:text="Start server"/>
+        <Button
+            android:id="@+id/close_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/button_gradient"
+            android:text="Cancel"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

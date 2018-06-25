@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        toolbar:titleTextAppearance="@style/MP.Theme.TextAppearance.Light.Toolbar.Title"
+        toolbar:title="@string/now_playing"/>
+
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        android:layout_below="@+id/play_all"
+        />
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.l4digital.fastscroll.FastScrollRecyclerView
+            android:id="@+id/playing_now_songs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_local_music"
+            android:clipToPadding="false"
+            app:bubbleColor="@color/red_dim"
+            app:bubbleTextColor="#ffffff"
+            app:handleColor="@color/red_dim"
+            app:trackColor="#bbbbbb"
+            app:hideScrollbar="true"
+            app:showTrack="false" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.library.activities.albumart.AlbumArt"
+    android:orientation="vertical"
+    android:background="@color/black"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_album_art"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        toolbar:titleTextAppearance="@style/MP.Theme.TextAppearance.Light.Toolbar.Title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/album_art"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="..."
+            android:scaleType="fitCenter"
+            android:background="@color/black"
+            android:src="@drawable/vinyl_blue" />
+    </LinearLayout>
+
+</LinearLayout>

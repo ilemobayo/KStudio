@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="status_bar_color">#FF000000</color>
+    <color name="layout_border_color">#FF111111</color>
+    <!-- Common -->
+    <color name="transparent">@android:color/transparent</color>
+    <color name="translusent">#11000000</color>
+    <color name="green">#129412</color>
+    <color name="green.dark">#1ea167</color>
+    <color name="green_dim">#177049</color>
+    <color name="green_light">#84e975</color>
+    <color name="blue">#FF3498db</color>
+    <color name="blue_light">#047edf</color>
+    <color name="purple">#ab08e7</color>
+    <color name="purple_light">#a870bc</color>
+    <color name="purple_dark">#640089</color>
+    <color name="red">#FFDD0000</color>
+    <color name="red_light">#ff6767</color>
+    <color name="red_dim">#e72030</color>
+    <color name="red_dim_1">#e72030</color>
+    <color name="red_dim_2">#e75078</color>
+    <color name="red_trans">#55f21228</color>
+    <color name="yellow">#f6ba35</color>
+    <color name="yellow_dim">#ff002b</color>
+    <color name="pink">#ff8ab7</color>
+    <color name="white">#ffffff</color>
+    <color name="white_trans">#a0ffffff</color>
+    <color name="silver">#e8e8e8</color>
+    <color name="grey">#cfcece</color>
+    <color name="grey_light">#e7e7e7</color>
+    <color name="grey_light_a">#c4c4c4</color>
+    <color name="grey_dim">#9e9e9e</color>
+    <color name="grey_cream">#FFE2D9B6</color>
+    <color name="black">#000000</color>
+    <!--<color name="black_dark">#4e4e4e</color>-->
+    <color name="black_dark">#ffffff</color>
+    <color name="black_light">#666666</color>
+    <color name="black_trans_1">#33000000</color>
+    <!--Naija Loaded-->
+    <color name="green_splash">#37b329</color>
+    <color name="green_start_gradient">#5ca754</color>
+    <color name="green_end_gradient">#6eda62</color>
+    <color name="green_light_faint">#f4faf4</color>
+    <color name="yellow_splash">#faf25e</color>
+    <color name="light_splash">#3fa348</color>
+
+
+    <!-- Theme - Dark Blue -->
+    <!--<color name="mp.theme.dark_blue.background">#3C785F</color>-->
+    <color name="mp.theme.dark_blue.background">@color/black</color>
+    <color name="mp.theme.dark_blue.gradientColor">@color/black</color>
+    <color name="mp.theme.dark_blue.colorControlActivated">@color/grey_dim</color>
+    <color name="mp.theme.dark_blue.colorControlHighlight">@color/white_trans</color>
+
+    <color name="mp.theme.dark_blue.colorPrimary">@color/white</color>
+    <color name="mp.theme.dark_blue.colorPrimaryDark">@color/black</color>
+    <color name="mp.theme.dark_blue.toolBar.colorAccent">@color/black</color>
+    <color name="mp.theme.dark_blue.colorAccent">@color/white</color>
+    <color name="mp.theme.dark_blue.textColorPrimary">@color/black</color>
+    <color name="mp.theme.dark_blue.textColorSecondary">@color/black_light</color>
+
+    <color name="mp.theme.dark_blue.actionMode.statusBarColor">@color/black</color>
+    <color name="mp.theme.dark_blue.actionMode.background">@color/black</color>
+
+    <color name="mp.line">#3D000000</color>
+    <!--<color name="mp.list.background">#1ADD0900</color>-->
+    <color name="mp.list.background">@color/transparent</color>
+    <color name="mp.list.background.selected">#6CDD0900</color>
+    <color name="mp.list.scrollThumb">#99DD0900</color>
+    <color name="mp.list.text.title">#DD0900</color>
+    <color name="mp.list.text.title.selected">#3C5078</color>
+    <color name="mp.list.text.hint">@color/white</color>
+    <color name="mp.list.text.hint.selected">@color/white</color>
+
+    <color name="mp.popupMenu.background">#cccccc</color>
+
+    <color name="mp.text.hint">@color/blue</color>
+
+    <!-- Segmented Control -->
+    <color name="mp.widget.segmented.default">#07c443</color>
+    <color name="mp.widget.segmented.checked">#3C5F78</color>
+
+    <!-- CharacterView -->
+    <color name="mp.characterView.background">#9CBDCC</color>
+    <color name="mp.characterView.textColor">@color/mp.list.text.title</color>
+
+    <!-- Auth -->
+    <color name="color_log_in">#94019c8f</color>
+    <color name="color_sign_up">#93303f9f</color>
+    <color name="color_logo_log_in">#b4faf5</color>
+    <color name="color_logo_sign_up">#bbc4fd</color>
+    <color name="color_label">#ededed</color>
+    <color name="white_transparent">#fafafa</color>
+    <color name="color_input_hint">#FFF</color>
+    <color name="color_text_highlight">#fafafa</color>
+    <color name="color_text">#FFF</color>
+
+    <!-- firebase -->
+    <color name="bg_login">#26ae90</color>
+    <color name="bg_register">#2e3237</color>
+    <color name="bg_main">#428bca</color>
+    <color name="input_login">#222222</color>
+    <color name="input_login_hint">#999999</color>
+    <color name="input_register">#888888</color>
+    <color name="input_register_bg">#3b4148</color>
+    <color name="input_register_hint">#5e6266</color>
+    <color name="btn_login">#26ae90</color>
+    <color name="btn_login_bg">#eceef1</color>
+    <color name="lbl_name">#333333</color>
+    <color name="btn_logut_bg">#ff6861</color>
+
+</resources>

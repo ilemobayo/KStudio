@@ -1,0 +1,20 @@
+package com.musicplayer.aow.delegates.softcode.adapters.placeholder
+
+data class MemberItem(val owner: String = "",
+                      val downloadable: Boolean = false,
+                      val dateUpdated: String = "",
+                      val dateCreated: String = "",
+                      val description: String = "",
+                      val noStreams: Int = 0,
+                      val type: String = "",
+                      val picture: String = "",
+                      val noDownloads: Int = 0,
+                      val noPurchase: Int = 0,
+                      val public: Boolean = false,
+                      val price: Int = 0,
+                      val name: String = "",
+                      val paid: Boolean = false,
+                      val addOns: AddOns,
+                      val location: String = "",
+                      val Id: String = "",
+                      val free: Boolean = false)

@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.library.playlist.PlayListsFragment"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/create_playlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/button_gradient"
+        android:text="Create playlist"/>
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        android:layout_below="@+id/create_playlist"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_playlist_views"
+        android:layout_below="@id/create_playlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_play_list"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        />
+
+    <ProgressBar
+        style="@style/MP.Theme.Widget.ProgressBar"/>
+</RelativeLayout>

@@ -1,0 +1,204 @@
+<resources>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="kingsstudio">MusixPlay</string>
+    <string name="application_name">Musixplay</string>
+    <string name="superstarkingszstudio">Superstar Loaded Music</string>
+    <string name="todo">TODO</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings relatedApplicationSettingsings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+
+    <!--WIFI STRINGS-->
+    <string name="app_name">WiFi Direct</string>
+    <string name="enable_p2p_button">P2P On/Off</string>
+    <string name="discover_peers_button">Discover</string>
+    <string name="connect_peer_button">Connect</string>
+    <string name="disconnect_peer_button">Disconnect</string>
+    <string name="get_file_button">Launch Gallery</string>
+    <string name="empty"></string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
+    <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
+    <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
+    <string name="group_owner_text">"Am I the Group Owner? "</string>
+    <string name="label_me">ME</string>
+    <string name="label_peers">PEERS</string>
+
+
+    <!--Alarm Scheduler-->
+    <string name="btn_start"> Start </string>
+    <string name="btn_stop"> Stop </string>
+    <string name="kings_studio">Musixplay</string>
+    <string name="we_love_your_music">We love your music...</string>
+    <string name="title_activity_app_settings">Settings</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <!-- Auth -->
+    <string name="sign_up_label">Sign Up</string>
+    <string name="log_in_label">Log In</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="password_hint">Password</string>
+    <string name="email_hint">Email</string>
+    <string name="confirm_hint">Confirm Password</string>
+
+    <!-- firebase -->
+    <string name="action_sign_in_short">Register</string>
+    <string name="email">Email</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
+    <string name="change_email">Change Email</string>
+    <string name="change_password">Change Password</string>
+    <string name="send_password_reset_email">Send Password reset email</string>
+    <string name="remove_user">Remove user</string>
+    <string name="new_pass">New Password</string>
+    <string name="title_activity_profile">Firebase</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Fullname</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_link_to_register">Not a member?\nREGISTER NOW</string>
+    <string name="btn_link_to_login">Already registered. Login Me!</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="btn_forgot_password">Forgot your password?</string>
+    <string name="btn_reset_password">Reset Password</string>
+    <string name="btn_back"><![CDATA[<< Back]]></string>
+    <string name="hint_new_email">New Email</string>
+    <string name="btn_change">Change</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="lbl_forgot_password">Forgot password?</string>
+    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+
+    <!--EQ-->
+    <string name="enabled">Enabled</string>
+    <string name="flat">Flat</string>
+    <string name="bass_boost">Bass boost</string>
+    <string name="virtualizer">Virtualizer</string>
+    <string name="reverb">Preset Reverb</string>
+    <string name="about">About...</string>
+    <string name="ok">OK</string>
+    <string name="copyright_message">Copyright \u00A92013 Kingsz Studio.</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="event">Event/Party</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="my_account">My Account</string>
+    <string name="settings">Settings</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="title_activity_maps">Event Map</string>
+    <string name="location">Location</string>
+    <string name="date">Date</string>
+    <string name="play">Play</string>
+    <string name="download">Download</string>
+    <string name="by">By:</string>
+    <string name="tracks">Tracks</string>
+    <string name="track">Track</string>
+    <string name="delete">Delete</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="add_to_queue">Add to queue</string>
+    <string name="play_next">Play next</string>
+    <string name="play_now">Play now</string>
+    <string name="file_delete_failed">Failed to delete file use File Explore instead.</string>
+    <string name="default_playlist_name">New playlist</string>
+    <string name="create_playlist_dialog_title">Playlist name</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="unknown">Unknown</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop record and recognize(humming)</string>
+    <string name="recording">recording</string>
+    <string name="volume">volume:</string>
+    <string name="search">Search</string>
+    <string name="album_cover">Audio album cover art.</string>
+    <string name="gesture_control_settings">Gesture control settings:</string>
+    <string name="enable_shake_detection">Enable shake detection</string>
+    <string name="shake_your_device_to_change_the_current_playback_song">Shake your device to change the current playback song.</string>
+    <string name="enable_flip_detection">Enable flip detection</string>
+    <string name="turn_your_device_face_down_to_pause_current_playback">Turn your device face down to pause current playback.</string>
+    <string name="remove">Remove</string>
+    <string name="signout">signout</string>
+    <string name="follow">Follow</string>
+    <string name="artist">Artist</string>
+</resources>

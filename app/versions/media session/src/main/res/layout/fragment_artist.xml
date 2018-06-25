@@ -1,0 +1,17 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.library.artist.ArtistFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/artist_recycler_views"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/mp.padding.large"
+        tools:listitem="@layout/artist_card_view"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        />
+</FrameLayout>

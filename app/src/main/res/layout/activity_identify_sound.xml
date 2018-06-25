@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    <FrameLayout
+        android:id="@+id/liner"
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+        <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/spin_kit"
+            style="@style/SpinKitView.Large.MultiplePulse"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/red" />
+    </FrameLayout>
+        <RelativeLayout
+            android:id="@+id/control"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            tools:context=".ui.acrcloud.IdentifySoundActivity"
+            android:orientation="horizontal"
+            android:layout_below="@+id/liner">
+
+            <Button
+                android:id="@+id/start"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/button_circle_bg"
+                android:drawableTop="@android:drawable/ic_btn_speak_now"
+                android:drawableTint="@color/white"
+                android:text="@string/start"
+                android:textAllCaps="false"
+                android:textColor="#fff"
+                />
+
+            <Button
+                android:id="@+id/stop"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_circle_bg"
+                android:drawableTop="@android:drawable/ic_btn_speak_now"
+                android:drawableTint="@color/white"
+                android:text="@string/stop"
+                android:textAllCaps="false"
+                android:textColor="#fff"
+                />
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/button_circle_bg"
+                android:drawableTop="@android:drawable/ic_btn_speak_now"
+                android:drawableTint="@color/white"
+                android:text="@string/mp.cancel"
+                android:textAllCaps="false"
+                android:textColor="#fff"
+                />
+        </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/info"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        tools:context=".ui.acrcloud.IdentifySoundActivity"
+        android:orientation="vertical"
+        android:layout_below="@+id/control"
+        android:layout_above="@+id/from">
+
+        <TextView
+            android:id="@+id/volume"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/from"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
+        tools:context=".ui.acrcloud.IdentifySoundActivity"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Music Recognition by"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            />
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/acrcloud_white"
+            android:tint="@color/bg_main"/>
+
+    </LinearLayout>
+</RelativeLayout>

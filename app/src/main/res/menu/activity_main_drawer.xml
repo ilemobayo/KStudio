@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="nav_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_account"
+            android:icon="@drawable/ic_profile"
+            android:title="@string/my_account" />
+        <item
+            android:id="@+id/nav_now_playing"
+            android:icon="@drawable/ic_nowplaying"
+            android:title="@string/now_playing" />
+    </group>
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_event"-->
+            <!--android:icon="@drawable/ic_event"-->
+            <!--android:title="@string/event" />-->
+    <!--</group>-->
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_identify"-->
+            <!--android:icon="@drawable/button_circle_bg"-->
+            <!--android:title="Identify Audio"/>-->
+    <!--</group>-->
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_record"-->
+            <!--android:icon="@android:drawable/ic_menu_preferences"-->
+            <!--android:title="Karaoke"-->
+            <!--/>-->
+    <!--</group>-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_eq"
+            android:icon="@drawable/ic_eq"
+            android:title="@string/equalizer" />
+    </group>
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings" />
+    </group>
+</menu>

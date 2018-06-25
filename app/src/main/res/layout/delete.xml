@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/equalizer_relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splashscreen_bg"
+    android:clickable="true">
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:id="@+id/equalizer_spinner">
+    </Spinner>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_bass_boost"
+        android:layout_below="@id/equalizer_spinner"
+        android:layout_marginBottom="100dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bass_boost_textview"
+        android:text="BASS BOOST"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_above="@id/seekbar_bass_boost"
+        android:layout_centerHorizontal="true"/>
+
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_70hz"
+        android:layout_below="@id/seekbar_bass_boost"
+        android:layout_marginBottom="45dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_70hz_textview"
+        android:text="70 HZ"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/seekbar_70hz"
+        android:layout_centerHorizontal="true"/>
+
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_240hz"
+        android:layout_below="@id/seekbar_70hz"
+        android:layout_marginBottom="45dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_240hz_textview"
+        android:text="240 HZ"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/seekbar_240hz"
+        android:layout_centerHorizontal="true"/>
+
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_920hz"
+        android:layout_marginBottom="45dp"
+        android:layout_below="@id/seekbar_240hz"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_920hz_textview"
+        android:layout_marginTop="10dp"
+        android:text="910 HZ"
+        android:textColor="#FFFFFF"
+        android:layout_above="@id/seekbar_920hz"
+        android:layout_centerHorizontal="true"/>
+
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_5khz"
+        android:layout_below="@id/seekbar_920hz"
+        android:layout_marginBottom="45dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_5khz_textview"
+        android:text="5 KHZ"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/seekbar_5khz"
+        android:layout_centerHorizontal="true"/>
+
+
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_15khz"
+        android:layout_below="@id/seekbar_5khz"
+        android:layout_marginBottom="15dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_15khz_textview"
+        android:text="15 KHZ"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:layout_above="@id/seekbar_15khz"
+        android:layout_centerHorizontal="true"/>
+
+
+</LinearLayout>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.external.ExternalPlayerActivity"
+    android:layout_gravity="center_vertical"
+    app:cardCornerRadius="5dp">
+
+
+    <LinearLayout
+        android:id="@+id/layout_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:layout_marginTop="@dimen/mp.music.seekBar.marginTop"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        >
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/external_image_view_album"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_centerInParent="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/nigerian_artists" />
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:layout_marginTop="0dp">
+            <TextView
+                android:id="@+id/external_audio_view_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="@color/red_dim"
+                android:background="@color/white"
+                tools:text="Drag me down"
+                android:singleLine="true"
+                />
+
+            <LinearLayout
+                android:id="@+id/external_player_controller"
+                android:layout_below="@+id/external_audio_view_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:minHeight="40dp"
+                android:gravity="center_vertical"
+                android:paddingRight="5dp">
+
+                <TextView
+                    android:id="@+id/external_text_view_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/mp.music.default_duration"
+                    android:textColor="@color/black"
+                    android:background="@color/white"
+                    android:textSize="12sp" />
+
+                <android.support.v7.widget.AppCompatSeekBar
+                    android:id="@+id/external_seek_bar"
+                    style="@style/Widget.AppCompat.SeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="10000"
+                    tools:progress="5000" />
+
+
+                <TextView
+                    android:id="@+id/external_text_view_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/mp.music.default_duration"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    tools:text="03:22" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_below="@+id/external_player_controller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:minHeight="30dp"
+                android:gravity="center">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/external_button_play_toggle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_play" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

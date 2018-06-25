@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:toolbar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        toolbar:titleTextColor="@color/black"
+        android:fitsSystemWindows="true"/>
+
+    <View
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <Button
+        android:id="@+id/play_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/button_gradient"
+        android:text="Play all"
+        android:textColor="@color/black"/>
+    <View
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+    <android.support.v7.widget.RecyclerView
+        tools:listitem="@layout/item_local_music"
+        android:id="@+id/playlist_songs_recycler_views"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clipToPadding="false"
+        android:visibility="visible"
+        />
+
+    <TextView
+        style="@style/MP.Theme.TextAppearance.List.Empty"
+        android:id="@+id/empty"
+        android:text="@string/mp.play_list.details.empty"
+        android:layout_gravity="center|center_vertical|center_horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        />
+
+    <ProgressBar
+        style="@style/MP.Theme.Widget.ProgressBar"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+</LinearLayout>

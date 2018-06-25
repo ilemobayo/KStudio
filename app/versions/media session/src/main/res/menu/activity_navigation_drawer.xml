@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_player"
+            android:icon="@drawable/ic_main_nav_music_selected"
+            android:title="Player"
+            />
+        <item
+            android:id="@+id/nav_library"
+            android:icon="@drawable/ic_main_nav_play_list_selected"
+            android:title="Library" />
+        <item
+            android:id="@+id/nav_online"
+            android:icon="@drawable/ic_main_nav_local_files_selected"
+            android:title="Online" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_main_nav_settings_selected"
+            android:title="Settings" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>

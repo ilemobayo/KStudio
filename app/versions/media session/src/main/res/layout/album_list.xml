@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="50dp"
+    android:layout_margin="5dp"
+    android:id="@+id/album">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view_container"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:clickable="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:layout_marginRight="0dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:cardCornerRadius="5dp"
+            app:cardUseCompatPadding="true">
+            <ImageView
+                android:id="@+id/ivFish"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/gradient_skyline"
+                android:transitionName="simple_activity_transition" />
+            <TextView
+                android:id="@+id/text_view_duration"
+                style="@style/MP.Theme.TextAppearance.List.Hint"
+                android:layout_marginTop="@dimen/mp.margin.small"
+                tools:text="Album"
+                android:text="Album"
+                android:textSize="6sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:shadowColor="@color/black"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="1"/>
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_toRightOf="@+id/card_view_container"
+            android:layout_toEndOf="@+id/card_view_container"
+            android:layout_toLeftOf="@+id/item_options_action"
+            android:layout_toStartOf="@+id/item_options_action"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:id="@+id/cardname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:text="Album title"
+                android:textColor="@color/black"
+                android:textSize="11dp"
+                android:textStyle="normal"
+                android:singleLine="true"
+                android:shadowColor="@color/white"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="0"
+                android:background="@color/transparent"/>
+            <TextView
+                android:id="@+id/cardart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:text="Artist Name"
+                android:textColor="@color/grey_dim"
+                android:textSize="10dp"
+                android:textStyle="normal"
+                android:singleLine="true"
+                android:shadowColor="@color/white"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="0"
+                android:background="@color/transparent"/>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/item_options_action"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            >
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/item_button_action"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_list_item_action"
+                android:background="@color/transparent"
+                android:rotation="90"
+                />
+        </FrameLayout>
+
+</RelativeLayout>

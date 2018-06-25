@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:scaleType="centerCrop"
+    android:gravity="center"
+    tools:context=".ui.splashscreen.SplashScreen">
+    <!--android:background="@drawable/fela"-->
+
+    <TextView
+        android:id="@+id/application_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="@dimen/mp.margin.xlarge"
+        android:layout_marginRight="@dimen/mp.margin.xlarge"
+        android:layout_marginBottom="@dimen/mp.margin.normal"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="@string/kings_studio"
+        android:singleLine="true"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"/>
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/gradient_one"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/mp.margin.xlarge"
+        android:layout_marginRight="@dimen/mp.margin.xlarge"
+        android:layout_marginBottom="@dimen/mp.margin.normal"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="Powered by Naijaloaded.com"
+        android:singleLine="true"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="2"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-9dp"
+        android:text="@string/we_love_your_music"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="2"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_centerInParent="false"/>
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-1dp"
+        android:text="Initializing player..."
+        android:textAlignment="center"
+        android:textSize="10sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="1"/>
+
+</LinearLayout>

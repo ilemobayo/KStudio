@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.recorder.VoiceRecorderActivity">
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical">
+             <TextView
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:layout_marginBottom="20dp"
+                 android:text="Karaoke"
+                 android:textSize="40dp"
+                 android:textAlignment="center"
+                 android:textColor="@color/black"/>
+             <TextView
+                 android:id="@+id/indicator"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:layout_marginBottom="20dp"
+                 android:textColor="@color/red_light"
+                 android:text="Not Recording"
+                 android:textAlignment="center"/>
+             <Button
+                 android:id="@+id/btn_record"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:layout_marginBottom="20dp"
+                 android:text="Start recording"
+                 android:layout_gravity="bottom"
+                 android:background="@drawable/button_gradient"/>
+
+             <Button
+                 android:id="@+id/btn_record_play"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:layout_marginBottom="20dp"
+                 android:text="Start playback"
+                 android:layout_gravity="bottom"
+                 android:background="@drawable/button_gradient"/>
+         </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

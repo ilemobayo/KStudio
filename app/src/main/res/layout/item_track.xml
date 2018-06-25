@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/song_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="@dimen/mp.padding.large"
+    android:layout_marginBottom="1dp"
+    android:layout_marginTop="1dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/mp.divider.line"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/indicator_i"
+        android:layout_width="35dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center">
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:visibility="invisible"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/loading"
+            style="@style/SpinKitView.Large.FadingCircle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/red_dim" />
+        <android.support.v7.widget.AppCompatImageView
+            android:visibility="invisible"
+            android:id="@+id/button_play_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_pause"
+            android:tint="@color/red_dim"
+            />
+        <TextView
+            style="@style/MP.Theme.TextAppearance.List.Title"
+            android:id="@+id/position"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            tools:text="1"
+            android:textSize="13sp"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/details"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/indicator_i"
+        android:layout_toStartOf="@+id/item_options_action_like"
+        android:layout_marginEnd="@dimen/mp.margin.normal"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        >
+
+        <TextView
+            style="@style/MP.Theme.TextAppearance.List.Title"
+            android:id="@+id/text_view_name"
+            tools:text="Kings Studio"
+            android:textSize="13sp"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:id="@+id/text_view_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Musixplay"
+                android:textSize="12sp"
+                android:layout_alignParentStart="true"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textStyle="normal"
+                />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:visibility="visible"
+        android:id="@+id/item_options_action_like"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/item_options_action"
+        >
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/item_button_action_like"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_favorite_no"
+            android:background="@color/transparent"
+            android:tint="@color/red_dim"
+            />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/item_options_action"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        >
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/item_button_action"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_list_item_action"
+            android:background="@color/transparent"
+            android:rotation="90"
+            />
+    </FrameLayout>
+
+</RelativeLayout>

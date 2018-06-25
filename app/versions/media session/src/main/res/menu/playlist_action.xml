@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_item_play_now"
+        android:title="Play now"
+        />
+    <item
+        android:id="@+id/menu_item_play_next"
+        android:title="Play next"
+        />
+    <item
+        android:id="@+id/menu_item_add_to_queue"
+        android:title="Add to queue"
+        />
+    <item
+        android:id="@+id/menu_item_clear"
+        android:title="Clear"
+        />
+    <item
+        android:id="@+id/menu_item_rename"
+        android:title="@string/mp.menu.rename"
+        />
+    <item
+        android:id="@+id/menu_item_delete"
+        android:title="@string/mp.menu.delete"
+        />
+</menu>

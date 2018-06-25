@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.main.library.playlist.PlayListsFragment"
+    android:orientation="vertical">
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/playlist_tablayout"
+        android:background="@color/red_dim"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        app:tabIndicatorColor="@color/white"
+        app:tabTextAppearance="@style/MyTextAppearanceTablayout"
+        app:tabTextColor="@color/white"
+        app:tabSelectedTextColor="@color/white"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        android:elevation="0dp"/>
+
+    <View
+        android:id="@+id/divider"
+        style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+        />
+
+    <com.musicplayer.aow.ui.widget.CustomViewPager
+        android:id="@+id/playlist_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

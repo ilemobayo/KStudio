@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <RelativeLayout
+        android:id="@+id/layout_play_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="@dimen/mp.music.playControls.marginBottom"
+        android:showDividers="middle"
+        android:divider="@drawable/common_divider_xlarge_horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        >
+        <SearchView
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/refresh"
+            android:layout_toStartOf="@+id/refresh"/>
+
+        <Button
+            android:id="@+id/refresh"
+            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:text="Naijaloaded Web"
+            android:textSize="10dp"
+            android:background="@drawable/white_bg"
+            android:layout_marginRight="5dp"/>
+
+    </RelativeLayout>
+
+    <!--<View-->
+        <!--android:id="@+id/divider"-->
+        <!--style="@style/MP.Theme.Widget.Divider.Line.Vertical"-->
+        <!--android:layout_below="@+id/create_playlist"-->
+        <!--/>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/music_update_recycler_view_body"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="5dp"
+        android:background="@color/green_light_faint"
+        />
+
+</LinearLayout>

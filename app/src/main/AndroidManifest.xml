@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/apk/res-auto"
+    package="com.musicplayer.aow">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature android:name="android.hardware.bluetooth" />
+    <uses-feature android:name="android.hardware.telephony" />
+
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_PRIVILEGED"
+        tool:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
+    <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACTION_PICK_WIFI_NETWORK" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tool:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission
+        android:name="android.permission.READ_PRECISE_PHONE_STATE"
+        tool:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        tool:ignore="ProtectedPermissions" />
+
+    <application
+        android:name=".application.MusicPlayerApplication"
+        android:allowBackup="false"
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/mp.app.name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tool:replace="android:label">
+
+        <!-- Splash screen -->
+        <!-- <activity -->
+        <!-- android:name="com.musicplayer.aow.ui.splashscreen.SplashScreen" -->
+        <!-- android:launchMode="singleInstance" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/SplashTheme"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+
+
+        <!-- Main activity -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Music Vinyl Activity -->
+        <activity
+            android:name=".ui.music.MusicPlayerActivity"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+
+        <receiver
+            android:name=".utils.security.IncomingSms"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".delegates.player.PlaybackService"
+            android:label="PlaybackService"
+            tool:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.musicplayer.aow.ACTION.PLAY_TOGGLE" />
+                <action android:name="com.musicplayer.aow.ACTION.PLAY_NEXT" />
+                <action android:name="com.musicplayer.aow.ACTION.PLAY_LAST" />
+                <action android:name="com.musicplayer.aow.ACTION.STOP_SERVICE" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <!-- Firebase -->
+        <service
+            android:name=".delegates.firebase.MyFirebaseMessagingService"
+            tool:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".delegates.firebase.FirebaseIDService"
+            tool:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".delegates.scheduler.JobServices"
+            android:label="Scheduler service"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".delegates.scheduler.ServiceReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".ui.external.VideoViewActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.external.ExternalPlayerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".delegates.searchaudio.SearchAudio"
+            android:label="Search"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.main.library.activities.AlbumSongs"
+            android:label=""
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.library.activities.ArtistSongs"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.library.playlist.offline.PlaylistSongs.PlaylistSongsListActivity"
+            android:label="Playlist"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            tool:ignore="InnerclassSeparator">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+        <activity android:name=".ui.nowplaying.NowPlayingActivity" />
+        <activity android:name=".ui.main.library.home.browse.BrowseActivity" />
+        <activity android:name=".ui.main.library.home.podcast.PodcastActivity" />
+        <activity android:name=".ui.main.library.home.podcast.PodcastSearchActivity" />
+        <activity android:name=".ui.auth.AuthActivity" />
+        <activity android:name=".ui.auth.SignUpActivity" />
+        <activity android:name=".ui.auth.ProfileActivity" />
+        <activity android:name=".ui.eq.EqActivity" />
+        <activity
+            android:name=".ui.event.MapsActivity"
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+        <activity android:name=".ui.event.EventsListActivity" />
+
+        <!--
+             A receiver that will receive media buttons and send as
+            intents to your MediaBrowserServiceCompat implementation.
+            Required on pre-Lollipop. More information at
+            http://developer.android.com/reference/android/support/v4/media/session/MediaButtonReceiver.html
+        -->
+
+        <activity android:name=".ui.recorder.VoiceRecorderActivity" />
+        <activity android:name=".ui.acrcloud.IdentifySoundActivity" />
+        <activity android:name=".ui.main.search.SearchActivity" />
+
+        <service
+            android:name=".delegates.softcode.adapters.MXLiveService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ui.main.library.home.artist.ArtistOnline" />
+
+        <service android:name=".delegates.player.mediasession.BackgroundAudioService">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".ui.main.library.playlist.online.playlistsongs.PlaylistSongsActivity"></activity>
+    </application>
+
+</manifest>

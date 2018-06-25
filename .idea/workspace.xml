@@ -30,14 +30,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="802cfee9-ba4f-4498-80d2-30d9077e4342" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -99,10 +92,10 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
-              <caret line="37" column="44" lean-forward="false" selection-start-line="37" selection-start-column="44" selection-end-line="37" selection-end-column="44" />
+              <caret line="37" column="60" lean-forward="false" selection-start-line="37" selection-start-column="60" selection-end-line="37" selection-end-column="60" />
               <folding>
-                <element signature="e#2783#2784#0" expanded="true" />
-                <element signature="e#2827#2828#0" expanded="true" />
+                <element signature="e#2782#2783#0" expanded="true" />
+                <element signature="e#2826#2827#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -3175,7 +3168,6 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/songs/dialog/adapter/PlaylistDialogAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/PlaylistSongs/adapter/PlaylistSongsAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/activities/artistsonglist/ArtistSongsListAdapter.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/browse/BrowseAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/browse_list_activity.xml" />
@@ -3209,6 +3201,7 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/browse/BrowseActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/data/model/PlayList.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" />
       </list>
     </option>
   </component>
@@ -3284,6 +3277,30 @@
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
+            </path>
+            <path>
+              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
+            </path>
+            <path>
+              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="player" type="72ca9032:PsiDirectoryNodeCustom" />
+            </path>
+            <path>
+              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="player" type="72ca9032:PsiDirectoryNodeCustom" />
+              <item name="mediasession" type="72ca9032:PsiDirectoryNodeCustom" />
             </path>
             <path>
               <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
@@ -3425,7 +3442,7 @@
     <property name="last.edited.regexp" value="[ooooo]hhjj huu" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1529916774263" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1529917118118" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="android.profiler.active" value="true" />
   </component>
@@ -4111,10 +4128,10 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
-          <caret line="37" column="44" lean-forward="false" selection-start-line="37" selection-start-column="44" selection-end-line="37" selection-end-column="44" />
+          <caret line="37" column="60" lean-forward="false" selection-start-line="37" selection-start-column="60" selection-end-line="37" selection-end-column="60" />
           <folding>
-            <element signature="e#2783#2784#0" expanded="true" />
-            <element signature="e#2827#2828#0" expanded="true" />
+            <element signature="e#2782#2783#0" expanded="true" />
+            <element signature="e#2826#2827#0" expanded="true" />
           </folding>
         </state>
       </provider>

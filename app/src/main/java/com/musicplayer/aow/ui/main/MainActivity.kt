@@ -685,21 +685,21 @@ class MainActivity : BaseActivity(),
     private val mMediaBrowserCompatConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
             super.onConnected()
-            Log.e(this.javaClass.name, "i am connected")
             try {
                 // Get the token for the MediaSession
                 val token: MediaSessionCompat.Token = mMediaBrowserCompat!!.sessionToken
-                Log.e(this.javaClass.name, "Token is ${token}")
                 // Create a MediaControllerCompat
-                val mediaController = MediaControllerCompat(this@MainActivity, // Context
+                mMediaControllerCompat = MediaControllerCompat(this@MainActivity, // Context
                         token)
                 // Save the controller
-                MediaControllerCompat.setMediaController(this@MainActivity, mediaController);
+                MediaControllerCompat.setMediaController(this@MainActivity, mMediaControllerCompat);
                 MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
-                MediaControllerCompat.getMediaController(this@MainActivity).transportControls.pause()
+                MediaControllerCompat.getMediaController(this@MainActivity).transportControls.play()
+
+                mMediaControllerCompat!!.registerCallback(mMediaControllerCompatCallback)
                 
             } catch (e: RemoteException) {
-                Log.e(this.javaClass.name, "error")
+                Toast.makeText(applicationContext, "connection error to ms", Toast.LENGTH_SHORT).show()
                 Log.e(this.javaClass.name, e.localizedMessage)
             }
 
@@ -737,25 +737,18 @@ class MainActivity : BaseActivity(),
 
     fun testMediaSession(){
 
-        if (mMediaBrowserCompat?.isConnected!!) {
-            Toast.makeText(applicationContext, "i am connected to ms", Toast.LENGTH_SHORT).show()
             MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
             if (mCurrentState == STATE_PAUSED) {
-                Toast.makeText(applicationContext, "i am playing ms", Toast.LENGTH_SHORT).show()
                 MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.play()
                 mCurrentState = STATE_PLAYING
             } else {
-                Toast.makeText(applicationContext, "i am plaused ms", Toast.LENGTH_SHORT).show()
                 if (MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
                     MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.pause()
                 }
 
                 mCurrentState = STATE_PAUSED
             }
-            mMediaControllerCompat!!.registerCallback(mMediaControllerCompatCallback)
-        } else {
-            Toast.makeText(applicationContext, "i am not connected to ms", Toast.LENGTH_SHORT).show()
-        }
+
     }
 
     override fun onStart() {
@@ -766,9 +759,9 @@ class MainActivity : BaseActivity(),
         }
         
         //mediasession connect
-        mMediaBrowserCompat!!.connect()
-
-
+        if(!mMediaBrowserCompat!!.isConnected) {
+            mMediaBrowserCompat!!.connect()
+        }
     }
 
     override fun onResume() {
@@ -777,7 +770,6 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onStop() {
-        mMediaBrowserCompat?.disconnect()
         mHandler.removeCallbacks(mProgressCallback)
         ApplicationSettings().ShakeWithSensorDetectorStop()
         super.onStop()

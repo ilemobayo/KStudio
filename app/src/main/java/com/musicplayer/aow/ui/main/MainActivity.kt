@@ -3,7 +3,6 @@ package com.musicplayer.aow.ui.main
 import android.Manifest
 import android.app.Activity
 import android.app.SearchManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -11,26 +10,19 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.os.RemoteException
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import com.github.nisrulz.sensey.Sensey
 import com.google.firebase.auth.FirebaseAuth
 import com.karumi.dexter.Dexter
@@ -116,10 +108,6 @@ class MainActivity : BaseActivity(),
         tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
         // set a custom status bar drawable
         tintManager.setStatusBarTintResource(R.color.black)
-
-        //mediasession
-        mMediaBrowserCompat = MediaBrowserCompat(this, ComponentName(this, PlayerService::class.java),
-                mMediaBrowserCompatConnectionCallback, null)
 
         namePlayback = findViewById(R.id.text_view_name)
         artistPlayback = findViewById(R.id.text_view_artist)
@@ -675,93 +663,13 @@ class MainActivity : BaseActivity(),
     /**
      * MEDIASESSION INTEGRATION
      */
-    private val STATE_PAUSED = 0
-    private val STATE_PLAYING = 1
 
-    private var mCurrentState: Int = 0
-
-    private var mMediaBrowserCompat: MediaBrowserCompat? = null
-    private var mMediaControllerCompat: MediaControllerCompat? = null
-
-    private val mMediaBrowserCompatConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
-        override fun onConnected() {
-            super.onConnected()
-            try {
-                // Get the token for the MediaSession
-                val token: MediaSessionCompat.Token = mMediaBrowserCompat!!.sessionToken
-                // Create a MediaControllerCompat
-                mMediaControllerCompat = MediaControllerCompat(this@MainActivity, // Context
-                        token)
-                // Save the controller
-                MediaControllerCompat.setMediaController(this@MainActivity, mMediaControllerCompat);
-                MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
-                MediaControllerCompat.getMediaController(this@MainActivity).transportControls.play()
-
-                mMediaControllerCompat!!.registerCallback(mMediaControllerCompatCallback)
-                
-            } catch (e: RemoteException) {
-                Toast.makeText(applicationContext, "connection error to ms", Toast.LENGTH_SHORT).show()
-                Log.e(this.javaClass.name, e.localizedMessage)
-            }
-
-        }
-
-        override fun onConnectionFailed() {
-            super.onConnectionFailed()
-            Log.e(this.javaClass.name, "connection error")
-        }
-
-        override fun onConnectionSuspended() {
-            super.onConnectionSuspended()
-            Log.e(this.javaClass.name, "connection suspended")
-        }
-    }
-
-    private val mMediaControllerCompatCallback = object : MediaControllerCompat.Callback() {
-
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            super.onPlaybackStateChanged(state)
-            if (state == null) {
-                return
-            }
-
-            when (state.state) {
-                PlaybackStateCompat.STATE_PLAYING -> {
-                    mCurrentState = STATE_PLAYING
-                }
-                PlaybackStateCompat.STATE_PAUSED -> {
-                    mCurrentState = STATE_PAUSED
-                }
-            }
-        }
-    }
-
-    fun testMediaSession(){
-
-            //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
-            if (mCurrentState == STATE_PAUSED) {
-                MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.play()
-                mCurrentState = STATE_PLAYING
-            } else {
-                if (MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
-                    MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.pause()
-                }
-
-                mCurrentState = STATE_PAUSED
-            }
-
-    }
 
     override fun onStart() {
         super.onStart()
         if (mPlayer != null && mPlayer!!.isPlaying) {
             mHandler.removeCallbacks(mProgressCallback)
             mHandler.post(mProgressCallback)
-        }
-        
-        //mediasession connect
-        if(!mMediaBrowserCompat!!.isConnected) {
-            mMediaBrowserCompat!!.connect()
         }
     }
 
@@ -771,10 +679,6 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onStop() {
-        //mediasession connect
-        if(mMediaBrowserCompat!!.isConnected) {
-            mMediaBrowserCompat!!.disconnect()
-        }
         mHandler.removeCallbacks(mProgressCallback)
         ApplicationSettings().ShakeWithSensorDetectorStop()
         super.onStop()
@@ -786,16 +690,6 @@ class MainActivity : BaseActivity(),
         Sensey.getInstance().stop()
         ApplicationSettings.instance?.ShakeWithSensorDetectorDestroy()
         super.onDestroy()
-        if (MediaControllerCompat.getMediaController(this) != null) {
-            MediaControllerCompat.getMediaController(this).unregisterCallback(mMediaControllerCompatCallback)
-        }
-//        if (MediaControllerCompat.getMediaController(this).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
-//            MediaControllerCompat.getMediaController(this).transportControls.pause()
-//        }
-
-        if(mMediaBrowserCompat!!.isConnected) {
-            mMediaBrowserCompat!!.disconnect()
-        }
     }
 
     companion object {

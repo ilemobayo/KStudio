@@ -30,30 +30,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="802cfee9-ba4f-4498-80d2-30d9077e4342" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerCallback.kt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/main2.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/main2.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -112,7 +95,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2120">
-              <caret line="295" column="83" lean-forward="true" selection-start-line="295" selection-start-column="83" selection-end-line="295" selection-end-column="83" />
+              <caret line="295" column="31" lean-forward="false" selection-start-line="295" selection-start-column="31" selection-end-line="295" selection-end-column="31" />
               <folding>
                 <element signature="e#46#1046#0" expanded="true" />
               </folding>
@@ -133,10 +116,10 @@
       <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="440" column="10" lean-forward="false" selection-start-line="440" selection-start-column="10" selection-end-line="440" selection-end-column="10" />
+            <state relative-caret-position="119">
+              <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
               <folding>
-                <marker date="1530167576347" expanded="true" signature="28432:28438" ph="{...}" />
+                <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -3241,8 +3224,8 @@
         <option value="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
       </list>
     </option>
   </component>
@@ -3381,7 +3364,7 @@
     <property name="last.edited.regexp" value="[ooooo]hhjj huu" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530167794533" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530167980530" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="android.profiler.active" value="true" />
   </component>
@@ -4054,7 +4037,7 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2120">
-          <caret line="295" column="83" lean-forward="true" selection-start-line="295" selection-start-column="83" selection-end-line="295" selection-end-column="83" />
+          <caret line="295" column="31" lean-forward="false" selection-start-line="295" selection-start-column="31" selection-end-line="295" selection-end-column="31" />
           <folding>
             <element signature="e#46#1046#0" expanded="true" />
           </folding>
@@ -4063,10 +4046,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="440" column="10" lean-forward="false" selection-start-line="440" selection-start-column="10" selection-end-line="440" selection-end-column="10" />
+        <state relative-caret-position="119">
+          <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
           <folding>
-            <marker date="1530167576347" expanded="true" signature="28432:28438" ph="{...}" />
+            <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
           </folding>
         </state>
       </provider>

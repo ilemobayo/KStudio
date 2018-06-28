@@ -33,10 +33,14 @@
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -81,11 +85,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PlaybackService.kt" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PlaybackService.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="138" column="38" lean-forward="false" selection-start-line="138" selection-start-column="38" selection-end-line="138" selection-end-column="38" />
+            <state relative-caret-position="-361">
+              <caret line="142" column="27" lean-forward="false" selection-start-line="142" selection-start-column="27" selection-end-line="142" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -113,25 +117,28 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+      <file leaf-file-name="MediaStyleHelper.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
+            <state relative-caret-position="417">
+              <caret line="32" column="32" lean-forward="false" selection-start-line="32" selection-start-column="32" selection-end-line="35" selection-end-column="17" />
               <folding>
-                <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
+                <element signature="e#59#369#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MediaStyleHelper.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
+      <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="31" column="34" lean-forward="false" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
+            <state relative-caret-position="4903">
+              <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
               <folding>
-                <element signature="e#59#369#0" expanded="true" />
+                <element signature="e#5994#6040#0" expanded="true" />
+                <element signature="e#6530#6561#1" expanded="true" />
+                <element signature="e#6563#6595#1" expanded="true" />
+                <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -3224,8 +3231,8 @@
         <option value="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
       </list>
     </option>
   </component>
@@ -3325,6 +3332,15 @@
           <expand>
             <path>
               <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+            </path>
+            <path>
+              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+            </path>
+            <path>
+              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
               <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
             </path>
           </expand>
@@ -3364,7 +3380,7 @@
     <property name="last.edited.regexp" value="[ooooo]hhjj huu" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530167980530" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530175187129" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="android.profiler.active" value="true" />
   </component>
@@ -3629,7 +3645,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.5833333" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962178" sideWeight="0.49333334" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2375189" sideWeight="0.7216667" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2375189" sideWeight="0.7216667" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Color Manager" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3161876" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Compute Code Lines" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
@@ -3992,16 +4008,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="31" column="34" lean-forward="false" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
-          <folding>
-            <element signature="e#59#369#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
@@ -4026,11 +4032,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="138" column="38" lean-forward="false" selection-start-line="138" selection-start-column="38" selection-end-line="138" selection-end-column="38" />
-          <folding />
+        <state relative-caret-position="4903">
+          <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
+          <folding>
+            <element signature="e#5994#6040#0" expanded="true" />
+            <element signature="e#6530#6561#1" expanded="true" />
+            <element signature="e#6563#6595#1" expanded="true" />
+            <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -4044,13 +4055,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="664" column="7" lean-forward="false" selection-start-line="664" selection-start-column="7" selection-end-line="664" selection-end-column="7" />
+        <state relative-caret-position="417">
+          <caret line="32" column="32" lean-forward="false" selection-start-line="32" selection-start-column="32" selection-end-line="35" selection-end-column="17" />
           <folding>
-            <marker date="1530168321029" expanded="true" signature="23991:23997" ph="{...}" />
+            <element signature="e#59#369#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-361">
+          <caret line="142" column="27" lean-forward="false" selection-start-line="142" selection-start-column="27" selection-end-line="142" selection-end-column="27" />
+          <folding />
         </state>
       </provider>
     </entry>

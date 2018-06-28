@@ -15,6 +15,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.provider.MediaStore
 import android.support.v4.app.NotificationCompat
+import android.support.v4.media.session.MediaButtonReceiver
+import android.support.v4.media.session.PlaybackStateCompat
 import android.webkit.URLUtil
 import android.widget.RemoteViews
 import com.bumptech.glide.Glide
@@ -99,9 +101,13 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                     }
                 }
             } else if (ACTION_PLAY_NEXT == action) {
-                playNext()
+                if (successfullyRetrievedAudioFocus()) {
+                    playNext()
+                }
             } else if (ACTION_PLAY_LAST == action) {
-                playLast()
+                if (successfullyRetrievedAudioFocus()) {
+                    playLast()
+                }
             } else if (ACTION_STOP_SERVICE == action) {
                 if (isPlaying) {
                     pause()
@@ -134,7 +140,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     override fun stopService(name: Intent): Boolean {
-        //stopForeground(true)
+        stopForeground(true)
         unregisterCallback(this)
         return super.stopService(name)
     }
@@ -221,7 +227,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     override fun onTriggerLoading(isLoading: Boolean) {
-        //showNotification()
+        showNotification()
     }
 
     // Notification
@@ -239,9 +245,14 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                 .setSmallIcon(R.drawable.ic_logo)  // the status icon
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                .setDeleteIntent(
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                applicationContext, PlaybackStateCompat.ACTION_STOP)
+                )
                 .setCustomContentView(smallContentView)
                 .setCustomBigContentView(bigContentView)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)
                 .build()
 

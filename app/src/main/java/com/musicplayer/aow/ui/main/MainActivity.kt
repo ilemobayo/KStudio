@@ -50,11 +50,11 @@ import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.event.PlaySongEvent
 import com.musicplayer.aow.delegates.firebase.ForceUpdateChecker
 import com.musicplayer.aow.delegates.player.*
-import com.musicplayer.aow.delegates.player.mediasession.BackgroundAudioService
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.ui.auth.AuthActivity
 import com.musicplayer.aow.ui.base.BaseActivity
 import com.musicplayer.aow.ui.eq.EqActivity
+import com.musicplayer.aow.ui.event.EventsListActivity
 import com.musicplayer.aow.ui.main.library.LibraryAdapter
 import com.musicplayer.aow.ui.main.search.SearchActivity
 import com.musicplayer.aow.ui.music.MusicPlayerActivity
@@ -106,7 +106,7 @@ class MainActivity : BaseActivity(),
         //window.setBackgroundDrawable(null)
         val tintManager = SystemBarTintManager(this)
         // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
+        tintManager.isStatusBarTintEnabled = false
         // enable navigation bar tint
         tintManager.setNavigationBarTintEnabled(true)
 
@@ -118,7 +118,7 @@ class MainActivity : BaseActivity(),
         tintManager.setStatusBarTintResource(R.color.black)
 
         //mediasession
-        mMediaBrowserCompat = MediaBrowserCompat(this, ComponentName(this, BackgroundAudioService::class.java),
+        mMediaBrowserCompat = MediaBrowserCompat(this, ComponentName(this, PlayerService::class.java),
                 mMediaBrowserCompatConnectionCallback, null)
 
         namePlayback = findViewById(R.id.text_view_name)
@@ -253,10 +253,10 @@ class MainActivity : BaseActivity(),
 //                val intent = Intent(applicationContext, IdentifySoundActivity::class.java)
 //                startActivity(intent)
 //            }
-//            R.id.nav_event -> {
-//                val intent = Intent(applicationContext, EventsListActivity::class.java)
-//                startActivity(intent)
-//            }
+            R.id.nav_event -> {
+                val intent = Intent(applicationContext, EventsListActivity::class.java)
+                startActivity(intent)
+            }
 //            R.id.nav_record -> {
 //                val intent = Intent(applicationContext, VoiceRecorderActivity::class.java)
 //                startActivity(intent)
@@ -435,9 +435,10 @@ class MainActivity : BaseActivity(),
         } else {
             audioFocus!!.play()
             mPlayer!!.play()
-            //test MediaSession
-            testMediaSession()
         }
+
+        //test MediaSession
+        //testMediaSession()
     }
 
     // Player Callbacks
@@ -737,7 +738,7 @@ class MainActivity : BaseActivity(),
 
     fun testMediaSession(){
 
-            MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
+            //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
             if (mCurrentState == STATE_PAUSED) {
                 MediaControllerCompat(this, mMediaBrowserCompat!!.sessionToken).transportControls.play()
                 mCurrentState = STATE_PLAYING
@@ -770,6 +771,10 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onStop() {
+        //mediasession connect
+        if(mMediaBrowserCompat!!.isConnected) {
+            mMediaBrowserCompat!!.disconnect()
+        }
         mHandler.removeCallbacks(mProgressCallback)
         ApplicationSettings().ShakeWithSensorDetectorStop()
         super.onStop()
@@ -788,7 +793,9 @@ class MainActivity : BaseActivity(),
 //            MediaControllerCompat.getMediaController(this).transportControls.pause()
 //        }
 
-        mMediaBrowserCompat?.disconnect()
+        if(mMediaBrowserCompat!!.isConnected) {
+            mMediaBrowserCompat!!.disconnect()
+        }
     }
 
     companion object {

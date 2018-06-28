@@ -1,6 +1,5 @@
 package com.musicplayer.aow.delegates.player
 
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.Equalizer
 import android.webkit.URLUtil
@@ -23,8 +22,7 @@ import java.util.*
  */
 class Player private constructor() : IPlayback,
         MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnBufferingUpdateListener,
-        AudioManager.OnAudioFocusChangeListener {
+        MediaPlayer.OnBufferingUpdateListener {
 
     override var mPlayer: MediaPlayer? = null
 
@@ -54,6 +52,7 @@ class Player private constructor() : IPlayback,
         Equalizer(0, mPlayer!!.audioSessionId)
         mPlayList = PlayList()
         mPlayer!!.setOnCompletionListener(this)
+        mPlayer!!.setAuxEffectSendLevel(1.0f)
         //mediaPlayer!!.setOnBufferingUpdateListener(this)
     }
 
@@ -315,11 +314,6 @@ class Player private constructor() : IPlayback,
         for (callback in mCallbacks) {
             callback.onComplete(song)
         }
-    }
-
-    //Audio Focus
-    override fun onAudioFocusChange(focusChange: Int) {
-        //
     }
 
     companion object {

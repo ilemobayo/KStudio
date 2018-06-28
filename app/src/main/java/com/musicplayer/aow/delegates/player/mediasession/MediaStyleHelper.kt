@@ -34,6 +34,7 @@ object MediaStyleHelper {
                         MediaButtonReceiver.buildMediaButtonPendingIntent(
                                 context, PlaybackStateCompat.ACTION_STOP)
                 )
+                //.setColor(Injection.provideContext()!!.resources.getColor(R.color.white))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         return builder
     }

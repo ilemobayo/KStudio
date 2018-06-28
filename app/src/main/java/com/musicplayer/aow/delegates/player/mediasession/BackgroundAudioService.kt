@@ -24,6 +24,8 @@ import java.io.IOException
 import java.util.*
 
 class BackgroundAudioService : MediaBrowserServiceCompat(), MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
+
+
     private var mMediaPlayer: MediaPlayer? = null
     private var mMediaSessionCompat: MediaSessionCompat? = null
     private val mPlaylist = ArrayList<Song>()

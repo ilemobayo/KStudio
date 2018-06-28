@@ -225,14 +225,9 @@
         <activity android:name=".ui.acrcloud.IdentifySoundActivity" />
         <activity android:name=".ui.main.search.SearchActivity" />
 
-        <service
-            android:name=".delegates.softcode.adapters.MXLiveService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".ui.main.library.home.artist.ArtistOnline" />
 
-        <service android:name=".delegates.player.mediasession.BackgroundAudioService">
+        <service android:name=".delegates.player.PlayerService">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />

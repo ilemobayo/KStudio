@@ -22,7 +22,7 @@
             android:layout_height="52dp"
             android:title="@string/application_name"
             toolbar:title="@string/application_name"
-            toolbar:subtitle="play your music on the go"
+            toolbar:subtitle="Music with style"
             toolbar:titleTextColor="@color/black"
             android:fitsSystemWindows="true"/>
 

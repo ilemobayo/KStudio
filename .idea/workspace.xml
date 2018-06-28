@@ -30,8 +30,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="802cfee9-ba4f-4498-80d2-30d9077e4342" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerCallback.kt" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
@@ -42,12 +42,18 @@
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackBRService.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackStatus.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/main2.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/main2.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -92,25 +98,46 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="BackgroundAudioService.kt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt">
+      <file leaf-file-name="PlaybackService.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="151" column="175" lean-forward="false" selection-start-line="151" selection-start-column="175" selection-end-line="151" selection-end-column="175" />
+            <state relative-caret-position="194">
+              <caret line="138" column="38" lean-forward="false" selection-start-line="138" selection-start-column="38" selection-end-line="138" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PlayerService.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2120">
+              <caret line="295" column="83" lean-forward="true" selection-start-line="295" selection-start-column="83" selection-end-line="295" selection-end-column="83" />
               <folding>
-                <element signature="e#59#955#0" expanded="true" />
-                <element signature="e#9935#9971#1" expanded="true" />
+                <element signature="e#46#1046#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PlaybackService.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
+      <file leaf-file-name="Player.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-218">
-              <caret line="28" column="6" lean-forward="false" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
+            <state relative-caret-position="78">
+              <caret line="308" column="39" lean-forward="false" selection-start-line="308" selection-start-column="39" selection-end-line="308" selection-end-column="39" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="177">
+              <caret line="440" column="10" lean-forward="false" selection-start-line="440" selection-start-column="10" selection-end-line="440" selection-end-column="10" />
+              <folding>
+                <marker date="1530167576347" expanded="true" signature="28432:28438" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -118,21 +145,21 @@
       <file leaf-file-name="MediaStyleHelper.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="93">
-              <caret line="15" column="60" lean-forward="false" selection-start-line="15" selection-start-column="60" selection-end-line="15" selection-end-column="60" />
-              <folding />
+            <state relative-caret-position="400">
+              <caret line="31" column="34" lean-forward="false" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
+              <folding>
+                <element signature="e#59#369#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+      <file leaf-file-name="EqActivity.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10973">
-              <caret line="762" column="43" lean-forward="false" selection-start-line="762" selection-start-column="43" selection-end-line="762" selection-end-column="43" />
-              <folding>
-                <marker date="1529931754642" expanded="true" signature="28277:28283" ph="{...}" />
-              </folding>
+            <state relative-caret-position="224">
+              <caret line="76" column="58" lean-forward="false" selection-start-line="76" selection-start-column="58" selection-end-line="76" selection-end-column="58" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -148,8 +175,8 @@
         <option value="layoutResourceFile" />
         <option value="resourceFile" />
         <option value="Class" />
-        <option value="Kotlin Interface" />
         <option value="Kotlin File" />
+        <option value="Kotlin Interface" />
       </list>
     </option>
   </component>
@@ -3165,21 +3192,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/softcode/adapters/onlinefavorites/playlist/PlayListFavDatabase.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/softcode/adapters/onlinefavorites/song/SongFavDatabase.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/data/source/AppLocalDataSource.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/DiscoveryFragment.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/softcode/adapters/placeholder/PlaceholderDataNoMember.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/utils/CursorDB.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/searchaudio/SearchAudio.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/utils/receiver/RunAfterBootService.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/activities/albumsonglist/AlbumSongListAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/utils/StorageUtil.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/songs/dialog/adapter/PlaylistDialogSLAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/songs/dialog/adapter/PlaylistDialogAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/PlaylistSongs/adapter/PlaylistSongsAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/activities/artistsonglist/ArtistSongsListAdapter.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/browse/BrowseAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/browse_list_activity.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/search/adapter/SearchSectionAdapter.kt" />
@@ -3188,7 +3205,6 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fragment_offline_playlist.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/offline/OfflinePlaylistAdapter.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/PlayListAdapter.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/PlayListsFragment.kt" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fragment_play_lists.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_play_list_details.xml" />
@@ -3212,17 +3228,29 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/browse/BrowseActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/data/model/PlayList.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerCallback.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/res/menu/main2.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/values/styles.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-7" />
-    <option name="width" value="1380" />
-    <option name="height" value="745" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="754" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -3259,22 +3287,7 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="KStudio" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KStudio" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="KStudio" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KStudio" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -3329,52 +3342,28 @@
           <expand>
             <path>
               <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="player" type="72ca9032:PsiDirectoryNodeCustom" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="aow" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="delegates" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="player" type="72ca9032:PsiDirectoryNodeCustom" />
-              <item name="mediasession" type="72ca9032:PsiDirectoryNodeCustom" />
-            </path>
-            <path>
-              <item name="KStudio" type="1abcf292:AndroidViewProjectNode" />
               <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="KStudio" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KStudio" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+            </path>
+            <path>
+              <item name="KStudio" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KStudio" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -3392,7 +3381,7 @@
     <property name="last.edited.regexp" value="[ooooo]hhjj huu" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530004461810" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1530167794533" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="android.profiler.active" value="true" />
   </component>
@@ -3625,7 +3614,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="1380" height="745" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="ADC" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -3636,14 +3625,14 @@
       <window_info id="jsonformat" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32980332" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Material Palette" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="false" weight="0.6716667" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.58714044" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.59" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="JSON Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32833335" sideWeight="0.5" order="19" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="AdbCommander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="BugVM" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.5109983" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" x="40" y="468" width="1322" height="229" />
-      <window_info id="Anko Layout Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21666667" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" x="95" y="69" width="1176" height="600" />
+      <window_info id="Anko Layout Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21633889" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" x="95" y="69" width="1176" height="600" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962178" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.8233333" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.67" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -3657,7 +3646,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.5833333" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962178" sideWeight="0.49333334" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22424242" sideWeight="0.7216667" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2375189" sideWeight="0.7216667" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Color Manager" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3161876" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Compute Code Lines" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
@@ -3673,7 +3662,7 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43333334" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="92" y="92" width="1182" height="554" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21363637" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21331316" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32994923" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -3687,88 +3676,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/auth/ProfileActivity.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="24" column="26" lean-forward="true" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/musicplayer/aow/delegates/data/model/PlayList.java" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/songs/AllSongsFragment.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1115">
-          <caret line="85" column="69" lean-forward="true" selection-start-line="85" selection-start-column="69" selection-end-line="85" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/utils/CursorDB.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="45" column="8" lean-forward="false" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-167">
-          <caret line="97" column="38" lean-forward="false" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/browse_list_activity.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-13">
-          <caret line="111" column="53" lean-forward="false" selection-start-line="111" selection-start-column="53" selection-end-line="111" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/search/adapter/SearchAdapter.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="45" column="32" lean-forward="true" selection-start-line="45" selection-start-column="32" selection-end-line="45" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/search/adapter/SearchSectionAdapter.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="55" column="65" lean-forward="false" selection-start-line="55" selection-start-column="65" selection-end-line="55" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/home/browse/BrowseAdapter.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="68" column="46" lean-forward="false" selection-start-line="68" selection-start-column="46" selection-end-line="68" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/playlist/PlayListAction.kt" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/bottomsheet_layout.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="31" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/library/LibraryAdapter.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="10" column="49" lean-forward="true" selection-start-line="10" selection-start-column="49" selection-end-line="10" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_play_lists.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
@@ -3799,25 +3706,6 @@
         <state relative-caret-position="194">
           <caret line="43" column="8" lean-forward="true" selection-start-line="43" selection-start-column="8" selection-end-line="54" selection-end-column="59" />
         </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="204" column="17" lean-forward="false" selection-start-line="204" selection-start-column="17" selection-end-line="204" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="22" column="62" lean-forward="true" selection-start-line="22" selection-start-column="62" selection-end-line="22" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_offline_playlist.xml">
@@ -3978,13 +3866,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/build/generated/source/kapt/debug/com/musicplayer/aow/delegates/softcode/adapters/onlinefavorites/playlist/PlaylistFavDAO_Impl.java" />
-    <entry file="file://$PROJECT_DIR$/app/versions/media session/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="579" column="0" lean-forward="false" selection-start-line="579" selection-start-column="0" selection-end-line="579" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/data/model/PlayList.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -3997,31 +3878,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="252" column="1" lean-forward="false" selection-start-line="252" selection-start-column="1" selection-end-line="252" selection-end-column="1" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackBRService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="10" column="24" lean-forward="false" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackStatus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="12" lean-forward="false" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackBRService.java" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackStatus.java" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MusicLibrary.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="19" column="13" lean-forward="false" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -4033,39 +3898,175 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/IPlayback.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10973">
-          <caret line="762" column="43" lean-forward="false" selection-start-line="762" selection-start-column="43" selection-end-line="762" selection-end-column="43" />
+        <state relative-caret-position="204">
+          <caret line="16" column="44" lean-forward="true" selection-start-line="16" selection-start-column="44" selection-end-line="16" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider editor-type-id="android-manifest">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="103">
+          <caret line="231" column="41" lean-forward="true" selection-start-line="231" selection-start-column="41" selection-end-line="231" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerCallback.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="5" column="35" lean-forward="false" selection-start-line="5" selection-start-column="35" selection-end-line="5" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/versions/media session/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="709">
+          <caret line="579" column="0" lean-forward="false" selection-start-line="579" selection-start-column="0" selection-end-line="579" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_search.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="39" lean-forward="false" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/main2.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="45" lean-forward="false" selection-start-line="10" selection-start-column="45" selection-end-line="10" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="449">
+          <caret line="27" column="27" lean-forward="true" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
           <folding>
-            <marker date="1529931754642" expanded="true" signature="28277:28283" ph="{...}" />
+            <element signature="e#734#749#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/app_bar_main.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="24" column="46" lean-forward="false" selection-start-line="24" selection-start-column="46" selection-end-line="24" selection-end-column="46" />
+          <folding>
+            <element signature="e#1002#1028#0" expanded="false" />
+            <element signature="e#1055#1081#0" expanded="false" />
+            <element signature="e#1381#1421#0" expanded="false" />
+            <element signature="e#4448#4488#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/doc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="84" column="16" lean-forward="false" selection-start-line="84" selection-start-column="16" selection-end-line="84" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="40" column="68" lean-forward="false" selection-start-line="40" selection-start-column="68" selection-end-line="40" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/eq/EqActivity.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="76" column="58" lean-forward="false" selection-start-line="76" selection-start-column="58" selection-end-line="76" selection-end-column="58" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/MediaStyleHelper.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="93">
-          <caret line="15" column="60" lean-forward="false" selection-start-line="15" selection-start-column="60" selection-end-line="15" selection-end-column="60" />
+        <state relative-caret-position="400">
+          <caret line="31" column="34" lean-forward="false" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
+          <folding>
+            <element signature="e#59#369#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/Player.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="308" column="39" lean-forward="false" selection-start-line="308" selection-start-column="39" selection-end-line="308" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/AudioFocus.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1258">
+          <caret line="76" column="14" lean-forward="false" selection-start-line="76" selection-start-column="14" selection-end-line="76" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/utils/receiver/AudioNoisy.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="11" column="6" lean-forward="false" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlaybackService.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-218">
-          <caret line="28" column="6" lean-forward="false" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
+        <state relative-caret-position="194">
+          <caret line="138" column="38" lean-forward="false" selection-start-line="138" selection-start-column="38" selection-end-line="138" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/mediasession/BackgroundAudioService.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/delegates/player/PlayerService.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="151" column="175" lean-forward="false" selection-start-line="151" selection-start-column="175" selection-end-line="151" selection-end-column="175" />
+        <state relative-caret-position="2120">
+          <caret line="295" column="83" lean-forward="true" selection-start-line="295" selection-start-column="83" selection-end-line="295" selection-end-column="83" />
           <folding>
-            <element signature="e#59#955#0" expanded="true" />
-            <element signature="e#9935#9971#1" expanded="true" />
+            <element signature="e#46#1046#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/musicplayer/aow/ui/main/MainActivity.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="440" column="10" lean-forward="false" selection-start-line="440" selection-start-column="10" selection-end-line="440" selection-end-column="10" />
+          <folding>
+            <marker date="1530167576347" expanded="true" signature="28432:28438" ph="{...}" />
           </folding>
         </state>
       </provider>

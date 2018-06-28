@@ -3,6 +3,8 @@ package com.musicplayer.aow.delegates.player
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
@@ -26,7 +28,7 @@ import com.musicplayer.aow.utils.receiver.AudioNoisy
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.onComplete
 
-class PlaybackService : Service(), IPlayback, IPlayback.Callback {
+class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.OnAudioFocusChangeListener {
 
     override val mPlayer: MediaPlayer?
         get() = null
@@ -37,9 +39,6 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
 
     var mediaPlayer: Player? = Player.instance
 
-    private var audioFocus = AudioFocus.instance
-    
-    private var mNoisyIntentFilter: IntentFilter? = null
     private var mAudioBecommingNoisy: AudioNoisy? = null
 
     private val mBinder = LocalBinder()
@@ -85,8 +84,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
         super.onCreate()
         mediaPlayer = Player.instance
         mediaPlayer!!.registerCallback(this)
-        mAudioBecommingNoisy = AudioNoisy()
-        mNoisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        initNoisyReceiver()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -94,15 +92,11 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
             val action = intent.action
             if (ACTION_PLAY_TOGGLE == action) {
                 if (isPlaying) {
-                    audioFocus!!.pause()
-                    if (mediaPlayer!!.isPlaying) {
-                        //unregisterReceiver(mAudioBecommingNoisy);
-                    }
                     pause()
                 } else {
-                    audioFocus!!.play()
-                    registerReceiver(mAudioBecommingNoisy, mNoisyIntentFilter)
-                    play()
+                    if (successfullyRetrievedAudioFocus()) {
+                        play()
+                    }
                 }
             } else if (ACTION_PLAY_NEXT == action) {
                 playNext()
@@ -110,18 +104,16 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
                 playLast()
             } else if (ACTION_STOP_SERVICE == action) {
                 if (isPlaying) {
-                    audioFocus!!.pause()
                     pause()
                 }
-                stopForeground(true)
-                //unregisterReceiver(mAudioBecommingNoisy);
-                //unregisterCallback(this)
             }
         }else{
             if (isPlaying) {
                 pause()
             } else {
-                play()
+                if (successfullyRetrievedAudioFocus()) {
+                    play()
+                }
             }
         }
         return START_STICKY_COMPATIBILITY
@@ -138,20 +130,20 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
     fun recreate(){
         mediaPlayer = Player.instance
         mediaPlayer!!.registerCallback(this)
-        mAudioBecommingNoisy = AudioNoisy()
-        mNoisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        initNoisyReceiver()
     }
 
     override fun stopService(name: Intent): Boolean {
-        stopForeground(true)
+        //stopForeground(true)
         unregisterCallback(this)
-        //unregisterReceiver(mAudioBecommingNoisy)
         return super.stopService(name)
     }
 
     override fun onDestroy() {
         releasePlayer()
-        //unregisterReceiver(mAudioBecommingNoisy)
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.abandonAudioFocus(this)
+        unregisterReceiver(mNoisyReceiver)
         super.onDestroy()
     }
 
@@ -209,9 +201,6 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
 
     override fun releasePlayer() {
         mediaPlayer!!.releasePlayer()
-        mediaPlayer = null
-        audioFocus = null
-        super.onDestroy()
     }
 
     // Playback Callbacks
@@ -232,7 +221,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
     }
 
     override fun onTriggerLoading(isLoading: Boolean) {
-        showNotification()
+        //showNotification()
     }
 
     // Notification
@@ -341,6 +330,55 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback {
             }
         }else{
             remoteView.setImageViewResource(R.id.image_view_album, R.drawable.gradient_danger)
+        }
+    }
+
+    private fun initNoisyReceiver() {
+        //Handles headphones coming unplugged. cannot be done through a manifest receiver
+        val filter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        registerReceiver(mNoisyReceiver, filter)
+    }
+
+    private fun successfullyRetrievedAudioFocus(): Boolean {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        val result = audioManager.requestAudioFocus(this,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+
+        return result == AudioManager.AUDIOFOCUS_GAIN
+    }
+
+    private val mNoisyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (isPlaying) {
+                pause()
+            }
+        }
+    }
+
+    override fun onAudioFocusChange(focusChange: Int) {
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                if (isPlaying) {
+                    pause()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                pause()
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                if (mediaPlayer != null) {
+                    mediaPlayer!!.mPlayer!!.setVolume(0.3f, 0.3f)
+                }
+            }
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                if (mediaPlayer != null) {
+                    if (!isPlaying) {
+                        play()
+                    }
+                    mediaPlayer!!.mPlayer!!.setVolume(1.0f, 1.0f)
+                }
+            }
         }
     }
 

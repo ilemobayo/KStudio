@@ -1,5 +1,6 @@
 package com.musicplayer.aow.ui.main.library.home.browse
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.widget.LinearLayoutManager
@@ -24,12 +25,15 @@ import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.song.SongFavDatabase
+import com.musicplayer.aow.delegates.softcode.adapters.placeholder.PlaceHolderSearchData
 import com.musicplayer.aow.delegates.softcode.adapters.placeholder.PlaceholderData
 import com.musicplayer.aow.ui.base.BaseActivity
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
 import com.readystatesoftware.systembartint.SystemBarTintManager
 import kotlinx.android.synthetic.main.browse_list_activity.*
 import org.jetbrains.anko.find
+import org.json.JSONArray
+import org.json.JSONException
 
 
 /**
@@ -75,55 +79,19 @@ class BrowseActivity: BaseActivity(){
             val tracks: PlayList = PlayList()
             if (data != null) {
                 val gson = Gson()
-                val placeholder = gson.fromJson(data, PlaceholderData::class.java)
-                toolbar.title = placeholder.name
-                item_name.text = placeholder.name
-                if (placeholder.type.equals("playlist", true)  || placeholder.type.equals("album", true)){
-                    item_owner.text = placeholder.owner
-                    item_element_list.text = placeholder.description
-                    tracks.name = placeholder.name
-                    tracks.picture = placeholder.picture
-                    tracks.mxp_id = placeholder._id
-                    placeholder.member.forEach {
-                        val song = Song(it.name,
-                                it.name,
-                                it.owner,
-                                "name",
-                                it.location,
-                                130000,
-                                1000,
-                                false,
-                                0,
-                                "",
-                                it.picture)
-                        song.mxp_id = it._id
-                        tracks.songs?.add(song)
-                    }
-                    //set favorite
-                    favorite(tracks, Song(), true)
-                }else{
-                    item_owner.text = placeholder.owner
-                    item_element_list.text = placeholder.description
-                    tracks.name = placeholder.name
-                    tracks.picture = placeholder.picture
-                    tracks.mxp_id = placeholder._id
-                    val song = Song(placeholder.name,
-                            placeholder.name,
-                            placeholder.owner,
-                            "name",
-                            placeholder.location,
-                            130000,
-                            1000,
-                            false,
-                            0,
-                            "",
-                            placeholder.picture)
-                    song.mxp_id = placeholder._id
-                    tracks.songs?.add(song)
-
-                    //set favorite
-                    favorite(PlayList(), song, false)
+                val host = intent.getStringExtra("host")
+                if(host != null) {
+                    val placeholder = gson.fromJson(data, PlaceHolderSearchData::class.java)
+                    toolbar.title = placeholder.name
+                    item_name.text = placeholder.name
+                    viewModelBrowser(null, placeholder, tracks)
+                }else {
+                    val placeholder = gson.fromJson(data, PlaceholderData::class.java)
+                    toolbar.title = placeholder.name
+                    item_name.text = placeholder.name
+                    viewModelBrowser(placeholder, null, tracks)
                 }
+
 
                 item_button_option.setOnClickListener {
                     val context = this
@@ -203,33 +171,51 @@ class BrowseActivity: BaseActivity(){
     }
 
     fun favorite(playList: PlayList, song: Song, isPlaylist: Boolean){
-        val fav = isFavorite(playList, song, isPlaylist)
-        item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
-        item_button_option_like.setOnClickListener {
-            //save to favorite
-            if (fav){
-                deleteFromFavorite(playList, song, isPlaylist)
-                item_button_option_like.
-                        setImageResource(
-                                if (isFavorite(playList, song, isPlaylist)) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no
-                        )
-            } else {
-                addToFavorite(playList, song, isPlaylist)
-                item_button_option_like.
-                        setImageResource(if (isFavorite(playList, song, isPlaylist)) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no
-                        )
-            }
+        if(isPlaylist) {
+            val fSong = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId(playList.mxp_id!!)
+            fSong?.observe(this, object: Observer<PlayList>{
+                override fun onChanged(t: PlayList?) {
+                    var fav = true
+                    fav = t != null
+                    item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+                    item_button_option_like.setOnClickListener {
+                        //save to favorite
+                        if (fav){
+                            deleteFromFavorite(playList, song, isPlaylist)
+                        } else {
+                            addToFavorite(playList, song, isPlaylist)
+                        }
+                    }
+                }
+            })
+        }else{
+            val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(song.path!!)
+            fSong?.observe(this, object: Observer<Song>{
+                override fun onChanged(t: Song?) {
+                    var fav = true
+                    fav = t != null
+                    item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+                    item_button_option_like.setOnClickListener {
+                        //save to favorite
+                        if (fav){
+                            deleteFromFavorite(playList, song, isPlaylist)
+                        } else {
+                            addToFavorite(playList, song, isPlaylist)
+                        }
+                    }
+                }
+            })
         }
+
     }
 
     fun isFavorite(playList: PlayList = PlayList(), song: Song = Song(), isPlaylist: Boolean = true): Boolean{
-        //Log.e(TAG, songFavDatabase?.songFavDAO()?.fetchAllSong()?.size.toString())
         if(isPlaylist) {
             val fSong = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId(playList.mxp_id!!)
-            return fSong != null
+            return fSong?.value != null
         }else{
             val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(song.path!!)
-            return fSong != null
+            return fSong?.value != null
         }
     }
 
@@ -247,6 +233,132 @@ class BrowseActivity: BaseActivity(){
             playListFavDatabase?.playlistFavDAO()?.deletePlayList(playList)
         }else{
             songFavDatabase?.songFavDAO()?.deleteSong(song)
+        }
+    }
+
+    private fun viewModelBrowser(data1: PlaceholderData? = null, data2: PlaceHolderSearchData? = null, tracks: PlayList){
+        if(data1 != null && data2 == null){
+            val placeholder = data1
+            if (placeholder.type.equals("playlist", true)  || placeholder.type.equals("album", true)){
+                item_owner.text = placeholder.owner
+                item_element_list.text = placeholder.description
+                tracks.name = placeholder.name
+                tracks.picture = placeholder.picture
+                tracks.mxp_id = placeholder._id
+                placeholder.member.forEach {
+                    val song = Song(it.name,
+                            it.name,
+                            it.owner,
+                            "name",
+                            it.location,
+                            130000,
+                            1000,
+                            false,
+                            0,
+                            "",
+                            it.picture)
+                    song.mxp_id = it._id
+                    tracks.songs?.add(song)
+                }
+                //set favorite
+                favorite(tracks, Song(), true)
+            }else{
+                item_owner.text = placeholder.owner
+                item_element_list.text = placeholder.description
+                tracks.name = placeholder.name
+                tracks.picture = placeholder.picture
+                tracks.mxp_id = placeholder._id
+                val song = Song(placeholder.name,
+                        placeholder.name,
+                        placeholder.owner,
+                        "name",
+                        placeholder.location,
+                        130000,
+                        1000,
+                        false,
+                        0,
+                        "",
+                        placeholder.picture)
+                song.mxp_id = placeholder._id
+                tracks.songs?.add(song)
+
+                //set favorite
+                favorite(PlayList(), song, false)
+            }
+        }else if(data1 == null && data2 != null){
+            val placeholder = data2
+            if (placeholder.type.equals("playlist", true)  || placeholder.type.equals("album", true)){
+                item_owner.text = placeholder.owner
+                item_element_list.text = placeholder.description
+                tracks.name = placeholder.name
+                tracks.picture = placeholder.picture
+                tracks.mxp_id = placeholder._id
+
+                val mItem = JSONArray(placeholder.member)
+                for (i in 0..(mItem.length().minus(1))) {
+                    try {
+                        val item = mItem.getJSONObject(i)
+                        val memberItem = item.getJSONArray("member")
+                        for (x in 0..(memberItem?.length()!!.minus(1))) {
+                            val members = memberItem.getJSONObject(x)
+                            val mMemberItem = PlaceholderData()
+                            mMemberItem._id = members.getString("_id")
+                            mMemberItem.name = members.getString("name")
+                            mMemberItem.type = members.getString("type")
+                            mMemberItem.owner = members.getString("owner")
+                            mMemberItem.picture = members.getString("picture")
+                            if (mMemberItem.picture == "" || mMemberItem.picture == null){
+                                mMemberItem.picture = "http://zuezhome.com/play/ic_logo.png"
+                            }
+                            mMemberItem.location = members.getString("location")
+                            mMemberItem.description = members.getString("description")
+                            mMemberItem.dateCreated = members.getString("date_created")
+
+                            val song = Song(
+                                    mMemberItem.name,
+                                    mMemberItem.name,
+                                    mMemberItem.owner,
+                                    "name",
+                                    mMemberItem.location,
+                                    130000,
+                                    1000,
+                                    false,
+                                    0,
+                                    "",
+                                    mMemberItem.picture)
+                            song.mxp_id = mMemberItem._id
+                            tracks.songs?.add(song)
+                        }
+                    }catch (e: JSONException){
+
+                    }
+                }
+
+                //set favorite
+                favorite(tracks, Song(), true)
+            }else{
+                item_owner.text = placeholder.owner
+                item_element_list.text = placeholder.description
+                tracks.name = placeholder.name
+                tracks.picture = placeholder.picture
+                tracks.mxp_id = placeholder._id
+                val song = Song(placeholder.name,
+                        placeholder.name,
+                        placeholder.owner,
+                        "name",
+                        placeholder.location,
+                        130000,
+                        1000,
+                        false,
+                        0,
+                        "",
+                        placeholder.picture)
+                song.mxp_id = placeholder._id
+                tracks.songs?.add(song)
+
+                //set favorite
+                favorite(PlayList(), song, false)
+            }
         }
     }
 

@@ -10,23 +10,21 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.provider.MediaStore
 import android.support.v4.app.NotificationCompat
 import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import android.webkit.URLUtil
 import android.widget.RemoteViews
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.data.model.Song
 import com.musicplayer.aow.ui.main.MainActivity
-import com.musicplayer.aow.utils.receiver.AudioNoisy
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.onComplete
 
@@ -40,8 +38,6 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     private var mContentViewSmall: RemoteViews? = null
 
     var mediaPlayer: Player? = Player.instance
-
-    private var mAudioBecommingNoisy: AudioNoisy? = null
 
     private val mBinder = LocalBinder()
 
@@ -63,7 +59,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                 mContentViewSmall = RemoteViews(packageName, R.layout.remote_view_music_player_small)
                 setUpRemoteView(mContentViewSmall!!)
             }
-            updateRemoteViews(mContentViewSmall!!)
+            updateRemoteViews(mContentViewSmall!!, mediaPlayer!!.playingSong)
             return mContentViewSmall!!
         }
 
@@ -73,7 +69,7 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                 mContentViewBig = RemoteViews(packageName, R.layout.remote_view_music_player)
                 setUpRemoteView(mContentViewBig!!)
             }
-            updateRemoteViews(mContentViewBig!!)
+            updateRemoteViews(mContentViewBig!!, mediaPlayer!!.playingSong)
             return mContentViewBig!!
         }
 
@@ -93,10 +89,10 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
         if (intent != null) {
             val action = intent.action
             if (ACTION_PLAY_TOGGLE == action) {
-                if (isPlaying) {
-                    pause()
-                } else {
-                    if (successfullyRetrievedAudioFocus()) {
+                if (successfullyRetrievedAudioFocus()) {
+                    if (isPlaying) {
+                        pause()
+                    } else {
                         play()
                     }
                 }
@@ -112,17 +108,11 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                 if (isPlaying) {
                     pause()
                 }
+                stopForeground(true)
             }
-        }else{
-            if (isPlaying) {
-                pause()
-            } else {
-                if (successfullyRetrievedAudioFocus()) {
-                    play()
-                }
-            }
+
         }
-        return START_STICKY_COMPATIBILITY
+        return START_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -150,6 +140,9 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.abandonAudioFocus(this)
         unregisterReceiver(mNoisyReceiver)
+//        val intent = Intent("com.musicplayer.musixplay")
+//        intent.putExtra("run", "carter")
+//        sendBroadcast(intent)
         super.onDestroy()
     }
 
@@ -211,23 +204,27 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
 
     // Playback Callbacks
     override fun onSwitchLast(last: Song?) {
-        showNotification()
+        //showNotification()
     }
 
     override fun onSwitchNext(next: Song?) {
-        showNotification()
+        //showNotification()
     }
 
     override fun onComplete(next: Song?) {
-        showNotification()
+        //showNotification()
     }
 
     override fun onPlayStatusChanged(isPlaying: Boolean) {
-        showNotification()
+        //showNotification()
     }
 
     override fun onTriggerLoading(isLoading: Boolean) {
-        showNotification()
+
+    }
+
+    override fun onPrepared(isPrepared: Boolean) {
+        
     }
 
     // Notification
@@ -261,12 +258,12 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     private fun setUpRemoteView(remoteView: RemoteViews) {
-        remoteView.setImageViewResource(R.id.image_view_play_toggle, if (isPlaying) {
-            R.drawable.ic_remote_view_pause
-        }else{
-            R.drawable.ic_remote_view_play
-        }
-        )
+//        remoteView.setImageViewResource(R.id.image_view_play_toggle, if (isPlaying) {
+//            R.drawable.ic_remote_view_pause
+//        }else{
+//            R.drawable.ic_remote_view_play
+//        }
+//        )
         remoteView.setImageViewResource(R.id.image_view_close, R.drawable.ic_remote_view_close)
         remoteView.setImageViewResource(R.id.image_view_play_last, R.drawable.ic_remote_view_play_last)
         remoteView.setImageViewResource(R.id.image_view_play_next, R.drawable.ic_remote_view_play_next)
@@ -276,39 +273,33 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
         remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntent(ACTION_PLAY_TOGGLE))
     }
 
-    private fun updateRemoteViews(remoteView: RemoteViews) {
-        val currentSong = mediaPlayer!!.playingSong
+    private fun updateRemoteViews(remoteView: RemoteViews, currentSong: Song?) {
+        remoteView.setImageViewResource(R.id.image_view_play_toggle,
+                if (isPlaying) {
+                    R.drawable.ic_remote_view_pause
+                }else{
+                    R.drawable.ic_remote_view_play
+                }
+        )
         if (currentSong != null) {
             remoteView.setTextViewText(R.id.text_view_name, currentSong.displayName)
             remoteView.setTextViewText(R.id.text_view_artist, currentSong.artist)
-        }
-        remoteView.setImageViewResource(R.id.image_view_play_toggle, if (isPlaying) {
-                R.drawable.ic_remote_view_pause
-            }else{
-                R.drawable.ic_remote_view_play
-            }
-        )
 
-        if ((currentSong != null) && (currentSong.albumArt != null)) {
             if(URLUtil.isHttpUrl(currentSong.albumArt) || URLUtil.isHttpsUrl(currentSong.albumArt)){
                 doAsync {
                     val img = Glide.with(applicationContext)
-                            .load(currentSong.albumArt).asBitmap()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .error(R.drawable.gradient_info)
-                            .into(80, 80)
+                            .load(currentSong.albumArt)
+                            .asBitmap()
+                            .into(50, 50)
                             .get()
                     onComplete {
-                        if(img != null) {
-                            remoteView.setImageViewBitmap(R.id.image_view_album, img)
-                        }else {
-                            remoteView.setImageViewUri(R.id.image_view_album, Uri.parse(currentSong.albumArt))
-                        }
+                        remoteView.setImageViewBitmap(R.id.image_view_album,img)
                     }
                 }
+                Log.e(this.javaClass.name, currentSong.albumArt + "     " + currentSong.title)
             }else {
-
                 doAsync {
+                    var bit: Bitmap? = null
                     val alb = Injection.provideContext()!!
                             .contentResolver.query(
                             MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
@@ -318,29 +309,26 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                             MediaStore.Audio.Albums._ID + "=?",
                             arrayOf(currentSong.albumArt!!),
                             null)
-                    var bit:Bitmap? = null
                     if (alb.moveToFirst()) {
                         val data = alb.getString(alb.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
                         bit = Glide.with(applicationContext)
                                 .load(data).asBitmap()
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .error(R.drawable.gradient_info)
-                                .into(100, 100)
+                                .into(50, 50)
                                 .get()
                     }
                     alb.close()
                     onComplete {
                         if (bit != null) {
-                            remoteView.setImageViewBitmap(R.id.image_view_album, bit)
-                        } else {
+                            remoteView.setImageViewBitmap(R.id.image_view_album,bit)
+                        }else{
                             remoteView.setImageViewResource(R.id.image_view_album, R.drawable.gradient_danger)
                         }
                     }
 
                 }
+                Log.e(this.javaClass.name, currentSong.albumArt + "     " + currentSong.title)
             }
-        }else{
-            remoteView.setImageViewResource(R.id.image_view_album, R.drawable.gradient_danger)
         }
     }
 

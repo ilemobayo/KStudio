@@ -3,6 +3,7 @@ package com.musicplayer.aow.delegates.scheduler
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.musicplayer.aow.delegates.player.PlaybackService
 
 
 /**
@@ -11,6 +12,7 @@ import android.content.Intent
 class ServiceReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        UtilServes().scheduleJob(context)
+        context.startService(Intent(context, PlaybackService::class.java))
     }
+    
 }

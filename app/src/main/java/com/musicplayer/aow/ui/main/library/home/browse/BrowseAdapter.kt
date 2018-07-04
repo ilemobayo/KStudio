@@ -1,5 +1,6 @@
 package com.musicplayer.aow.ui.main.library.home.browse
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.support.design.widget.BottomSheetDialog
@@ -63,18 +64,23 @@ class BrowseAdapter(
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val model = mSongModel?.get(position)
         if (model != null) {
-            val fav = isFavorite(model)
-            holder.favorite.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
-            //implementation of favorite
-            holder.favorite.setOnClickListener {
-                if (fav){
-                    deleteFromFavorite(model)
-                    holder.favorite.setImageResource(if (isFavorite(model)) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
-                } else {
-                    addToFavorite(model)
-                    holder.favorite.setImageResource(if (isFavorite(model)) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+            val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(model.path!!)
+            fSong?.observe(this.activity, object: Observer<Song> {
+                override fun onChanged(t: Song?) {
+                    var fav = true
+                    fav = t != null
+                    holder.favorite.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+                    holder.favorite.setOnClickListener {
+                        //save to favorite
+                        if (fav){
+                            deleteFromFavorite(model)
+                        } else {
+                            addToFavorite(model)
+                        }
+                    }
                 }
-            }
+            })
+
             //implementation of item click
             holder.mListItem.setOnClickListener {
                 RxBus.instance!!.post(PlayListNowEvent(PlayList(mSongModel), position))
@@ -149,6 +155,10 @@ class BrowseAdapter(
                             holder.loading.visibility = View.INVISIBLE
                         }
                     }
+                }
+
+                override fun onPrepared(isPrepared: Boolean) {
+                    
                 }
             }
             mPlayer?.registerCallback(callback!!)

@@ -37,7 +37,7 @@
         <item name="android:windowActivityTransitions">true</item>
 
         <!-- Translusent -->
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">true</item>
 
         <!-- specify enter and exit transitions -->

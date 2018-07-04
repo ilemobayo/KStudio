@@ -25,7 +25,6 @@ import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.ui.main.library.activities.ArtistSongs
-import com.musicplayer.aow.utils.TimeUtils
 import org.jetbrains.anko.find
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
@@ -58,7 +57,7 @@ class SongListAdapter(
         val model = mSongModel?.get(position)
         if (model != null) {
             //implementation of item click
-            holder?.mListItem?.setOnClickListener {
+            holder.mListItem.setOnClickListener {
                 RxBus.instance!!.post(PlayListNowEvent(PlayList(mSongModel), position))
             }
             loadViews(model, holder, position)
@@ -66,13 +65,10 @@ class SongListAdapter(
     }
 
     fun loadViews(model: Song,holder: SongListViewHolder?, position: Int){
-        val songArtist = model.artist
         holder!!.songTV.text = model.title?.toLowerCase()?.capitalize()
-        //holder.duration.text = formatDuration(model.duration)
         val tPosition = position
-        val tDuration = TimeUtils.formatDuration(model.duration)
         holder.duration.text = tPosition.plus(1).toString()
-        holder.songArtist.text = "$tDuration - $songArtist"
+        holder.songArtist.text = model.artist?.capitalize()
         
         broadcastChange(holder, model)
 

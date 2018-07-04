@@ -1,5 +1,6 @@
 package com.musicplayer.aow.ui.nowplaying
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -10,15 +11,12 @@ import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.player.Player
+import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.ui.nowplaying.draganddropinterface.SimpleItemTouchHelperCallback
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
 import com.readystatesoftware.systembartint.SystemBarTintManager
 import kotlinx.android.synthetic.main.activity_now_playing.*
 import rx.subscriptions.CompositeSubscription
-
-
-
-
 
 
 class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartListener {
@@ -27,8 +25,10 @@ class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartLis
     private var mItemTouchHelper: ItemTouchHelper? = null
     var adapter: NowPlayingAdapter? = null
 
+    //room for resntly played
+    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val playList = NowPlaying.instance!!.playlist
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_now_playing)
 
@@ -57,7 +57,7 @@ class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartLis
         }
 
 
-        loadData(playList)
+        loadResent()
     }
 
     private fun loadData(playList: PlayList) {
@@ -85,5 +85,28 @@ class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartLis
 
     override fun onDragStarted(viewHolder: RecyclerView.ViewHolder) {
         mItemTouchHelper!!.startDrag(viewHolder)
+    }
+
+
+    private fun loadResent(){
+        val resultPlaylist = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
+        resultPlaylist?.observe(this, object: Observer<PlayList> {
+            override fun onChanged(result: PlayList?) {
+                if(result != null ) {
+                    if (result.songs?.size!! > 0) {
+                        loadData(result)
+                    } else {
+                        //loadAllSongs()
+                    }
+                }else{
+                    val playList = PlayList()
+                    playList.name = "Recently Played"
+                    playList.mxp_id = "nowplaying"
+                    playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
+                    loadData(playList)
+                }
+            }
+        })
+
     }
 }

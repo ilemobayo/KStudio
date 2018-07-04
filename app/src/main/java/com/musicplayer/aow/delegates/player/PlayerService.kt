@@ -21,18 +21,16 @@ import com.musicplayer.aow.R
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.data.model.Song
 import com.musicplayer.aow.delegates.player.mediasession.MediaStyleHelper
-import com.musicplayer.aow.utils.CursorDB
-import java.util.*
 
 class PlayerService: MediaBrowserServiceCompat(),
         MediaPlayer.OnCompletionListener,
         AudioManager.OnAudioFocusChangeListener,
-        IPlayback{
+        IPlayback, IPlayback.Callback{
+
 
     var mediaPlayer: Player? = Player.instance
     private var mMediaPlayer: MediaPlayer? = null
     private var mMediaSessionCompat: MediaSessionCompat? = null
-    private val mPlaylist = ArrayList<Song>()
 
     override var isPlaying: Boolean = false
         get() = mediaPlayer!!.isPlaying
@@ -74,6 +72,8 @@ class PlayerService: MediaBrowserServiceCompat(),
     }
 
     override fun playNext(): Boolean {
+        initMediaSessionMetadata()
+        showPausedNotification()
         return mediaPlayer!!.playNext()
     }
 
@@ -111,6 +111,36 @@ class PlayerService: MediaBrowserServiceCompat(),
 
     }
 
+    override fun onSwitchLast(last: Song?) {
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+        initMediaSessionMetadata()
+        showPlayingNotification()
+    }
+
+    override fun onSwitchNext(next: Song?) {
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+        initMediaSessionMetadata()
+        showPlayingNotification()
+    }
+
+    override fun onComplete(next: Song?) {
+        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+        initMediaSessionMetadata()
+        showPausedNotification()
+    }
+
+    override fun onPlayStatusChanged(isPlaying: Boolean) {
+
+    }
+
+    override fun onTriggerLoading(isLoading: Boolean) {
+
+    }
+
+    override fun onPrepared(isPrepared: Boolean) {
+
+    }
+
 
     private val mNoisyReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -126,10 +156,9 @@ class PlayerService: MediaBrowserServiceCompat(),
             super.onPlay()
             if (!successfullyRetrievedAudioFocus()) {
                 return
+            }else{
+                play()
             }
-
-            //mMediaSessionCompat!!.isActive = true
-            play()
         }
 
         override fun onPause() {
@@ -142,17 +171,23 @@ class PlayerService: MediaBrowserServiceCompat(),
 
         override fun onSkipToPrevious() {
             super.onSkipToPrevious()
-            playLast()
+            if (successfullyRetrievedAudioFocus()) {
+                playLast()
+            }
         }
 
         override fun onSkipToNext() {
             super.onSkipToNext()
-            playNext()
+            if (successfullyRetrievedAudioFocus()) {
+                playNext()
+            }
         }
 
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
             super.onPlayFromMediaId(mediaId, extras)
-            play()
+            if (successfullyRetrievedAudioFocus()) {
+                play()
+            }
             //Work with extras here if you want
         }
 
@@ -167,21 +202,9 @@ class PlayerService: MediaBrowserServiceCompat(),
 
     override fun onCreate() {
         super.onCreate()
-
         initMediaPlayer()
         initMediaSession()
         initNoisyReceiver()
-        initSongs()
-    }
-
-    private fun initSongs() {
-        val data = CursorDB().songs(this)
-        if (data != null) {
-            while (data.moveToNext()) {
-                mPlaylist.add(CursorDB().cursorToMusic(data))
-            }
-            data.close()
-        }
     }
 
     private fun initNoisyReceiver() {
@@ -219,14 +242,14 @@ class PlayerService: MediaBrowserServiceCompat(),
     }
 
     private fun showPausedNotification() {
-        val builder = MediaStyleHelper.from(this, mMediaSessionCompat!!) ?: return
+        val builder = MediaStyleHelper.from(applicationContext, mMediaSessionCompat!!) ?: return
 
         builder.addAction(NotificationCompat.Action(android.R.drawable.ic_media_previous, "Previous", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)))
         builder.addAction(NotificationCompat.Action(android.R.drawable.ic_media_play, "Play", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
         builder.addAction(NotificationCompat.Action(android.R.drawable.ic_media_next, "Next", MediaButtonReceiver.buildMediaButtonPendingIntent(this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)))
         builder.setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0).setMediaSession(mMediaSessionCompat!!.sessionToken))
         builder.setSmallIcon(R.drawable.ic_logo)
-        NotificationManagerCompat.from(this).notify(1, builder.build())
+        NotificationManagerCompat.from(applicationContext).notify(1, builder.build())
     }
 
 
@@ -239,8 +262,8 @@ class PlayerService: MediaBrowserServiceCompat(),
         mMediaSessionCompat!!.isActive = true
 
         val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
-        mediaButtonIntent.setClass(this, MediaButtonReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0)
+        mediaButtonIntent.setClass(applicationContext, MediaButtonReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, 0)
         mMediaSessionCompat!!.setMediaButtonReceiver(pendingIntent)
 
         sessionToken = mMediaSessionCompat!!.sessionToken
@@ -258,6 +281,7 @@ class PlayerService: MediaBrowserServiceCompat(),
     }
 
     private fun initMediaSessionMetadata() {
+        val currentSong = mediaPlayer!!.playingSong
         val metadataBuilder = MediaMetadataCompat.Builder()
         //Notification icon in card
         metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, BitmapFactory.decodeResource(resources, R.drawable.ic_logo))
@@ -265,10 +289,10 @@ class PlayerService: MediaBrowserServiceCompat(),
 
         //lock screen icon for pre lollipop
         metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Display Title")
-        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "Display Subtitle")
-        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 1)
-        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 1)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong?.title)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong?.artist)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, mediaPlayer!!.mPlayList?.playingIndex?.toLong()!!)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, mediaPlayer!!.mPlayList?.playingIndex?.toLong()!!)
 
         mMediaSessionCompat!!.setMetadata(metadataBuilder.build())
     }

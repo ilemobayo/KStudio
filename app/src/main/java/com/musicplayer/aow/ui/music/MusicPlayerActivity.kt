@@ -11,7 +11,6 @@ import android.support.design.widget.BottomSheetDialog
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -39,7 +38,6 @@ import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.song.Song
 import com.musicplayer.aow.ui.base.BaseActivity
 import com.musicplayer.aow.ui.main.MusicPlayerContract
 import com.musicplayer.aow.ui.main.MusicPlayerPresenter
-import com.musicplayer.aow.ui.main.library.activities.AlbumSongs
 import com.musicplayer.aow.ui.main.library.activities.ArtistSongs
 import com.musicplayer.aow.ui.nowplaying.NowPlayingActivity
 import com.musicplayer.aow.utils.TimeUtils
@@ -51,10 +49,7 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.onComplete
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 
 
 class MusicPlayerActivity : BaseActivity(), MusicPlayerContract.View, IPlayback.Callback, View.OnClickListener{
@@ -162,32 +157,31 @@ class MusicPlayerActivity : BaseActivity(), MusicPlayerContract.View, IPlayback.
 
         textViewName!!.isSelected = true
 
-        try {
-            val input = assets.open("file/test.lrc")
-            // myData.txt can't be more than 2 gigs.
-            val size = input.available()
-            val buffer = BufferedReader(InputStreamReader(input))
-            var line: String?
-            do {
-                line = buffer.readLine();
-                if (line != null) {
-                    val regex = """(])""".toRegex()
-                    val x = regex.split(line)
-                    val first = x.first().split("""(\[)""".toRegex()).last()
-                    val last = x.last()
-                    try {
-                        Log.e("Lyrics", (first).toString())
-                    }catch (e: NumberFormatException){}
-                    lrc_text.text = last;
-                } else {
-                    //you may want to close the file now since there's nothing more to be done here.
-                }
-            }while (line != null)
-            input.close()
-
-        }catch (e: IOException){
-            
-        }
+//        try {
+//            val input = assets.open("file/test.lrc")
+//            // myData.txt can't be more than 2 gigs.
+//            val size = input.available()
+//            val buffer = BufferedReader(InputStreamReader(input))
+//            var line: String?
+//            do {
+//                line = buffer.readLine();
+//                if (line != null) {
+//                    val regex = """(])""".toRegex()
+//                    val x = regex.split(line)
+//                    val first = x.first().split("""(\[)""".toRegex()).last()
+//                    val last = x.last()
+//                    try {
+//                        Log.e("Lyrics", (first).toString())
+//                    }catch (e: NumberFormatException){}
+//                    lrc_text.text = last;
+//                } else {
+//                    //you may want to close the file now since there's nothing more to be done here.
+//                }
+//            }while (line != null)
+//            input.close()
+//
+//        }catch (e: IOException){
+//        }
 
         textViewArtist!!.setOnClickListener {
             if(mPlayer != null) {
@@ -497,10 +491,8 @@ class MusicPlayerActivity : BaseActivity(), MusicPlayerContract.View, IPlayback.
                 mBottomSheetDialog.dismiss()
             }
             album.setOnClickListener {
-                val intent = Intent(ctx, AlbumSongs::class.java)
-                intent.putExtra("com.musicplayer.aow.album.name",
-                        model.album)
-                ContextCompat.startActivity(ctx, intent, null)
+                val sAlbum = SoftCodeAdapter().getAlbum(context, model.albumArt!!)
+                SoftCodeAdapter().openAlbumActivity(context, sAlbum)
                 mBottomSheetDialog.dismiss()
             }
             artist.setOnClickListener {
@@ -666,6 +658,10 @@ class MusicPlayerActivity : BaseActivity(), MusicPlayerContract.View, IPlayback.
 
     override fun onTriggerLoading(isLoading: Boolean) {
         buttonPlayToggle!!.setImageResource(R.drawable.loading)
+    }
+
+    override fun onPrepared(isPrepared: Boolean) {
+        
     }
 
     override fun updatePlayToggle(play: Boolean) {

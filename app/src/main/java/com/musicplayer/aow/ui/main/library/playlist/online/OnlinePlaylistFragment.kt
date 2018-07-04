@@ -1,11 +1,11 @@
 package com.musicplayer.aow.ui.main.library.playlist.online
 
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,9 +27,8 @@ class OnlinePlaylistFragment : Fragment() {
     var modelData:ArrayList<PlayList> = ArrayList()
 
     private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
-
     private var songFavDatabase = SongFavDatabase.getsInstance(Injection.provideContext()!!)
-    var favoriteSongs: PlayList = PlayList()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -42,22 +41,6 @@ class OnlinePlaylistFragment : Fragment() {
 
         recycler_view = view.find(R.id.recyclerview)
         recycler_view!!.visibility = View.VISIBLE
-
-        loadData()
-    }
-
-    fun loadData(){
-        favoriteSongs.name = "Favorite Songs"
-        favoriteSongs.songs = songFavDatabase?.songFavDAO()?.fetchAllSong() as ArrayList<Song>
-        modelData = ArrayList()
-        modelData.add(favoriteSongs)
-        modelData.addAll(playListFavDatabase?.playlistFavDAO()?.fetchAllPlayList() as ArrayList)
-
-        val l = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayList()
-        if(l?.size != 0) {
-            Log.e(this.javaClass.name, (l as java.util.ArrayList<PlayList>).get(0).songs?.size.toString())
-        }
-        adapter?.swapCursor(modelData)
         //Setup layout manager
         val layoutManager = PreCachingLayoutManager(activity!!)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -73,6 +56,58 @@ class OnlinePlaylistFragment : Fragment() {
         recycler_view!!.setHasFixedSize(true)
         recycler_view!!.layoutManager = layoutManager
         recycler_view!!.adapter = adapter
+
+        upDate()
+        loadData()
+    }
+
+    fun loadData(){
+        val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSong()
+        favoriteSongsList?.observe(this, object: Observer<List<Song>>{
+            override fun onChanged(t: List<Song>?) {
+                upDate()
+            }
+        })
+
+        val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
+        favoritePlaylist?.observe(this, object: Observer<List<PlayList>> {
+            override fun onChanged(t: List<PlayList>?) {
+                upDate()
+            }
+        })
+
+    }
+
+    fun upDate(){
+        reloadFavoriteSongs()
+    }
+
+
+    private fun reloadFavoriteSongs(){
+        modelData = ArrayList()
+        val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSong()
+        favoriteSongsList?.observe(this, object: Observer<List<Song>>{
+
+            override fun onChanged(t: List<Song>?) {
+                favoriteSongsList.removeObserver(this)
+                val favoriteSongs = PlayList()
+                favoriteSongs.name = "Favorite Songs"
+                favoriteSongs.songs = t as ArrayList
+                modelData.add(favoriteSongs)
+                reloadPlaylists()
+            }
+        })
+    }
+
+    fun reloadPlaylists(){
+        val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
+        favoritePlaylist?.observe(this, object: Observer<List<PlayList>> {
+            override fun onChanged(t: List<PlayList>?) {
+                favoritePlaylist.removeObserver(this)
+                modelData.addAll(t as ArrayList)
+                adapter?.swapCursor(modelData)
+            }
+        })
     }
 
 

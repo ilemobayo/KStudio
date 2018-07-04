@@ -13,12 +13,12 @@
             android:icon="@drawable/ic_nowplaying"
             android:title="@string/now_playing" />
     </group>
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_event"
-            android:icon="@drawable/ic_event"
-            android:title="@string/event" />
-    </group>
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_event"-->
+            <!--android:icon="@drawable/ic_event"-->
+            <!--android:title="@string/event" />-->
+    <!--</group>-->
     <!--<group android:checkableBehavior="single">-->
         <!--<item-->
             <!--android:id="@+id/nav_identify"-->

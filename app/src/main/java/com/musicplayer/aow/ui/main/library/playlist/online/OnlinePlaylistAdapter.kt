@@ -20,12 +20,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.google.gson.GsonBuilder
 import com.musicplayer.aow.R
+import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.bus.RxBus
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.data.model.Song
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.player.Player
-import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
+import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.ui.main.library.playlist.online.playlistsongs.PlaylistSongsActivity
 import org.jetbrains.anko.find
 import java.util.*
@@ -36,19 +37,19 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
     private var mModel = data
     private var view: View? = null
     private var layoutInflater = inflater
+    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: OnlinePlayListViewHolder, position: Int) {
         val model = mModel?.get(position)
         val playlistName = model?.name
-        val playlistdetails = SoftCodeAdapter().getSongCountForPlaylist(context, model?._id!! )
         holder.pName.text = playlistName
 
         val gsonBuilder = GsonBuilder().create()
         val jsonFromPojo = gsonBuilder.toJson(model)
         val intent = Intent(context, PlaylistSongsActivity::class.java)
         intent.putExtra("data", jsonFromPojo)
-        intent.putExtra("name", model.name)
+        intent.putExtra("name", model?.name)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         //implementation of item click
         holder.item?.setOnClickListener {
@@ -58,7 +59,6 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
         //here we set item click for songs
         //to set options
         holder.pOption.setOnClickListener {
-            val playlistSongs = SoftCodeAdapter().getPlaylistTracks(context, model._id)
             if (view != null) {
                 val context = view!!.context
                 val mBottomSheetDialog = BottomSheetDialog(context)
@@ -72,11 +72,10 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
                 val delete = sheetView.find<LinearLayout>(R.id.menu_item_delete)
                 val rename = sheetView.find<LinearLayout>(R.id.menu_item_rename)
                 val clear = sheetView.find<LinearLayout>(R.id.menu_item_clear)
-
-                if (model._id == SoftCodeAdapter().getFavoritesId(context!!)){
-                    rename.visibility = View.GONE
-                    delete.visibility = View.GONE
-                }
+                val delete_label = sheetView.find<TextView>(R.id.delete)
+                delete_label.text = context.getString(R.string.remove)
+                clear.visibility = View.GONE
+                rename.visibility = View.GONE
 
                 //Don't show the delete and rename button for default playlists
                 if(playlistName == context.getString(R.string.mp_play_list_songs) ||
@@ -91,28 +90,19 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
                 }
 
                 play.setOnClickListener {
-                    RxBus.instance!!.post(PlayListNowEvent(playlistSongs,0))
+                    RxBus.instance!!.post(PlayListNowEvent(model!!,0))
                     mBottomSheetDialog.dismiss()
                 }
                 playNext.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,playlistSongs.songs as ArrayList<Song>)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,model?.songs as ArrayList<Song>)
                     mBottomSheetDialog.dismiss()
                 }
                 queue.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,playlistSongs.songs as ArrayList<Song>)
-                    mBottomSheetDialog.dismiss()
-                }
-                rename.setOnClickListener {
-                    showPlaylistRenameDialog(model)
-                    mBottomSheetDialog.dismiss()
-                }
-                clear.setOnClickListener {
-                    playlistSongs.songs = ArrayList()
-                    //updatePlayList(model!!)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,model?.songs as ArrayList<Song>)
                     mBottomSheetDialog.dismiss()
                 }
                 delete.setOnClickListener{
-                    deletePlayList(model._id)
+                    playListFavDatabase?.playlistFavDAO()?.deletePlayList(model!!)
                     mBottomSheetDialog.dismiss()
                 }
             }

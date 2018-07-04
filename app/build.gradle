@@ -157,6 +157,10 @@ dependencies {
     //music identification
     implementation files('libs/acrcloud-android-sdk-1.5.7.3.jar')
 
+    //Exoplayer
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.3'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.3'
+
 
 
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {

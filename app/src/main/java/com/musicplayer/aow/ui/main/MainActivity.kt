@@ -3,6 +3,8 @@ package com.musicplayer.aow.ui.main
 import android.Manifest
 import android.app.Activity
 import android.app.SearchManager
+import android.arch.lifecycle.Observer
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -10,15 +12,21 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.RemoteException
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -46,11 +54,9 @@ import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.
 import com.musicplayer.aow.ui.auth.AuthActivity
 import com.musicplayer.aow.ui.base.BaseActivity
 import com.musicplayer.aow.ui.eq.EqActivity
-import com.musicplayer.aow.ui.event.EventsListActivity
 import com.musicplayer.aow.ui.main.library.LibraryAdapter
 import com.musicplayer.aow.ui.main.search.SearchActivity
 import com.musicplayer.aow.ui.music.MusicPlayerActivity
-import com.musicplayer.aow.ui.nowplaying.NowPlaying
 import com.musicplayer.aow.ui.nowplaying.NowPlayingActivity
 import com.musicplayer.aow.ui.settings.SettingsActivity
 import com.musicplayer.aow.utils.ApplicationSettings
@@ -71,6 +77,17 @@ class MainActivity : BaseActivity(),
         View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener,
         ForceUpdateChecker.OnUpdateNeededListener{
+
+    /**
+     * MEDIASESSION INTEGRATION
+     */
+    private val STATE_PAUSED = 0
+    private val STATE_PLAYING = 1
+
+    private var mCurrentState: Int = 0
+
+    private var mMediaBrowserCompat: MediaBrowserCompat? = null
+    private var mMediaControllerCompat: MediaControllerCompat? = null
 
     private var auth: FirebaseAuth? = null
     //init objects
@@ -108,6 +125,11 @@ class MainActivity : BaseActivity(),
         tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
         // set a custom status bar drawable
         tintManager.setStatusBarTintResource(R.color.black)
+
+        
+        //mediasession
+        mMediaBrowserCompat = MediaBrowserCompat(applicationContext, ComponentName(this, PlayerService::class.java),
+                mMediaBrowserCompatConnectionCallback, null)
 
         namePlayback = findViewById(R.id.text_view_name)
         artistPlayback = findViewById(R.id.text_view_artist)
@@ -241,10 +263,10 @@ class MainActivity : BaseActivity(),
 //                val intent = Intent(applicationContext, IdentifySoundActivity::class.java)
 //                startActivity(intent)
 //            }
-            R.id.nav_event -> {
-                val intent = Intent(applicationContext, EventsListActivity::class.java)
-                startActivity(intent)
-            }
+//            R.id.nav_event -> {
+//                val intent = Intent(applicationContext, EventsListActivity::class.java)
+//                startActivity(intent)
+//            }
 //            R.id.nav_record -> {
 //                val intent = Intent(applicationContext, VoiceRecorderActivity::class.java)
 //                startActivity(intent)
@@ -410,23 +432,27 @@ class MainActivity : BaseActivity(),
     private fun onPlayToggleAction() {
         //if (mediaPlayer == null) return
         if (mPlayer!!.playingList == null || mPlayer!!.playingList!!.numOfSongs == 0){
-            val recentPlayList = NowPlaying.instance!!.playlist
-            if (recentPlayList.numOfSongs != 0) {
-                playSong(recentPlayList, recentPlayList.playingIndex)
-                return
-            }
-        }
-
-        if (mPlayer!!.isPlaying) {
-            audioFocus!!.pause()
-            mPlayer!!.pause()
-        } else {
-            audioFocus!!.play()
-            mPlayer!!.play()
+            val recentPlayList = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
+            recentPlayList?.observe(this, object: Observer<PlayList> {
+                override fun onChanged(it: PlayList?) {
+                    recentPlayList?.removeObserver(this)
+                    if (it?.songs?.size != 0) {
+                        playSong(it, it?.playingIndex!!)
+                    } else {
+                        if (mPlayer!!.isPlaying) {
+                            audioFocus!!.pause()
+                            mPlayer!!.pause()
+                        } else {
+                            audioFocus!!.play()
+                            mPlayer!!.play()
+                        }
+                    }
+                }
+            })
         }
 
         //test MediaSession
-        //testMediaSession()
+        testMediaSession()
     }
 
     // Player Callbacks
@@ -443,6 +469,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onPlayStatusChanged(isPlaying: Boolean) {
+        //testMediaSession()
         if (Player.instance!!.mPlayList != null) {
             if (Player.instance!!.mPlayList!!.currentSong != null) {
                 namePlayback!!.text = Player.instance!!.mPlayList!!.currentSong?.displayName
@@ -508,6 +535,10 @@ class MainActivity : BaseActivity(),
         loading!!.visibility = View.VISIBLE
     }
 
+    override fun onPrepared(isPrepared: Boolean) {
+        
+    }
+
     override fun updatePlayToggle(play: Boolean) {
         button_play_toggle!!.visibility = View.VISIBLE
         loading!!.visibility = View.INVISIBLE
@@ -526,24 +557,42 @@ class MainActivity : BaseActivity(),
 
     private fun loadResent(){
         val result = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
-        if(result != null ) {
-            if (result.songs?.size!! > 0) {
-                lastPlayed(result)
-            } else {
-                //loadAllSongs()
+
+        result?.observe(this, object: Observer<PlayList> {
+            override fun onChanged(t: PlayList?) {
+                result?.removeObserver(this)
+                if(t == null ) {
+                    val playList = PlayList()
+                    playList.name = "Recently Played"
+                    playList.mxp_id = "nowplaying"
+                    playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
+                }else{
+                    if (t.songs?.size!! > 0) {
+                        lastPlayed(t)
+                    } else {
+                        if (mPlayer!!.isPlaying) {
+                            audioFocus!!.pause()
+                            mPlayer!!.pause()
+                        } else {
+                            audioFocus!!.play()
+                            mPlayer!!.play()
+                        }
+                    }
+                }
             }
-        }else{
-            val playList = PlayList()
-            playList.name = "Resently Played"
-            playList.mxp_id = "nowplaying"
-            playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
-        }
+
+        })
+
+
     }
 
     private fun lastPlayed(playlist: PlayList){
         playlist.playMode = PreferenceManager.lastPlayMode(applicationContext)
         //update player playing list
-        NowPlaying.instance!!.setPlayList(playlist)
+        playlist.name = "Recently Played"
+        playlist.mxp_id = "nowplaying"
+        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playlist)
+
         val song = playlist.currentSong
         if (song != null) {
             // Step 1: Song name and artist
@@ -557,7 +606,7 @@ class MainActivity : BaseActivity(),
     }
 
     private fun loadNowPlayingTable(playList: PlayList) {
-        playList.name = "Resently Played"
+        playList.name = "Recently Played"
         playList.mxp_id = "nowplaying"
         playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
     }
@@ -638,7 +687,7 @@ class MainActivity : BaseActivity(),
     //Force Update Firebase
     override fun onUpdateNeeded(updateUrl:String) {
         val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
-        dialog.setTitle("New version available")
+        dialog.setTitle("New update available")
         dialog.setMessage("Please, update app to new version to continue.")
         dialog.setPositiveButton("Update",
                         { dialog, which ->
@@ -663,6 +712,82 @@ class MainActivity : BaseActivity(),
     /**
      * MEDIASESSION INTEGRATION
      */
+    private val mMediaBrowserCompatConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
+        override fun onConnected() {
+            super.onConnected()
+            try {
+                // Get the token for the MediaSession
+                val token: MediaSessionCompat.Token = mMediaBrowserCompat!!.sessionToken
+                // Create a MediaControllerCompat
+                mMediaControllerCompat = MediaControllerCompat(applicationContext, // Context
+                        token)
+                // Save the controller
+                MediaControllerCompat.setMediaController(this@MainActivity, mMediaControllerCompat)
+                mCurrentState == STATE_PAUSED
+                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
+                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.pause()
+                mMediaControllerCompat?.registerCallback(mMediaControllerCompatCallback)
+
+            } catch (e: RemoteException) {
+                Log.e(this.javaClass.name, "error")
+                Log.e(this.javaClass.name, e.localizedMessage)
+            }
+
+        }
+
+        override fun onConnectionFailed() {
+            super.onConnectionFailed()
+            Log.e(this.javaClass.name, "connection error")
+        }
+
+        override fun onConnectionSuspended() {
+            super.onConnectionSuspended()
+            Log.e(this.javaClass.name, "connection suspended")
+        }
+    }
+
+    private val mMediaControllerCompatCallback = object : MediaControllerCompat.Callback() {
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            super.onPlaybackStateChanged(state)
+            if (state == null) {
+                return
+            }
+
+            when (state.state) {
+                PlaybackStateCompat.STATE_PLAYING -> {
+                    mCurrentState = STATE_PLAYING
+                }
+                PlaybackStateCompat.STATE_PAUSED -> {
+                    mCurrentState = STATE_PAUSED
+                }
+                PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> {
+                    mCurrentState = STATE_PLAYING
+                }
+                PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> {
+                    mCurrentState = STATE_PLAYING
+                }
+            }
+        }
+    }
+
+    fun testMediaSession(){
+        
+        if (mMediaBrowserCompat?.isConnected!!) {
+            if (mCurrentState == STATE_PAUSED) {
+                MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).transportControls.play()
+                mCurrentState = STATE_PLAYING
+            } else {
+                if (MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
+                    MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).transportControls.pause()
+                }
+
+                mCurrentState = STATE_PAUSED
+            }
+
+        } else {
+            Log.e(this.javaClass.name, "not connected")
+        }
+    }
 
 
     override fun onStart() {
@@ -670,6 +795,10 @@ class MainActivity : BaseActivity(),
         if (mPlayer != null && mPlayer!!.isPlaying) {
             mHandler.removeCallbacks(mProgressCallback)
             mHandler.post(mProgressCallback)
+        }
+        //mediasession connect
+        if(!mMediaBrowserCompat!!.isConnected){
+            mMediaBrowserCompat!!.connect()
         }
     }
 
@@ -689,6 +818,13 @@ class MainActivity : BaseActivity(),
         //sensey gesture
         Sensey.getInstance().stop()
         ApplicationSettings.instance?.ShakeWithSensorDetectorDestroy()
+        //mediasession connect
+        if(mMediaBrowserCompat!!.isConnected){
+            if (MediaControllerCompat.getMediaController(this) != null) {
+                MediaControllerCompat.getMediaController(this).unregisterCallback(mMediaControllerCompatCallback)
+            }
+            mMediaBrowserCompat!!.disconnect()
+        }
         super.onDestroy()
     }
 

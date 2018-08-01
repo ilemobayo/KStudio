@@ -56,5 +56,7 @@ interface IPlayback {
         fun onPlayStatusChanged(isPlaying: Boolean)
 
         fun onTriggerLoading(isLoading: Boolean)
+
+        fun onPrepared(isPrepared: Boolean)
     }
 }

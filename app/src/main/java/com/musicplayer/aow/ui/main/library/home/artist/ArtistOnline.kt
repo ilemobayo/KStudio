@@ -68,8 +68,9 @@ class ArtistOnline : AppCompatActivity() {
                     val jsonArray = JSONObject(callResponse).getJSONArray("result")
                     callPlaylist(jsonArray)
                 } catch ( e: IOException) {
+                    Log.e(this.javaClass.name, e.message)
                 } catch (e: JsonSyntaxException){
-                    //
+                    Log.e(this.javaClass.name, e.message)
                 }
             }
         }
@@ -80,11 +81,12 @@ class ArtistOnline : AppCompatActivity() {
             returned_msg.visibility = View.INVISIBLE
             progress_bar.visibility = View.INVISIBLE
             layout_body.visibility = View.VISIBLE
+            recycler_views.visibility = View.VISIBLE
             recycler_views.adapter = SearchAdapter(applicationContext, section, false)
         }else{
             returned_msg.visibility = View.VISIBLE
             progress_bar.visibility = View.INVISIBLE
-            layout_body.visibility = View.INVISIBLE
+            layout_body.visibility = View.VISIBLE
         }
     }
 
@@ -109,7 +111,7 @@ class ArtistOnline : AppCompatActivity() {
             }catch (e: JSONException){
                 Log.e(this.javaClass.name, e.localizedMessage)
             } catch (e: JsonSyntaxException){
-                //
+                Log.e(this.javaClass.name, e.message)
             }
         }
         createMainSectionData(section_)

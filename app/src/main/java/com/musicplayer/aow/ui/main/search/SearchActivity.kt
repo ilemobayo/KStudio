@@ -136,7 +136,7 @@ class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 val item = jsonArray.getJSONObject(i)
                 val playlistSection = Search()
                 playlistSection.type = item.getString("type")
-                val memberItem = item.getJSONArray("member")
+                val memberItem = item.getJSONArray("items")
                 for (x in 0..(memberItem?.length()!!.minus(1))) {
                     val members = memberItem.getJSONObject(x).toString()
                     val gson = Gson()

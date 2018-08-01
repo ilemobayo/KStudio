@@ -65,6 +65,15 @@ class RecyclerViewAdapter(val mContext: Context, val dataList: ArrayList<Placeho
                 itemRowHolder.recycler_view_list.adapter = itemListDataAdapter
             }
             1 -> {
+                val placeholder = PlaceholderData()
+                placeholder.name = "BrilaFM"
+                placeholder.location = "https://ice31.securenetsystems.net/BRILAMP3"
+                placeholder.picture = ""
+                placeholder._id = "brilaFm"
+                placeholder.picture = ""
+                placeholder.owner = "brila"
+                placeholder.type = "radio"
+                model.member.add(placeholder)
                 val params = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT

@@ -57,7 +57,7 @@ class SettingsActivity : BaseActivity() {
         
         flipSwitchBtn = findViewById(R.id.flip_btn)
         shakeSwitchBtn = findViewById(R.id.shake_btn)
-        cacheSwitchBtn = findViewById(R.id.cache_btn)
+        //cacheSwitchBtn = findViewById(R.id.cache_btn)
 
         shakeSettings(shakeSwitchBtn!!)
         flipSettings(flipSwitchBtn!!)

@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.jakewharton.rxbinding:rxbinding-0.4.0">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxbinding-0.4.0.aar/93ebd1ebfcb3d775f89caa15dd7acb09/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxbinding-0.4.0.aar/93ebd1ebfcb3d775f89caa15dd7acb09/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxbinding-0.4.0.aar/9363434124709a17b0f5cd721a0db6dd/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxbinding-0.4.0.aar/9363434124709a17b0f5cd721a0db6dd/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

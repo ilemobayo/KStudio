@@ -57,19 +57,6 @@
         android:theme="@style/AppTheme"
         tool:replace="android:label">
 
-        <!-- Splash screen -->
-        <!-- <activity -->
-        <!-- android:name="com.musicplayer.aow.ui.splashscreen.SplashScreen" -->
-        <!-- android:launchMode="singleInstance" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- android:theme="@style/SplashTheme"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.MAIN" /> -->
-        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
-
-
         <!-- Main activity -->
         <activity
             android:name=".ui.main.MainActivity"
@@ -78,7 +65,6 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -103,7 +89,7 @@
 
         <service
             android:name=".delegates.player.PlaybackService"
-            android:label="PlaybackService"
+            android:label="PlayerService"
             tool:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.musicplayer.aow.ACTION.PLAY_TOGGLE" />
@@ -136,27 +122,15 @@
 
         <receiver android:name=".delegates.scheduler.ServiceReceiver">
             <intent-filter>
+                <action android:name="com.musicplayer.musixplay" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.external.VideoViewActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:mimeType="video/*" />
-            </intent-filter>
-        </activity>
         <activity android:name=".ui.external.ExternalPlayerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="content" />
                 <data android:scheme="file" />
                 <data android:mimeType="audio/*" />
@@ -174,10 +148,18 @@
         <activity
             android:name=".ui.main.library.activities.AlbumSongs"
             android:label=""
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.main.library.activities.ArtistSongs"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.main.library.playlist.offline.PlaylistSongs.PlaylistSongsListActivity"
             android:label="Playlist"
@@ -197,14 +179,30 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.musicplayer.aow.ui.main.MainActivity" />
         </activity>
-        <activity android:name=".ui.nowplaying.NowPlayingActivity" />
+        <activity android:name=".ui.nowplaying.NowPlayingActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
         <activity android:name=".ui.main.library.home.browse.BrowseActivity" />
         <activity android:name=".ui.main.library.home.podcast.PodcastActivity" />
         <activity android:name=".ui.main.library.home.podcast.PodcastSearchActivity" />
-        <activity android:name=".ui.auth.AuthActivity" />
+        <activity android:name=".ui.auth.AuthActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
         <activity android:name=".ui.auth.SignUpActivity" />
-        <activity android:name=".ui.auth.ProfileActivity" />
-        <activity android:name=".ui.eq.EqActivity" />
+        <activity android:name=".ui.auth.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
+        <activity android:name=".ui.eq.EqActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.event.MapsActivity"
             android:label="@string/title_activity_maps">
@@ -212,27 +210,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.musicplayer.aow.ui.main.MainActivity" />
         </activity>
-        <activity android:name=".ui.event.EventsListActivity" />
-
-        <!--
-             A receiver that will receive media buttons and send as
-            intents to your MediaBrowserServiceCompat implementation.
-            Required on pre-Lollipop. More information at
-            http://developer.android.com/reference/android/support/v4/media/session/MediaButtonReceiver.html
-        -->
+        <activity android:name=".ui.event.EventsListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.musicplayer.aow.ui.main.MainActivity" />
+        </activity>
 
         <activity android:name=".ui.recorder.VoiceRecorderActivity" />
         <activity android:name=".ui.acrcloud.IdentifySoundActivity" />
         <activity android:name=".ui.main.search.SearchActivity" />
 
-        <service
-            android:name=".delegates.softcode.adapters.MXLiveService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".ui.main.library.home.artist.ArtistOnline" />
 
-        <service android:name=".delegates.player.mediasession.BackgroundAudioService">
+        <service android:name=".delegates.player.PlayerService">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
@@ -247,7 +237,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.main.library.playlist.online.playlistsongs.PlaylistSongsActivity"></activity>
+        <activity android:name=".ui.main.library.playlist.online.playlistsongs.PlaylistSongsActivity"/>
     </application>
 
 </manifest>

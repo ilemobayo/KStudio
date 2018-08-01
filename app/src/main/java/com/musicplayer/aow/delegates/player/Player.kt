@@ -1,18 +1,22 @@
 package com.musicplayer.aow.delegates.player
 
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.Equalizer
+import android.net.Uri
+import android.util.Log
 import android.webkit.URLUtil
+import com.google.android.exoplayer2.*
+import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.ui.nowplaying.NowPlaying
-import org.jetbrains.anko.doAsync
+import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import java.io.IOException
 import java.util.*
-
-
-
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.Player.DefaultEventListener
 
 /**
  * Created with Android Studio.
@@ -23,14 +27,15 @@ import java.util.*
  */
 class Player private constructor() : IPlayback,
         MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnBufferingUpdateListener,
-        AudioManager.OnAudioFocusChangeListener {
+        MediaPlayer.OnBufferingUpdateListener,DefaultEventListener() {
+
+    //room for resntly played
+    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
 
     override var mPlayer: MediaPlayer? = null
 
-    private val mPlayOnFocusGain: Boolean = false
-
     var mPlayList: PlayList? = PlayList()
+
     // Default size 2: for service and UI
     private val mCallbacks = ArrayList<IPlayback.Callback>(2)
 
@@ -54,7 +59,56 @@ class Player private constructor() : IPlayback,
         Equalizer(0, mPlayer!!.audioSessionId)
         mPlayList = PlayList()
         mPlayer!!.setOnCompletionListener(this)
+        mPlayer!!.setAuxEffectSendLevel(1.0f)
         //mediaPlayer!!.setOnBufferingUpdateListener(this)
+    }
+
+
+
+    //EXOplayer
+    var playWhenReady: Boolean = false
+    var player: SimpleExoPlayer? = null
+    var playbackPosition = 0L
+    
+    private fun initializePlayer() {
+        player = ExoPlayerFactory.newSimpleInstance(
+                DefaultRenderersFactory(Injection.provideContext()),
+                DefaultTrackSelector(), DefaultLoadControl())
+        player!!.setPlayWhenReady(playWhenReady)
+        //player.seekTo(currentWindow, playbackPosition)
+        //OR
+        val uri = Uri.parse("")
+        val mediaSource = buildMediaSource(uri)
+        player!!.prepare(mediaSource, true, false)
+    }
+
+    private fun releaseExoPlayer() {
+        if (player != null) {
+            playbackPosition = player!!.getCurrentPosition();
+            //currentWindow = player!!.getCurrentWindowIndex();
+            playWhenReady = player!!.getPlayWhenReady();
+            player!!.release();
+            player = null;
+        }
+    }
+
+    override fun onPlayerStateChanged(playWhenReady: Boolean,
+                                      playbackState: Int) {
+        val stateString: String
+        when (playbackState) {
+            ExoPlayer.STATE_IDLE -> stateString = "ExoPlayer.STATE_IDLE      -"
+            ExoPlayer.STATE_BUFFERING -> stateString = "ExoPlayer.STATE_BUFFERING -"
+            ExoPlayer.STATE_READY -> stateString = "ExoPlayer.STATE_READY     -"
+            ExoPlayer.STATE_ENDED -> stateString = "ExoPlayer.STATE_ENDED     -"
+            else -> stateString = "UNKNOWN_STATE             -"
+        }
+        Log.d(TAG, "changed state to " + stateString
+                + " playWhenReady: " + playWhenReady)
+    }
+
+    private fun buildMediaSource(uri: Uri): MediaSource {
+        return ExtractorMediaSource.Factory(
+                DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri)
     }
 
     override fun setPlayList(list: PlayList) {
@@ -82,6 +136,8 @@ class Player private constructor() : IPlayback,
                     mPlayer!!.setDataSource(song?.path)
                     mPlayer!!.prepareAsync()
                     mPlayer!!.setOnPreparedListener({ mp ->
+                        mPlayList!!.currentSong?.duration = mp.duration
+                        notifyPrepared(true)
                         mp.start()
                         isPaused = false
                         notifyPlayStatusChanged(true)
@@ -90,9 +146,15 @@ class Player private constructor() : IPlayback,
                     val url = song?.path
                     mPlayer!!.setDataSource(url)
                     mPlayer!!.prepare()
-                    mPlayer!!.start()
-                    isPaused = false
-                    notifyPlayStatusChanged(true)
+                    mPlayer!!.setOnPreparedListener({ mp ->
+                        notifyPrepared(true)
+                        mp.start()
+                        isPaused = false
+                        notifyPlayStatusChanged(true)
+                    })
+//                    mPlayer!!.start()
+//                    isPaused = false
+//                    notifyPlayStatusChanged(true)
                 }
                 return true
             } catch (e: IOException) {
@@ -117,14 +179,16 @@ class Player private constructor() : IPlayback,
     }
 
     override fun play(list: PlayList, startIndex: Int): Boolean {
-        if (startIndex < 0 || startIndex >= list.numOfSongs) return false
+
+        if (startIndex < 0 || startIndex >= list.songs?.size!!) return false
 
         isPaused = false
         list.playingIndex = startIndex
         setPlayList(list)
-        doAsync {
-            NowPlaying.instance!!.setSongs(list.songs)
-        }
+        val playList = PlayList(list.songs)
+        playList.name = "Recently Played"
+        playList.mxp_id = "nowplaying"
+        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
         return play()
     }
 
@@ -245,7 +309,10 @@ class Player private constructor() : IPlayback,
             queue.add(value)
         }
         mPlayList!!.songs = queue
-        NowPlaying.instance!!.setUpdate()
+        val playList = PlayList(mPlayList!!.songs)
+        playList.name = "Recently Played"
+        playList.mxp_id = "nowplaying"
+        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
     }
 
     fun insertnext(index: Int, value: ArrayList<Song>) {
@@ -266,7 +333,10 @@ class Player private constructor() : IPlayback,
             queue.addAll(value)
         }
         mPlayList!!.songs = queue
-        NowPlaying.instance!!.setUpdate()
+        val playList = PlayList(mPlayList!!.songs)
+        playList.name = "Recently Played"
+        playList.mxp_id = "nowplaying"
+        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
     }
 
     fun updatePlaylist(value: ArrayList<Song>){
@@ -299,6 +369,12 @@ class Player private constructor() : IPlayback,
        }
     }
 
+    private fun notifyPrepared(isPlaying: Boolean) {
+        for (callback in mCallbacks) {
+            callback.onPrepared(isPlaying)
+        }
+    }
+
     private fun notifyPlayLast(song: Song) {
         for (callback in mCallbacks) {
             callback.onSwitchLast(song)
@@ -315,11 +391,6 @@ class Player private constructor() : IPlayback,
         for (callback in mCallbacks) {
             callback.onComplete(song)
         }
-    }
-
-    //Audio Focus
-    override fun onAudioFocusChange(focusChange: Int) {
-        //
     }
 
     companion object {

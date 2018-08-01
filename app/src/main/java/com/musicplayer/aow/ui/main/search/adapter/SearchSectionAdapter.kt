@@ -55,6 +55,7 @@ class SearchSectionAdapter(private val mContext: Context, private val itemsList:
                 val gsonBuilder = GsonBuilder().create()
                 val jsonFromPojo = gsonBuilder.toJson(singleItem)
                 val intent = Intent(mContext, BrowseActivity::class.java)
+                intent.putExtra("host", "search")
                 intent.putExtra("data", jsonFromPojo)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 ContextCompat.startActivity(mContext, intent, null)

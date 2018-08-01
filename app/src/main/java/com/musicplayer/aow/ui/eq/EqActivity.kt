@@ -6,7 +6,6 @@ import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
 import android.media.audiofx.Virtualizer
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -75,14 +74,14 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
         // set a custom navigation bar resource
         tintManager.setNavigationBarTintResource(R.drawable.gradient_warning);
         // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.drawable.gradient_info);
+        tintManager.setStatusBarTintResource(R.color.black);
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar2)
         setSupportActionBar(toolbar)
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
-        toolbar.title = "EQ."
+        toolbar.title = "Equalizer FX"
         toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_arrow_back_black)
         toolbar.setNavigationOnClickListener{
             finish()
@@ -107,6 +106,7 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
 
                 if (position==0) {
                     rev!!.preset = PresetReverb.PRESET_NONE
+                    rev!!.release()
                 } else if (position==1) {
                     rev!!.preset = PresetReverb.PRESET_LARGEHALL
                 } else if (position==2) {
@@ -120,8 +120,7 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
                 } else if (position==6) {
                     rev!!.preset = PresetReverb.PRESET_PLATE
                 }
-
-            Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show()
+                 rev!!.enabled = true
         })
 
         sliders[0] = findViewById(R.id.slider_1)

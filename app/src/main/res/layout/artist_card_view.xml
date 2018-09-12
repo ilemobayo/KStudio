@@ -1,233 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/layout_view_container_artist"
-        android:clickable="true"
-        android:layout_width="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:focusable="true">
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingBottom="5dp">
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view_container_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true"
+            card_view:cardCornerRadius="5dp">
+                <ImageView
+                    android:id="@+id/artist_album_art"
+                    android:layout_width="135dp"
+                    android:layout_height="145dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:contentDescription="@string/todo"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/gradient_danger"/>
+                <TextView
+                    android:id="@+id/text_view_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/mp.margin.small"
+                    android:fontFamily="@font/san_fransisco_compact_display_regular"
+                    tools:text="@string/artist"
+                    android:text="@string/artist"
+                    android:textSize="12sp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="top|center_horizontal|end"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:textStyle="normal"
+                    android:textColor="@color/white"
+                    android:shadowColor="@color/black"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="1"/>
+        </android.support.v7.widget.CardView>
 
         <RelativeLayout
+            android:id="@+id/labels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
-
-            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/card_view_container_artist"
-                android:clickable="true"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_below="@+id/card_view_container_artist">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                card_view:cardElevation="4dp"
-                card_view:cardUseCompatPadding="true"
-                card_view:cardCornerRadius="3dp"
-                android:focusable="true">
-                    <ImageView
-                        android:id="@+id/artist_album_art"
-                        android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:contentDescription="@string/todo"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/gradient_danger"/>
-                    <TextView
-                        android:id="@+id/text_view_duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/mp.margin.small"
-                        tools:text="Artist"
-                        android:text="Artist"
-                        android:textSize="10sp"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_gravity="top|center_horizontal|right"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:shadowColor="@color/black"
-                        android:shadowDx="0"
-                        android:shadowDy="0"
-                        android:shadowRadius="1"/>
-            </android.support.v7.widget.CardView>
-
-            <RelativeLayout
-                android:id="@+id/labels"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:layout_below="@+id/card_view_container_artist">
-                <LinearLayout
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toStartOf="@+id/item_options_action"
+                android:layout_toEndOf="@id/item_options_action"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/artist_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_toStartOf="@+id/item_options_action"
-                    android:layout_toEndOf="@id/item_options_action"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/artist_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/superstarkingszstudio"
-                        android:textSize="10dp"
-                        android:textColor="@color/black"
-                        android:shadowColor="@color/white"
-                        android:shadowDx="0"
-                        android:shadowDy="0"
-                        android:shadowRadius="0"
-                        android:paddingBottom="1dp"
-                        android:paddingLeft="2dp"
-                        android:paddingRight="2dp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:paddingTop="1dp"/>
-                    <TextView
-                        android:id="@+id/artist_no_songs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/artist_name"
-                        android:text="Numbers of Tracks."
-                        android:textSize="8dp"
-                        android:textColor="@color/black"
-                        android:shadowColor="@color/white"
-                        android:shadowDx="0"
-                        android:shadowDy="0"
-                        android:shadowRadius="0"
-                        android:paddingBottom="10dp"
-                        android:paddingLeft="2dp"
-                        android:paddingRight="2dp"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
-                </LinearLayout>
-                <FrameLayout
-                    android:id="@+id/item_options_action"
-                    android:layout_width="15dp"
-                    android:layout_height="35dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_gravity="bottom|right"
-                    >
-                    <android.support.v7.widget.AppCompatImageView
-                        android:id="@+id/item_button_action"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:scaleType="center"
-                        app:srcCompat="@drawable/ic_list_item_action"
-                        />
-                </FrameLayout>
-            </RelativeLayout>
+                    android:fontFamily="@font/san_fransisco_compact_display_semibold"
+                    android:text="@string/unknown"
+                    android:textSize="12sp"
+                    android:textColor="@color/black"
+                    android:shadowColor="@color/white"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="0"
+                    android:paddingBottom="1dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingTop="1dp"/>
+                <TextView
+                    android:id="@+id/artist_no_songs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/san_fransisco_compact_display_regular"
+                    android:text="@string/unknown"
+                    android:textSize="12sp"
+                    android:textColor="@color/grey_dim"
+                    android:shadowColor="@color/white"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="0"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+            </LinearLayout>
+            <FrameLayout
+                android:id="@+id/item_options_action"
+                android:layout_width="15dp"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="bottom|right"
+                >
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/item_button_action"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_list_item_action"
+                    />
+            </FrameLayout>
         </RelativeLayout>
 
     </LinearLayout>
-</LinearLayout>
 
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="@dimen/mp.list.itemHeight"-->
-    <!--android:layout_marginBottom="10dp"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--android:background="@color/mp.list.background"-->
-    <!--android:id="@+id/card_view_container_artist">-->
-
-    <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:background="?attr/selectableItemBackground"-->
-        <!--android:layout_marginBottom="@dimen/mp.divider.line"-->
-        <!--/>-->
-
-    <!--<android.support.v7.widget.AppCompatImageView-->
-        <!--android:id="@+id/image_view_file"-->
-        <!--android:layout_width="20dp"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:scaleType="fitCenter"-->
-        <!--android:layout_gravity="center"-->
-        <!--app:srcCompat="@drawable/library_artist"-->
-        <!--android:background="@color/transparent"-->
-        <!--android:layout_marginLeft="26dp"-->
-        <!--android:layout_marginStart="26dp"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--/>-->
-
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_toRightOf="@+id/image_view_file"-->
-        <!--android:layout_toEndOf="@+id/image_view_file"-->
-        <!--android:layout_toLeftOf="@+id/item_options_action"-->
-        <!--android:layout_toStartOf="@+id/item_options_action"-->
-        <!--android:layout_marginLeft="10dp"-->
-        <!--android:layout_marginStart="10dp"-->
-        <!--android:layout_marginRight="@dimen/mp.margin.normal"-->
-        <!--android:layout_marginEnd="@dimen/mp.margin.normal"-->
-        <!--android:background="@color/transparent"-->
-        <!--&gt;-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/artist_name"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="@string/superstarkingszstudio"-->
-                <!--android:textColor="#000000"-->
-                <!--android:paddingBottom="1dp"-->
-                <!--android:paddingLeft="2dp"-->
-                <!--android:paddingRight="2dp"-->
-                <!--android:maxLines="1"-->
-                <!--android:ellipsize="end"-->
-                <!--android:paddingTop="1dp"-->
-                <!--android:background="@color/transparent"/>-->
-            <!--<TextView-->
-                <!--android:id="@+id/artist_no_songs"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_below="@+id/artist_name"-->
-                <!--android:text="@string/kingsstudio"-->
-                <!--android:textColor="#000000"-->
-                <!--android:paddingBottom="10dp"-->
-                <!--android:paddingLeft="2dp"-->
-                <!--android:paddingRight="2dp"-->
-                <!--android:maxLines="1"-->
-                <!--android:ellipsize="end"-->
-                <!--android:background="@color/transparent"/>-->
-    <!--</LinearLayout>-->
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/item_options_action"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:paddingRight="2dp"-->
-        <!--android:paddingLeft="2dp"-->
-        <!--&gt;-->
-
-        <!--<android.support.v7.widget.AppCompatImageView-->
-            <!--android:id="@+id/item_button_action"-->
-            <!--android:layout_width="24dp"-->
-            <!--android:layout_height="24dp"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:scaleType="center"-->
-            <!--app:srcCompat="@drawable/ic_list_item_action"-->
-            <!--android:background="?attr/selectableItemBackgroundBorderless"-->
-            <!--/>-->
-    <!--</FrameLayout>-->
-
-<!--</RelativeLayout>-->
+</android.support.design.widget.CoordinatorLayout>

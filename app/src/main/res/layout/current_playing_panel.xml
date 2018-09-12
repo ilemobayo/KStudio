@@ -7,7 +7,7 @@
     android:layout_height="35dp"
     android:gravity="center_horizontal"
     android:elevation="0dp"
-    android:background="@drawable/gradient_danger"
+    android:background="@drawable/gradient_red_dim"
     >
 
     <RelativeLayout
@@ -51,6 +51,7 @@
 
                 <TextView
                     style="@style/MP.Theme.TextAppearance.List.Title"
+                    android:fontFamily="@font/san_fransisco_compact_display_bold"
                     android:id="@+id/text_view_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -74,6 +75,7 @@
 
                     <TextView
                         style="@style/MP.Theme.TextAppearance.List.Hint"
+                        android:fontFamily="@font/san_fransisco_compact_display_light"
                         android:id="@+id/text_view_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

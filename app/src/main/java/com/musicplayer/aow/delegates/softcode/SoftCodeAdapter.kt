@@ -9,13 +9,17 @@ import android.support.design.widget.BottomSheetDialog
 import android.support.v7.widget.RecyclerView
 import com.musicplayer.aow.delegates.data.model.Album
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.softcode.adapters.*
 
 class SoftCodeAdapter {
 
+    fun generatString(len: Int): String {
+        return Generator().randomString(len)
+    }
+
     fun getJsonString(context: Context, url: String): String? {
-        return HttpHelperFunctions(context!!.applicationContext)
+        return HttpHelperFunctions(context.applicationContext)
                 .getJsonString(url)
     }
 
@@ -27,20 +31,20 @@ class SoftCodeAdapter {
         NotificationFunctions(context).downloadSuccessNotification(title, location, msg)
     }
 
-    fun downloadFileAsync(context: Context,downloadUrl: String, song: Song) {
-        DownloadFileAsync(context).downloadFileAsync(downloadUrl, song)
+    fun downloadFileAsync(context: Context, downloadUrl: String, track: Track) {
+        DownloadFileAsync(context).downloadFileAsync(downloadUrl, track)
     }
 
     fun convertToBitmap(drawable: Drawable, widthPixels: Int, heightPixels: Int): Bitmap? {
-        val mutableBitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
-        val canvas = Canvas(mutableBitmap);
-        drawable.setBounds(0, 0, widthPixels, heightPixels);
-        drawable.draw(canvas);
+        val mutableBitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(mutableBitmap)
+        drawable.setBounds(0, 0, widthPixels, heightPixels)
+        drawable.draw(canvas)
 
-        return mutableBitmap;
+        return mutableBitmap
     }
 
-    fun deleteSongFromPhone(context: Context, model: Song){
+    fun deleteSongFromPhone(context: Context, model: Track){
         SongFunctions().deletSongFromPhone(context, model)
     }
 
@@ -60,11 +64,11 @@ class SoftCodeAdapter {
         ArtistFunctions().deleteArtist(context, artist, id)
     }
 
-    fun getAlbumTracks(context: Context, album: String, id: Boolean = true): ArrayList<Song> {
+    fun getAlbumTracks(context: Context, album: String, id: Boolean = true): ArrayList<Track> {
         return AlbumFunctions().getAlbumTracks(context, album, id)
     }
 
-    fun getArtistTracks(context: Context, artist: String, id: Boolean = true): ArrayList<Song> {
+    fun getArtistTracks(context: Context, artist: String, id: Boolean = true): ArrayList<Track> {
         return ArtistFunctions().getArtistTracks(context, artist, id)
     }
 
@@ -93,14 +97,13 @@ class SoftCodeAdapter {
     }
 
     fun addSongToPlaylist(
-            activity: Activity,
             context: Context,
             mylist: RecyclerView,
             mSelectPlaylistDialog: BottomSheetDialog,
-            song: Song = Song(),
-            songs: ArrayList<Song>? = ArrayList(),
+            track: Track = Track(),
+            tracks: ArrayList<Track>? = ArrayList(),
             arrayOfSongs: Boolean = false){
-        PlaylistFunctions().addSongToPlaylist(activity,context, mylist, mSelectPlaylistDialog, song, songs, arrayOfSongs)
+        PlaylistFunctions().addSongToPlaylist(context, mylist, mSelectPlaylistDialog, track, tracks, arrayOfSongs)
     }
 
     fun removeSongsFromPlayList(context: Context, id: Long, path: String){
@@ -110,6 +113,6 @@ class SoftCodeAdapter {
 
     /**
      * Offline save favorite playlist
-     * and offline saved favorite songs
+     * and offline saved favorite tracks
      */
 }

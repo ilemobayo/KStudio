@@ -30,6 +30,8 @@
         <TextView
             style="@style/MP.Theme.TextAppearance.List.Title"
             android:id="@+id/text_view_name"
+            android:fontFamily="@font/san_fransisco_compact_display_semibold"
+            android:textSize="12sp"
             tools:text="Favorite"
             />
     </LinearLayout>

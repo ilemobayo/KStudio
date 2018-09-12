@@ -40,6 +40,7 @@ class ExternalPlayerActivity : BaseActivity(), View.OnClickListener{
     private val mProgressCallback = object : Runnable {
         override fun run() {
             if (mPlayer!!.isPlaying) {
+
                 val progress = (seekBarProgress!!.max * (mPlayer!!.currentPosition.toFloat() / currentSongDuration.toFloat())).toInt()
                 updateProgressTextWithDuration(mPlayer!!.currentPosition)
                 if (progress >= 0 && progress <= seekBarProgress!!.max) {

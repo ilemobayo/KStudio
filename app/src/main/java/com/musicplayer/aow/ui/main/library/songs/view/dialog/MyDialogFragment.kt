@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.songs.dialog
+package com.musicplayer.aow.ui.main.library.songs.view.dialog
 
 import android.app.DialogFragment
 import android.os.Bundle

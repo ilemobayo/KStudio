@@ -7,14 +7,13 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.musicplayer.aow.application.Injection
-import com.musicplayer.aow.delegates.data.model.Song
-import rx.subscriptions.CompositeSubscription
+import com.musicplayer.aow.delegates.data.model.Track
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
 
-class StorageUtil(context: Context) {
+class StorageUtil(context: Context? = null) {
 
     var applicationFoldercontext = "musixplay"
 
@@ -23,44 +22,42 @@ class StorageUtil(context: Context) {
     val STORAGE = "com.musicplayer.aow.STORAGE"
     private var preferences: SharedPreferences? = null
 
-    private val mSubscriptions: CompositeSubscription? = null
-
 
     fun appPreference(): SharedPreferences? {
-        return context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        return context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
     }
 
-    fun storeAudio(arrayList: ArrayList<Song>?): Boolean {
-        preferences = context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+    fun storeAudio(arrayList: ArrayList<Track>?): Boolean {
+        preferences = context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         val gson = Gson()
         val json = gson.toJson(arrayList)
-        editor.putString("songs", json)
+        editor.putString("tracks", json)
         editor.apply()
         return true
     }
 
-    fun loadAudio(): ArrayList<Song>? {
-        preferences = context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+    fun loadAudio(): ArrayList<Track>? {
+        preferences = context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         val gson = Gson()
-        val json = preferences!!.getString("songs", null)
-        val type = object : TypeToken<ArrayList<Song>>() {}.type
+        val json = preferences!!.getString("tracks", null)
+        val type = object : TypeToken<ArrayList<Track>>() {}.type
         return if (json.isNullOrEmpty()) {
             ArrayList()
         }else {
-            gson.fromJson<ArrayList<Song>>(json, type)
+            gson.fromJson<ArrayList<Track>>(json, type)
         }
     }
 
     fun storeAudioIndex(index: Int) {
-        preferences = this.context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        preferences = this.context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         editor.putInt("audioIndex", index)
         editor.apply()
     }
 
     fun loadAudioIndex(): Int {
-        preferences = this.context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        preferences = this.context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         if (preferences != null) {
             return preferences!!.getInt("audioIndex", -1)//return -1 if no data found
         }else{
@@ -69,21 +66,21 @@ class StorageUtil(context: Context) {
     }
 
     fun clearCachedAudioPlaylist() {
-        preferences = this.context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        preferences = this.context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         editor.clear()
-        editor.commit()
+        editor.apply()
     }
 
     fun saveStringValue(name: String, value: String){
-        preferences = this.context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        preferences = this.context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         val editor = preferences!!.edit()
         editor.putString(name, value)
         editor.apply()
     }
 
     fun loadStringValue(name: String): String? {
-        preferences = this.context!!.getSharedPreferences(STORAGE,Context.MODE_PRIVATE);
+        preferences = this.context.getSharedPreferences(STORAGE,Context.MODE_PRIVATE)
         return preferences!!.getString(name, "empty")
     }
 
@@ -94,7 +91,7 @@ class StorageUtil(context: Context) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.e("App", "failed to create directory")
             }else{
-                var folderNames = arrayListOf("/tmpImg", "/update", "/cache/.img","/cache/.audio", "/.media", "/.nomedia",
+                val folderNames = arrayListOf("/tmpImg", "/update", "/cache/.img","/cache/.audio", "/.media", "/.nomedia",
                         "/download/lyrics", "/download/audio", "/download/albumart","/items", "/data")
                 folderNames
                         .asSequence()
@@ -106,7 +103,7 @@ class StorageUtil(context: Context) {
     }
 
     fun byteArrayToFile(byteArray: ByteArray, name: String): String? {
-        val file = File(Environment.getExternalStorageDirectory(), applicationFoldercontext + "/cache/.audio/" + name + ".mxp")
+        val file = File(Environment.getExternalStorageDirectory(), "$applicationFoldercontext/cache/.audio/$name.mxp")
         if (!file.exists()) {
             file.createNewFile()
         }

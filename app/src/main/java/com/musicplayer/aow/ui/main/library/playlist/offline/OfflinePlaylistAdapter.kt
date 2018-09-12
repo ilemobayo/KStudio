@@ -19,9 +19,12 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.musicplayer.aow.R
+import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.bus.RxBus
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
@@ -35,6 +38,7 @@ class OfflinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, i
     private var mModel = data
     private var view: View? = null
     private var layoutInflater = inflater
+    private var playlistDatabase: PlaylistDatabase? = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: OfflinePlayListViewHolder, position: Int) {
@@ -46,16 +50,14 @@ class OfflinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, i
         //implementation of item click
         holder.item?.setOnClickListener {
             val intent = Intent(context, PlaylistSongsListActivity::class.java)
-            intent.putExtra("_id", model._id)
             intent.putExtra("name", model.name)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             ContextCompat.startActivity(context, intent, null)
         }
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
         holder.pOption.setOnClickListener {
-            val playlistSongs = SoftCodeAdapter().getPlaylistTracks(context, model._id)
             if (view != null) {
                 val context = view!!.context
                 val mBottomSheetDialog = BottomSheetDialog(context)
@@ -76,27 +78,27 @@ class OfflinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, i
                 }
 
                 //Don't show the delete and rename button for default playlists
-                if(playlistName == context.getString(R.string.mp_play_list_songs) ||
+                if(playlistName == context.getString(R.string.mp_play_list_tracks) ||
                         playlistName == context.getString(R.string.mp_play_list_nowplaying) ||
                         playlistName == context.getString(R.string.mp_play_list_favorite) ){
                     rename.visibility = View.GONE
                     delete.visibility = View.GONE
                 }
 
-                if(playlistName == context.getString(R.string.mp_play_list_songs)){
+                if(playlistName == context.getString(R.string.mp_play_list_tracks)){
                     clear.visibility = View.GONE
                 }
 
                 play.setOnClickListener {
-                    RxBus.instance!!.post(PlayListNowEvent(playlistSongs,0))
+                    Player.instance?.play(model,0)
                     mBottomSheetDialog.dismiss()
                 }
                 playNext.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,playlistSongs.songs as ArrayList<Song>)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,model.tracks as ArrayList<Track>)
                     mBottomSheetDialog.dismiss()
                 }
                 queue.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,playlistSongs.songs as ArrayList<Song>)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,model.tracks as ArrayList<Track>)
                     mBottomSheetDialog.dismiss()
                 }
                 rename.setOnClickListener {
@@ -104,12 +106,17 @@ class OfflinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, i
                     mBottomSheetDialog.dismiss()
                 }
                 clear.setOnClickListener {
-                    playlistSongs.songs = ArrayList()
+                    AppExecutors.instance?.diskIO()?.execute {
+                        model.tracks?.clear()
+                        playlistDatabase?.playlistDAO()?.updatePlayList(model)
+                    }
                     //updatePlayList(model!!)
                     mBottomSheetDialog.dismiss()
                 }
                 delete.setOnClickListener{
-                    deletePlayList(model._id)
+                    AppExecutors.instance?.diskIO()?.execute {
+                        playlistDatabase?.playlistDAO()?.deletePlayList(model)
+                    }
                     mBottomSheetDialog.dismiss()
                 }
             }
@@ -162,7 +169,7 @@ class OfflinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, i
 
     private fun deletePlayList(id: Long) {
         try {
-            val uri_ = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+            val uri_ = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
             val whereclause = MediaStore.Audio.Playlists._ID + " =?"
             context.contentResolver.delete(uri_, whereclause, arrayOf(id.toString()))
         } catch (e: Exception){

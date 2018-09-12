@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 
 
 abstract class ListAdapter<T, V : IAdapterView<*>>(private val mContext: Context, private var mData: MutableList<Any>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -56,24 +56,24 @@ abstract class ListAdapter<T, V : IAdapterView<*>>(private val mContext: Context
     }
 
     override fun getItemCount(): Int {
-        return if (mData == null) 0 else mData!!.size
+        return if (mData == null) 0 else mData.size
     }
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
-    fun addData(data: MutableList<Song>){
-        mData!!.addAll(data)
+    fun addData(data: MutableList<Track>){
+        mData.addAll(data)
     }
 
     open fun getItem(position: Int): Any {
-        return mData!![position]
+        return mData[position]
     }
 
     fun clear() {
         if (mData != null)
-            mData!!.clear()
+            mData.clear()
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {

@@ -7,8 +7,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.NonNull
 
-@Entity(tableName = "song")
-class Song : Parcelable {
+@Entity(tableName = "track")
+class Track : Parcelable {
 
     var id: Int = 0
 
@@ -44,6 +44,8 @@ class Song : Parcelable {
     var description: String? = ""
 
     var date_created: String? = ""
+
+    var genre: String? = ""
 
     @NonNull
     @PrimaryKey(autoGenerate = false)
@@ -114,19 +116,19 @@ class Song : Parcelable {
     }
 
     override fun toString(): String {
-        return "Song(id=$id, title=$title, displayName=$displayName, artist=$artist, album=$album, path=$path," +
+        return "Track(id=$id, title=$title, displayName=$displayName, artist=$artist, album=$album, path=$path," +
                 " duration=$duration, size=$size, isFavorite=$isFavorite, numberOfPlay=$numberOfPlay," +
                 " dateAdded=$dateAdded, albumArt=$albumArt)"
     }
 
 
     companion object {
-        val CREATOR: Parcelable.Creator<Song> = object : Parcelable.Creator<Song> {
-            override fun createFromParcel(source: Parcel): Song {
-                return Song(source)
+        val CREATOR: Parcelable.Creator<Track> = object : Parcelable.Creator<Track> {
+            override fun createFromParcel(source: Parcel): Track {
+                return Track(source)
             }
 
-            override fun newArray(size: Int): Array<Song?> {
+            override fun newArray(size: Int): Array<Track?> {
                 return arrayOfNulls(size)
             }
         }

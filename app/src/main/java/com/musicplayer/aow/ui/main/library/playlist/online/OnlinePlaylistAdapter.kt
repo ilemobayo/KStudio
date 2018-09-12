@@ -22,8 +22,9 @@ import com.google.gson.GsonBuilder
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.bus.RxBus
+import com.musicplayer.aow.delegates.data.db.AppExecutors
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
@@ -56,7 +57,7 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
             ContextCompat.startActivity(context, intent, null)
         }
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
         holder.pOption.setOnClickListener {
             if (view != null) {
@@ -78,31 +79,33 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
                 rename.visibility = View.GONE
 
                 //Don't show the delete and rename button for default playlists
-                if(playlistName == context.getString(R.string.mp_play_list_songs) ||
+                if(playlistName == context.getString(R.string.mp_play_list_tracks) ||
                         playlistName == context.getString(R.string.mp_play_list_nowplaying) ||
                         playlistName == context.getString(R.string.mp_play_list_favorite) ){
                     rename.visibility = View.GONE
                     delete.visibility = View.GONE
                 }
 
-                if(playlistName == context.getString(R.string.mp_play_list_songs)){
+                if(playlistName == context.getString(R.string.mp_play_list_tracks)){
                     clear.visibility = View.GONE
                 }
 
                 play.setOnClickListener {
-                    RxBus.instance!!.post(PlayListNowEvent(model!!,0))
+                    Player.instance?.play(model!!,0)
                     mBottomSheetDialog.dismiss()
                 }
                 playNext.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,model?.songs as ArrayList<Song>)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,model?.tracks as ArrayList<Track>)
                     mBottomSheetDialog.dismiss()
                 }
                 queue.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,model?.songs as ArrayList<Song>)
+                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,model?.tracks as ArrayList<Track>)
                     mBottomSheetDialog.dismiss()
                 }
                 delete.setOnClickListener{
-                    playListFavDatabase?.playlistFavDAO()?.deletePlayList(model!!)
+                    AppExecutors.instance?.diskIO()?.execute {
+                        playListFavDatabase?.playlistFavDAO()?.deletePlayList(model!!)
+                    }
                     mBottomSheetDialog.dismiss()
                 }
             }
@@ -155,7 +158,7 @@ class OnlinePlaylistAdapter(var context: Context, data: ArrayList<PlayList>?, in
 
     private fun deletePlayList(id: Long) {
         try {
-            val uri_ = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+            val uri_ = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
             val whereclause = MediaStore.Audio.Playlists._ID + " =?"
             context.contentResolver.delete(uri_, whereclause, arrayOf(id.toString()))
         } catch (e: Exception){

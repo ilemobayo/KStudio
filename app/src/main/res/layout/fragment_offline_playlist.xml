@@ -9,10 +9,10 @@
         <Button
             android:id="@+id/create_playlist"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_gradient"
-            android:text="Create playlist"/>
+            android:text="@string/create_playlist"/>
 
         <View
             android:id="@+id/divider"

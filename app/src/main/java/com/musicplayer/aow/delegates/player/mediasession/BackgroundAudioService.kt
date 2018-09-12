@@ -18,7 +18,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
 import com.musicplayer.aow.R
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.utils.CursorDB
 import java.io.IOException
 import java.util.*
@@ -28,7 +28,7 @@ class BackgroundAudioService : MediaBrowserServiceCompat(), MediaPlayer.OnComple
 
     private var mMediaPlayer: MediaPlayer? = null
     private var mMediaSessionCompat: MediaSessionCompat? = null
-    private val mPlaylist = ArrayList<Song>()
+    private val mPlaylist = ArrayList<Track>()
 
 
     private val mNoisyReceiver = object : BroadcastReceiver() {

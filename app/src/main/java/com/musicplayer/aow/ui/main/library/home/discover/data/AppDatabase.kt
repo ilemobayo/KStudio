@@ -11,7 +11,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playListObjectDAO(): PlayListObjectDAO
 
     companion object {
-
         private val LOG_TAG = AppDatabase::class.java.simpleName
         private val LOCK = Any()
         private val DATABASE_NAME = "discovery"
@@ -21,7 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
             if (sInstance == null) {
                 synchronized(LOCK) {
                     sInstance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java,
-                            AppDatabase.DATABASE_NAME).allowMainThreadQueries().build()
+                            AppDatabase.DATABASE_NAME).build()
                 }
             }
             return sInstance

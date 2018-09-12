@@ -5,8 +5,12 @@ import android.content.Context
 import android.graphics.*
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
+import java.security.MessageDigest
 
-class CircleTransform(context: Context) : BitmapTransformation(context) {
+class CircleTransform(context: Context) : BitmapTransformation() {
+    override fun updateDiskCacheKey(messageDigest: MessageDigest) {
+
+    }
 
     override fun transform(pool: BitmapPool, toTransform: Bitmap, outWidth: Int, outHeight: Int): Bitmap? {
         return getCroppedBitmap(toTransform)
@@ -42,7 +46,7 @@ class CircleTransform(context: Context) : BitmapTransformation(context) {
                     0,
                     bitmap.height,
                     bitmap.height
-            );
+            )
 
         }else{
 
@@ -52,11 +56,11 @@ class CircleTransform(context: Context) : BitmapTransformation(context) {
                     bitmap.height/2 - bitmap.width/2,
                     bitmap.width,
                     bitmap.width
-            );
+            )
         }
     }
 
-    override fun getId(): String {
+    fun getId(): String {
         return javaClass.name
     }
 }

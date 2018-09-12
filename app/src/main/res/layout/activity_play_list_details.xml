@@ -24,10 +24,10 @@
     <Button
         android:id="@+id/play_all"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_margin="5dp"
         android:background="@drawable/button_gradient"
-        android:text="Play all"
+        android:text="@string/play_all"
         android:textColor="@color/black"/>
     <View
         style="@style/MP.Theme.Widget.Divider.Line.Vertical"

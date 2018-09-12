@@ -7,11 +7,16 @@
         <item
             android:id="@+id/nav_account"
             android:icon="@drawable/ic_profile"
-            android:title="@string/my_account" />
+            android:title="@string/my_account"
+            />
         <item
-            android:id="@+id/nav_now_playing"
-            android:icon="@drawable/ic_nowplaying"
-            android:title="@string/now_playing" />
+            android:id="@+id/nav_podcast"
+            android:icon="@drawable/podcast"
+            android:title="@string/podcast" />
+        <item
+            android:id="@+id/nav_game"
+            android:icon="@drawable/ic_videogame"
+            android:title="@string/game" />
     </group>
     <!--<group android:checkableBehavior="single">-->
         <!--<item-->
@@ -43,5 +48,11 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
             android:title="@string/settings" />
+    </group>
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_logo"
+            android:title="@string/about" />
     </group>
 </menu>

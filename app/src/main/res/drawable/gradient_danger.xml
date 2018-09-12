@@ -4,8 +4,4 @@
         android:startColor="#ffbf96"
         android:endColor="#fe7096"
         android:angle="270"/>
-    <!--<gradient-->
-        <!--android:startColor="@color/red_dim_2"-->
-        <!--android:endColor="@color/red_dim"-->
-        <!--android:angle="270"/>-->
 </shape>

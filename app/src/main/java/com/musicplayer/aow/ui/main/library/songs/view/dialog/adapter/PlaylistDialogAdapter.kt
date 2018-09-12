@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.songs.dialog.adapter
+package com.musicplayer.aow.ui.main.library.songs.view.dialog.adapter
 
 import android.annotation.TargetApi
 import android.content.ContentValues
@@ -17,8 +17,11 @@ import android.widget.TextView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.musicplayer.aow.R
+import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import org.jetbrains.anko.find
 
 
@@ -29,17 +32,15 @@ import org.jetbrains.anko.find
  * Created by Arca on 1/23/2018.
  */
 class PlaylistDialogAdapter (
-        context: Context,
         playlist: List<PlayList>,
-        private var song: Song,
-        private var songs: ArrayList<Song>? = ArrayList(),
+        private var track: Track,
+        private var tracks: ArrayList<Track>? = ArrayList(),
         private var dialog: BottomSheetDialog,
         private var arrayOfSongs: Boolean = false): RecyclerView.Adapter<PlaylistDialogAdapter.PlayListViewHolder>() {
 
+    private var playlisDatabase: PlaylistDatabase? = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
     val TAG = "PlayListAdapter"
-    var context: Context = context.applicationContext
     private val mSongModel = playlist
-    private var view: View? = null
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: PlayListViewHolder, position: Int) {
@@ -63,40 +64,31 @@ class PlaylistDialogAdapter (
         holder.item.setOnClickListener {
             //add to playlist here
             if (!arrayOfSongs) {
-                Log.e(this.javaClass.name, "single")
-                model.addSong(song)
-                updatePlayList(model._id, song.id)
+                model.addSong(track)
+                updatePlayList(model)
             }else{
-                Log.e(this.javaClass.name, "list of ${songs?.size} songs")
-                songs?.forEach {
+                tracks?.forEach {
                     model.addSong(it)
-                    updatePlayList(model._id, it.id)
                 }
+                updatePlayList(model)
             }
             //close parent dialog
             dialog.dismiss()
         }
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
     }
 
-    private fun updatePlayList(playListId: Long, songId: Int) {
-        val uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playListId)
-        val cursor = context.contentResolver.query(uri, arrayOf("count(*)"), null, null, null)
-        cursor.moveToFirst()
-        var last = cursor.getInt(0)
-        cursor.close()
-        val value = ContentValues()
-        value.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, ++last)
-        value.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songId)
-        context.contentResolver.insert(uri, value)
+    private fun updatePlayList(playlist: PlayList) {
+        AppExecutors.instance?.diskIO()?.execute{
+            playlisDatabase?.playlistDAO()?.updatePlayList(playlist)
+        }
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayListViewHolder {
-        view = LayoutInflater.from(parent.context).inflate(R.layout.item_dialog_playlist,parent,false)
-        return PlayListViewHolder(view!!)
+        return PlayListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_dialog_playlist,parent,false))
     }
 
     //we get the count of the list

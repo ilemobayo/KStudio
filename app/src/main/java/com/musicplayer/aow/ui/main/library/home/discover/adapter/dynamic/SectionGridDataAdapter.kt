@@ -19,6 +19,9 @@ import com.musicplayer.aow.ui.main.library.home.browse.BrowseActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.onComplete
+import com.bumptech.glide.request.RequestOptions
+
+
 
 class SectionGridDataAdapter (private val mContext: Context, private val itemsList: List<PlaceholderData>?, var shortList: Boolean = false) : RecyclerView.Adapter<SectionGridDataAdapter.SingleItemRowHolder>() {
 
@@ -32,16 +35,15 @@ class SectionGridDataAdapter (private val mContext: Context, private val itemsLi
         holder.tvTitle.text = singleItem.name
         holder.artist.text = singleItem.owner
 
-        doAsync {
-            val img = Glide.with(mContext)
-                    .load(singleItem.picture).asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(150, 150)
-                    .get()
-            onComplete {
-                holder.itemImage.setImageBitmap(img)
-            }
-        }
+       Glide.with(mContext)
+               .load(singleItem.picture)
+                .apply(
+                        RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .dontAnimate()
+                                .dontTransform()
+                )
+                .into(holder.itemImage)
 
         val gsonBuilder = GsonBuilder().create()
         val jsonFromPojo = gsonBuilder.toJson(singleItem)

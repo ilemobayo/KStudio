@@ -1,5 +1,10 @@
 package com.musicplayer.aow.delegates.data.model
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
+import android.support.annotation.NonNull
+
+@Entity(tableName = "album")
 class Album{
 
     var id: Int = 0
@@ -8,7 +13,9 @@ class Album{
 
     var title: String? = null
 
-    var albumName: String? = null
+    @NonNull
+    @PrimaryKey(autoGenerate = false)
+    var albumName: String? = "unknown"
 
     var numberOfSongs: String? = null
 

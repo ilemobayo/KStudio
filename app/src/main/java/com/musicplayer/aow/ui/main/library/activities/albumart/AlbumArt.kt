@@ -47,17 +47,14 @@ class AlbumArt : AppCompatActivity() {
                     val albumData = metadataRetriever.embeddedPicture
 
                     Glide.with(this@AlbumArt).load(albumData)
-                            .error(com.musicplayer.aow.R.drawable.vinyl_blue)
-                            .into(albumArt)
+                            .into(albumArt!!)
                 }
             }else{
                 // To get the data use
                 val data = intent.data
                 if (data != null) {
-                    var video = Uri.parse(data.path)!!
                     Glide.with(this@AlbumArt).load(data.path)
-                            .error(com.musicplayer.aow.R.drawable.nigerian_artists)
-                            .into(albumArt)
+                            .into(albumArt!!)
                 }
             }
         }

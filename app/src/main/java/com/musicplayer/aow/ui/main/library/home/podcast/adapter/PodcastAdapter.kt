@@ -18,8 +18,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.musicplayer.aow.R
 import com.musicplayer.aow.bus.RxBus
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.PlayList
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlaySongEvent
+import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.ui.main.library.home.podcast.model.Playlist
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
@@ -40,7 +42,7 @@ class PodcastAdapter(context: Context, activity: Activity, playList: ArrayList<P
         var model = mSongModel[position]
         var albumName = model.title
         var albumArtist = model.source
-        holder!!.albumName.text = albumName
+        holder.albumName.text = albumName
         holder.albumArtist.text = albumArtist
         holder.label.text = "Podcast"
 
@@ -51,17 +53,14 @@ class PodcastAdapter(context: Context, activity: Activity, playList: ArrayList<P
             onComplete {
                 Glide.with(context)
                         .load(model.imageUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .override(150, 145)
-                        .centerCrop()
-                        .error(icon)
                         .into(holder.albumArt)
 
                 holder.cardView.setOnClickListener {
-                    var song = Song(model.title, model.title,
+                    val song = Track(model.title, model.title,
                             model.source, model.category, model.audioUrl,
                             model.audioDuration!!.toInt() * 1000, 1000, false, 0, "", model.imageUrl)
-                    RxBus.instance!!.post(PlaySongEvent(song))
+                    //RxBus.instance!!.playEvent.postValue(PlaySongEvent(song))
+                    Player.instance?.play(PlayList(song))
                 }
             }
         }
@@ -75,7 +74,7 @@ class PodcastAdapter(context: Context, activity: Activity, playList: ArrayList<P
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
-        var view = LayoutInflater.from(parent!!.context).inflate(R.layout.container_fish,parent,false)
+        var view = LayoutInflater.from(parent.context).inflate(R.layout.container_fish,parent,false)
         return AlbumViewHolder(view)
     }
 

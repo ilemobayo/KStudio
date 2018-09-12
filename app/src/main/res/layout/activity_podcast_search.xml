@@ -6,14 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.musicplayer.aow.ui.main.library.home.podcast.PodcastSearchActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:titleTextColor="@color/black"
+        android:background="@color/red_dim"
+        app:titleTextColor="@color/white"
         app:title="Podcast"/>
 
     <android.support.v7.widget.RecyclerView

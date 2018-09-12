@@ -13,14 +13,14 @@ abstract class PlayListFavDatabase: RoomDatabase(){
     companion object {
         private val LOG_TAG = PlayListFavDatabase::class.java.simpleName
         private val LOCK = Any()
-        private val DATABASE_NAME = "playlist"
+        private val DATABASE_NAME = "playlistonline"
         private var sInstance: PlayListFavDatabase? = null
 
         fun getsInstance(context: Context): PlayListFavDatabase? {
             if (sInstance == null) {
                 synchronized(LOCK) {
                     sInstance = Room.databaseBuilder(context.applicationContext, PlayListFavDatabase::class.java,
-                            PlayListFavDatabase.DATABASE_NAME).allowMainThreadQueries().build()
+                            PlayListFavDatabase.DATABASE_NAME).build()
                 }
             }
             return sInstance

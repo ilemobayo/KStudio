@@ -17,17 +17,23 @@ package com.musicplayer.aow.delegates.exo
 
 
 import android.content.Context
+import android.net.Uri
 
 import com.google.android.exoplayer2.offline.DownloadManager
 import com.google.android.exoplayer2.offline.ProgressiveDownloadAction
+import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.Cache
+import com.google.android.exoplayer2.upstream.cache.CacheUtil
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.util.Util
 import com.musicplayer.aow.R
 
 import java.io.File
+import com.google.android.exoplayer2.upstream.cache.CacheUtil.getKey
+
+
 
 object DownloadUtil {
 
@@ -35,18 +41,18 @@ object DownloadUtil {
     private var downloadManager: DownloadManager? = null
 
     @Synchronized
-    fun getCache(context: Context): Cache {
+    fun getCache(context: Context): Cache? {
         if (cache == null) {
-            val cacheDirectory = File(context.getExternalFilesDir(null), "downloads")
+            val cacheDirectory = File(context.externalCacheDir, "offline")
             cache = SimpleCache(cacheDirectory, NoOpCacheEvictor())
         }
         return cache
     }
 
     @Synchronized
-    fun getDownloadManager(context: Context): DownloadManager {
+    fun getDownloadManager(context: Context): DownloadManager? {
         if (downloadManager == null) {
-            val actionFile = File(context.externalCacheDir, "actions")
+            val actionFile = File(context.externalCacheDir, "rules")
             downloadManager = DownloadManager(
                     getCache(context),
                     DefaultDataSourceFactory(
@@ -56,6 +62,16 @@ object DownloadUtil {
                     ProgressiveDownloadAction.DESERIALIZER)
         }
         return downloadManager
+    }
+
+    fun remove(path: String) {
+        val uri = Uri.parse(path)
+        val dataSpec = DataSpec(uri)
+        CacheUtil.remove(cache, CacheUtil.getKey(dataSpec))
+    }
+
+    fun removeAll(){
+
     }
 
 }

@@ -2,6 +2,7 @@ package com.musicplayer.aow.delegates.softcode.adapters
 
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 
 class AutoFitGridLayoutManager(context: Context, columnWidth: Int) : GridLayoutManager(context, 1) {
@@ -10,11 +11,10 @@ class AutoFitGridLayoutManager(context: Context, columnWidth: Int) : GridLayoutM
     private var columnWidthChanged = true
 
     init {
-
         setColumnWidth(columnWidth)
     }
 
-    fun setColumnWidth(newColumnWidth: Int) {
+    private fun setColumnWidth(newColumnWidth: Int) {
         if (newColumnWidth > 0 && newColumnWidth != columnWidth) {
             columnWidth = newColumnWidth
             columnWidthChanged = true

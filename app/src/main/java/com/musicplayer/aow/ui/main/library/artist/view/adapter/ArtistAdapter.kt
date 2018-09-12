@@ -1,10 +1,8 @@
-package com.musicplayer.aow.ui.main.library.artist.adapter
+package com.musicplayer.aow.ui.main.library.artist.view.adapter
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetDialog
 import android.support.v4.content.ContextCompat.startActivity
@@ -19,11 +17,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
-import com.musicplayer.aow.bus.RxBus
 import com.musicplayer.aow.delegates.data.model.Artists
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.delegates.event.PlayListNowEvent
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.ui.main.library.activities.ArtistSongs
@@ -31,7 +27,6 @@ import com.musicplayer.aow.utils.images.BitmapDraws
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.onComplete
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 /**
@@ -40,11 +35,8 @@ import java.util.*
 class ArtistAdapter(var context: Context, var activity: Activity, artistList: ArrayList<Artists>?) : RecyclerView.Adapter<ArtistAdapter.ArtistViewHolder>() {
 
     private var view:View? = null
-    private val mSubscriptions: CompositeSubscription? = null
     private var mArtistModel = artistList
-    var firstAlbumArt = false
 
-    @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: ArtistViewHolder, position: Int) {
 
         val model = mArtistModel?.get(position)
@@ -94,56 +86,54 @@ class ArtistAdapter(var context: Context, var activity: Activity, artistList: Ar
         //to set options
         holder.option.setOnClickListener {
             val songs = SoftCodeAdapter().getArtistTracks(context, model.artist_id!!, true)
-            if (holder.view != null) {
-                val context = holder.view.context
-                val mBottomSheetDialog = BottomSheetDialog(context)
-                val sheetView =  LayoutInflater.from(context).inflate(R.layout.bottom_sheet_modal_dialog_album, null)
-                mBottomSheetDialog.setContentView(sheetView)
-                mBottomSheetDialog.show()
-                mBottomSheetDialog.setOnDismissListener {
-                    //perform action on close
-                }
+            val context = holder.view.context
+            val mBottomSheetDialog = BottomSheetDialog(context)
+            val sheetView =  LayoutInflater.from(context).inflate(R.layout.bottom_sheet_modal_dialog_album, null)
+            mBottomSheetDialog.setContentView(sheetView)
+            mBottomSheetDialog.show()
+            mBottomSheetDialog.setOnDismissListener {
+                //perform action on close
+            }
 
-                val play = sheetView!!.find<LinearLayout>(R.id.menu_item_play_now)
-                val playNext = sheetView.find<LinearLayout>(R.id.menu_item_play_next)
-                val queue = sheetView.find<LinearLayout>(R.id.menu_item_add_to_queue)
-                val playlist = sheetView.find<LinearLayout>(R.id.menu_item_add_to_play_list)
-                val delete = sheetView.find<LinearLayout>(R.id.menu_item_delete)
+            val play = sheetView!!.find<LinearLayout>(R.id.menu_item_play_now)
+            val playNext = sheetView.find<LinearLayout>(R.id.menu_item_play_next)
+            val queue = sheetView.find<LinearLayout>(R.id.menu_item_add_to_queue)
+            val playlist = sheetView.find<LinearLayout>(R.id.menu_item_add_to_play_list)
+            val delete = sheetView.find<LinearLayout>(R.id.menu_item_delete)
 
-                play.setOnClickListener {
-                    RxBus.instance!!.post(PlayListNowEvent(PlayList(songs), 0))
-                    mBottomSheetDialog.dismiss()
-                }
+            play.setOnClickListener {
+                Player.instance?.play(PlayList(songs), 0)
+                mBottomSheetDialog.dismiss()
+            }
 
-                playNext.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,songs)
-                    mBottomSheetDialog.dismiss()
-                }
+            playNext.setOnClickListener {
+                Player.instance!!.insertnext(Player.instance!!.mPlayList!!.playingIndex,songs)
+                mBottomSheetDialog.dismiss()
+            }
 
-                queue.setOnClickListener {
-                    Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,songs)
-                    mBottomSheetDialog.dismiss()
-                }
+            queue.setOnClickListener {
+                Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,songs)
+                mBottomSheetDialog.dismiss()
+            }
 
-                playlist.setOnClickListener {
-                    mBottomSheetDialog.dismiss()
-                    //Dialog with ListView
-                    val nContext = view!!.context
-                    val mSelectPlaylistDialog = BottomSheetDialog(nContext)
-                    val sheetView =  LayoutInflater.from(nContext).inflate(R.layout.custom_dialog_select_playlist, null)
-                    val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
+            playlist.setOnClickListener {
+                mBottomSheetDialog.dismiss()
+                //Dialog with ListView
+                val nContext = view!!.context
+                val mSelectPlaylistDialog = BottomSheetDialog(nContext)
+                val sheetView =  LayoutInflater.from(nContext).inflate(R.layout.custom_dialog_select_playlist, null)
+                val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
 
-                    SoftCodeAdapter().addSongToPlaylist(activity,nContext, mylist, mSelectPlaylistDialog, Song(), songs, true)
+                SoftCodeAdapter().addSongToPlaylist(nContext, mylist, mSelectPlaylistDialog, Track(), songs, true)
 
-                    mSelectPlaylistDialog.setContentView(sheetView)
-                    mSelectPlaylistDialog.show()
-                    mSelectPlaylistDialog.setOnDismissListener {}
-                }
+                mSelectPlaylistDialog.setContentView(sheetView)
+                mSelectPlaylistDialog.show()
+                mSelectPlaylistDialog.setOnDismissListener {}
+            }
 
-                delete.setOnClickListener {
-                    SoftCodeAdapter().deleteArtist(context, model.artist_id!!, true)
-                    mBottomSheetDialog.dismiss()
-                }
+            delete.setOnClickListener {
+                SoftCodeAdapter().deleteArtist(context, model.artist_id!!, true)
+                mBottomSheetDialog.dismiss()
             }
         }
     }

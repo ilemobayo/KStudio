@@ -91,8 +91,7 @@ class VoiceRecorderActivity : AppCompatActivity() {
     }
 
 
-
-    public override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_voice_recorder)
 
@@ -132,7 +131,7 @@ class VoiceRecorderActivity : AppCompatActivity() {
 
     }
 
-    public override fun onStop() {
+    override fun onStop() {
         super.onStop()
         if (mRecorder != null) {
             mRecorder!!.release()

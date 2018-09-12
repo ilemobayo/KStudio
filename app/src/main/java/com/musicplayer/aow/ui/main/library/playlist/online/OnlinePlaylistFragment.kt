@@ -11,8 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.song.SongFavDatabase
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
@@ -57,58 +58,37 @@ class OnlinePlaylistFragment : Fragment() {
         recycler_view!!.layoutManager = layoutManager
         recycler_view!!.adapter = adapter
 
-        upDate()
         loadData()
     }
 
     fun loadData(){
-        val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSong()
-        favoriteSongsList?.observe(this, object: Observer<List<Song>>{
-            override fun onChanged(t: List<Song>?) {
-                upDate()
-            }
-        })
+        AppExecutors.instance?.diskIO()?.execute {
+            val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSong()
+            favoriteSongsList?.observe(this, Observer<List<Track>> { reloadFavoriteSongs() })
 
-        val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
-        favoritePlaylist?.observe(this, object: Observer<List<PlayList>> {
-            override fun onChanged(t: List<PlayList>?) {
-                upDate()
-            }
-        })
-
-    }
-
-    fun upDate(){
-        reloadFavoriteSongs()
+            val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
+            favoritePlaylist?.observe(this, Observer<List<PlayList>> { reloadFavoriteSongs() })
+        }
     }
 
 
     private fun reloadFavoriteSongs(){
         modelData = ArrayList()
-        val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSong()
-        favoriteSongsList?.observe(this, object: Observer<List<Song>>{
+        AppExecutors.instance?.diskIO()?.execute {
+            val favoriteSongsList = songFavDatabase?.songFavDAO()?.fetchAllSongs()
+            val favoriteSongs = PlayList()
+            favoriteSongs.name = "Favorite Songs"
+            favoriteSongs.tracks = favoriteSongsList as ArrayList
+            modelData.clear()
+            modelData.add(favoriteSongs)
 
-            override fun onChanged(t: List<Song>?) {
-                favoriteSongsList.removeObserver(this)
-                val favoriteSongs = PlayList()
-                favoriteSongs.name = "Favorite Songs"
-                favoriteSongs.songs = t as ArrayList
-                modelData.add(favoriteSongs)
-                reloadPlaylists()
-            }
-        })
-    }
+            val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayedList()
+            modelData.addAll(favoritePlaylist as ArrayList)
 
-    fun reloadPlaylists(){
-        val favoritePlaylist = playListFavDatabase?.playlistFavDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
-        favoritePlaylist?.observe(this, object: Observer<List<PlayList>> {
-            override fun onChanged(t: List<PlayList>?) {
-                favoritePlaylist.removeObserver(this)
-                modelData.addAll(t as ArrayList)
+            this.activity?.runOnUiThread {
                 adapter?.swapCursor(modelData)
             }
-        })
+        }
     }
-
 
 }

@@ -1,0 +1,395 @@
+package com.musicplayer.aow.delegates.player
+
+import android.app.Notification
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.media.AudioManager
+import android.media.MediaMetadataRetriever
+import android.media.MediaPlayer
+import android.media.session.PlaybackState
+import android.net.Uri
+import android.os.*
+import android.provider.MediaStore
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.content.ContextCompat
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaBrowserServiceCompat
+import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaButtonReceiver
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import android.text.TextUtils
+import android.util.Log
+import android.view.KeyEvent
+import android.webkit.URLUtil
+import android.widget.RemoteViews
+import com.amulyakhare.textdrawable.TextDrawable
+import com.amulyakhare.textdrawable.util.ColorGenerator
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.mpatric.mp3agic.Mp3File
+import com.musicplayer.aow.R
+import com.musicplayer.aow.delegates.data.model.PlayList
+import com.musicplayer.aow.delegates.data.model.Track
+import com.musicplayer.aow.delegates.exo.C
+import com.musicplayer.aow.delegates.player.mediasession.MediaStyleHelper
+import com.musicplayer.aow.ui.main.MainActivity
+import com.musicplayer.aow.utils.images.BitmapDraws
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.onComplete
+import java.io.File
+import java.io.IOException
+import java.nio.file.Path
+
+class PlaybackService : MediaBrowserServiceCompat(), IPlayback, IPlayback.Callback, AudioManager.OnAudioFocusChangeListener {
+
+    override val mPlayer: SimpleExoPlayer?
+        get() = null
+
+    private var mediaSession: MediaSessionCompat? = null
+    private var mediaSessionConnector: MediaSessionConnector? = null
+    private var playerNotificationManager: PlayerNotificationManager? = null
+
+    var mediaPlayer: Player? = Player.instance
+
+    private val mBinder = LocalBinder()
+
+    override var isPlaying: Boolean = false
+        get() = mediaPlayer!!.isPlaying
+
+    override var progress: Int = 0
+        get() = mediaPlayer!!.progress
+
+    override var playingSong: Song? = null
+        get() = mediaPlayer!!.playingSong
+
+    override var playingList: PlayList? = null
+        get() = mediaPlayer!!.playingList
+
+    inner class LocalBinder : Binder() {
+        val service: PlaybackService
+            get() = this@PlaybackService
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        initMediaPlayer()
+        initNoisyReceiver()
+        initMediaSession()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        MediaButtonReceiver.handleIntent(mediaSession, intent)
+        return Service.START_STICKY
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return mBinder
+    }
+
+    override fun onUnbind(intent: Intent): Boolean {
+        return false
+    }
+
+    override fun stopService(name: Intent): Boolean {
+        stopForeground(true)
+        unregisterCallback(this)
+        return super.stopService(name)
+    }
+
+    override fun onDestroy() {
+        releasePlayer()
+        stopForeground(true)
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.abandonAudioFocus(this)
+        unregisterReceiver(mNoisyReceiver)
+        mediaSession?.release()
+        mediaSessionConnector!!.setPlayer(null, null)
+        playerNotificationManager!!.setPlayer(null)
+        super.onDestroy()
+    }
+
+    override fun setPlayList(list: PlayList) {
+        mediaPlayer!!.setPlayList(list)
+    }
+
+    override fun play(): Boolean {
+        return mediaPlayer!!.play()
+    }
+
+    override fun play(list: PlayList): Boolean {
+        return mediaPlayer!!.play(list)
+    }
+
+    override fun play(list: PlayList, startIndex: Int): Boolean {
+        return mediaPlayer!!.play(list, startIndex)
+    }
+
+    override fun play(track: Song): Boolean {
+        return mediaPlayer!!.play(track)
+    }
+
+    override fun playLast(): Boolean {
+        return mediaPlayer!!.playLast()
+    }
+
+    override fun playNext(): Boolean {
+        return mediaPlayer!!.playNext()
+    }
+
+    override fun pause(): Boolean {
+        return mediaPlayer!!.pause()
+    }
+
+    override fun seekTo(progress: Int): Boolean {
+        return mediaPlayer!!.seekTo(progress)
+    }
+
+    override fun setPlayMode(playMode: PlayMode) {
+        mediaPlayer!!.setPlayMode(playMode)
+    }
+
+    override fun registerCallback(callback: IPlayback.Callback) {
+        mediaPlayer!!.registerCallback(callback)
+    }
+
+    override fun unregisterCallback(callback: IPlayback.Callback) {
+        mediaPlayer!!.unregisterCallback(callback)
+    }
+
+    override fun removeCallbacks() {
+        mediaPlayer!!.removeCallbacks()
+    }
+
+    override fun releasePlayer() {
+        mediaPlayer!!.releasePlayer()
+    }
+
+    // Playback Callbacks
+    override fun onSwitchLast(last: Song?) {
+        //showNotification()
+        //initMediaSession()
+    }
+
+    override fun onSwitchNext(next: Song?) {
+        //showNotification()
+        //initMediaSession()
+    }
+
+    override fun onComplete(next: Song?) {
+        //showNotification()
+        //initMediaSession()
+    }
+
+    override fun onPlayStatusChanged(isPlaying: Boolean) {
+        //showNotification()
+        //initMediaSession()
+    }
+
+    override fun onTriggerLoading(isLoading: Boolean) {
+
+    }
+
+    override fun onPrepared(isPrepared: Boolean) {
+
+    }
+
+    private fun initMediaPlayer() {
+        mediaPlayer = Player.instance
+        mediaPlayer!!.registerCallback(this)
+        mediaPlayer!!.attachEventListener()
+    }
+
+    /**
+     * Show a notification while this service is running.
+     */
+
+    fun showNotification(){
+        val track = mediaPlayer!!.playingSong
+        if (track != null) {
+            if (track.albumArt != null && track.albumArt != "null") {
+                if (URLUtil.isHttpUrl(track.albumArt) || URLUtil.isHttpsUrl(track.albumArt)) {
+                    doAsync {
+                        val img = Glide.with(applicationContext)
+                                .load(track.albumArt).asBitmap()
+                                .into(250, 250)
+                                .get()
+                        onComplete {
+
+                        }
+                    }
+                } else {
+                    try{
+                        val metadataRetriever = MediaMetadataRetriever()
+                        metadataRetriever.setDataSource(track.path)
+                        val data = metadataRetriever.embeddedPicture
+                        // convert the byte array to a bitmap
+                        if(data != null)
+                        {
+                            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                            if (bitmap != null){
+
+                            }else{
+
+                            }
+                        }else{
+
+                        }
+                        metadataRetriever.release()
+                    }catch (e:Exception){
+
+                    }
+                }
+            } else {
+
+            }
+        }
+    }
+
+    private fun initMediaSession() {
+        playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
+                this,
+                C.PLAYBACK_CHANNEL_ID,
+                R.string.playback_channel_name,
+                C.PLAYBACK_NOTIFICATION_ID,
+                object : PlayerNotificationManager.MediaDescriptionAdapter {
+                    override fun getCurrentContentTitle(player: com.google.android.exoplayer2.Player): String? {
+                        return mediaPlayer?.mPlayList!!.tracks?.get(player.currentWindowIndex)?.displayName
+                    }
+
+                    override fun createCurrentContentIntent(player: com.google.android.exoplayer2.Player): PendingIntent? {
+                        return PendingIntent.getActivity(
+                                applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0)
+                    }
+
+                    override fun getCurrentContentText(player: com.google.android.exoplayer2.Player): String? {
+                        return mediaPlayer?.mPlayList!!.tracks?.get(player.currentWindowIndex)?.artist
+                    }
+
+                    override fun getCurrentLargeIcon(player: com.google.android.exoplayer2.Player, callback: PlayerNotificationManager.BitmapCallback): Bitmap? {
+//                        return mediaPlayer?.
+//                                mPlayList!!.
+//                                getMediaDescription(
+//                                        applicationContext,
+//                                        mediaPlayer?.mPlayList!!.tracks?.get(player.currentWindowIndex)!!
+//                                ).iconBitmap
+                        return null
+                    }
+                }
+        )
+        playerNotificationManager!!.setColorized(true)
+        playerNotificationManager!!.setColor(Color.BLACK)
+        playerNotificationManager!!.setSmallIcon(R.drawable.ic_logo)
+        playerNotificationManager!!.setNotificationListener(object : PlayerNotificationManager.NotificationListener {
+            override fun onNotificationStarted(notificationId: Int, notification: Notification) {
+                startForeground(notificationId, notification)
+            }
+            override fun onNotificationCancelled(notificationId: Int) {
+                stopSelf()
+            }
+        })
+        playerNotificationManager!!.setPlayer(mediaPlayer?.mPlayer)
+
+        mediaSession = mediaPlayer?.mMediaSession
+        mediaSession!!.isActive = true
+        playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken)
+
+        mediaSessionConnector = MediaSessionConnector(mediaSession)
+        mediaSessionConnector?.setQueueNavigator(object: TimelineQueueNavigator(mediaSession) {
+            override fun onSkipToPrevious(player: com.google.android.exoplayer2.Player?) {
+                super.onSkipToPrevious(player)
+            }
+            override fun onSkipToNext(player: com.google.android.exoplayer2.Player?) {
+                super.onSkipToNext(player)
+            }
+            override fun getMediaDescription(player: com.google.android.exoplayer2.Player?, windowIndex: Int): MediaDescriptionCompat {
+                onPlayStatusChanged(true)
+                return playingList?.getMediaDescription(applicationContext, playingList?.currentSong?.value!!)!!
+            }
+        })
+        mediaSessionConnector?.setPlayer(mediaPlayer?.mPlayer, null)
+        sessionToken = mediaSessionConnector?.mediaSession?.sessionToken
+    }
+
+    //Not important for general audio service, required for class
+    override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
+        return if (TextUtils.equals(clientPackageName, packageName)) {
+            MediaBrowserServiceCompat.BrowserRoot(getString(R.string.application_name), null)
+        } else null
+
+    }
+
+    //Not important for general audio service, required for class
+    override fun onLoadChildren(parentId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
+        result.sendResult(null)
+    }
+
+    private fun initNoisyReceiver() {
+        //Handles headphones coming unplugged. cannot be done through a manifest receiver
+        val filter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        registerReceiver(mNoisyReceiver, filter)
+    }
+
+    private fun successfullyRetrievedAudioFocus(): Boolean {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        val result = audioManager.requestAudioFocus(this,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+
+        return result == AudioManager.AUDIOFOCUS_GAIN
+    }
+
+    private val mNoisyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (isPlaying) {
+                pause()
+            }
+        }
+    }
+
+    override fun onAudioFocusChange(focusChange: Int) {
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                if (mediaPlayer != null && isPlaying) {
+                    pause()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                if (mediaPlayer != null && isPlaying) {
+                    pause()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                if (mediaPlayer != null) {
+                    mediaPlayer?.mPlayer?.volume = 0.3f
+                }
+            }
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                if (mediaPlayer != null) {
+                    if (!isPlaying) {
+                        play()
+                    }
+                    mediaPlayer?.mPlayer?.volume = 1.0f
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "PlayerService"
+        private const val NOTIFICATION_ID = 101
+    }
+}
+

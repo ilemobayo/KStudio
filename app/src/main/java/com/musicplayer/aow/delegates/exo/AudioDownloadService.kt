@@ -17,29 +17,30 @@ package com.musicplayer.aow.delegates.exo
 
 import android.app.Notification
 import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.offline.DownloadManager.TaskState
 import com.google.android.exoplayer2.offline.DownloadService
-import com.google.android.exoplayer2.ui.DownloadNotificationUtil
-import com.google.android.exoplayer2.offline.DownloadManager.*
 import com.google.android.exoplayer2.scheduler.Scheduler
+import com.google.android.exoplayer2.ui.DownloadNotificationUtil
 import com.musicplayer.aow.R
 import com.musicplayer.aow.delegates.exo.C.DOWNLOAD_CHANNEL_ID
 import com.musicplayer.aow.delegates.exo.C.DOWNLOAD_NOTIFICATION_ID
 
-class AudioDownloadService : DownloadService(DOWNLOAD_NOTIFICATION_ID, DownloadService.DEFAULT_FOREGROUND_NOTIFICATION_UPDATE_INTERVAL, DOWNLOAD_CHANNEL_ID, R.string.download_channel_name) {
+class AudioDownloadService: DownloadService(DOWNLOAD_NOTIFICATION_ID,
+        DownloadService.DEFAULT_FOREGROUND_NOTIFICATION_UPDATE_INTERVAL,
+        DOWNLOAD_CHANNEL_ID, R.string.download_channel_name) {
 
-    override fun getDownloadManager(): DownloadManager {
-        return DownloadUtil.getDownloadManager(this)
+    override fun getDownloadManager(): DownloadManager? {
+        return DownloadUtil.getDownloadManager(applicationContext)
     }
 
     override fun getScheduler(): Scheduler? {
-        return
-        null
+        return null
     }
 
     override fun getForegroundNotification(taskStates: Array<TaskState>): Notification {
         return DownloadNotificationUtil.buildProgressNotification(
-                this,
-                R.drawable.exo_icon_play,
+                applicationContext,
+                R.drawable.ic_logo,
                 DOWNLOAD_CHANNEL_ID, null, null,
                 taskStates)
     }

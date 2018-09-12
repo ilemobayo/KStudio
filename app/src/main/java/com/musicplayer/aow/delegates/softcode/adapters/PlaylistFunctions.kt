@@ -11,9 +11,12 @@ import android.provider.MediaStore.Audio.PlaylistsColumns
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.ui.main.library.songs.dialog.adapter.PlaylistDialogAdapter
+import com.musicplayer.aow.delegates.data.model.Track
+import com.musicplayer.aow.ui.main.library.songs.view.dialog.adapter.PlaylistDialogAdapter
 import com.musicplayer.aow.utils.CursorDB
 import com.musicplayer.aow.utils.DeviceUtils
 import com.musicplayer.aow.utils.layout.PreCachingLayoutManager
@@ -24,6 +27,8 @@ import java.io.File
 
 
 class PlaylistFunctions{
+
+    private var playlisDatabase: PlaylistDatabase? = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
 
     fun createPlaylist(context: Context, name: String): Long {
         if (name.isNotEmpty()) {
@@ -37,9 +42,13 @@ class PlaylistFunctions{
             if (cur.count <= 0) {
                 val values = ContentValues(1)
                 values.put(MediaStore.Audio.PlaylistsColumns.NAME, name)
-                val uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, values)
-                cur.close()
-                return uri.lastPathSegment.toLong()
+                try {
+                    val uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, values)
+                    cur.close()
+                    return uri.lastPathSegment.toLong()
+                }catch (e:Exception){
+
+                }
             }
             cur.close()
             return -1
@@ -49,37 +58,24 @@ class PlaylistFunctions{
 
     //Add to Playlist Operation
     fun addSongToPlaylist(
-            activity: Activity ,
             context: Context,
             mylist: RecyclerView,
             mSelectPlaylistDialog: BottomSheetDialog,
-            model: Song,
-            songs: ArrayList<Song>? = ArrayList(),
+            model: Track,
+            tracks: ArrayList<Track>? = ArrayList(),
             arrayOfSongs: Boolean = false){
-        val MEDIA_URI = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
-        val WHERE = null
-        val ORDER_BY = null
-        val PROJECTIONS = null
-        val cursor = context.contentResolver.query(
-                MEDIA_URI,
-                PROJECTIONS,
-                WHERE,
-                null,
-                ORDER_BY)
-        val list: ArrayList<PlayList> = ArrayList()
-        if(cursor != null){
-            while (cursor.moveToNext()){
-                list.add(CursorDB().cursorToPlayList(cursor))
-            }
+        AppExecutors.instance?.diskIO()?.execute{
+            var list: ArrayList<PlayList> = ArrayList()
+            list = playlisDatabase?.playlistDAO()?.fetchAllPlayListWithNoRecentlyPlayedNLD() as ArrayList<PlayList>
+            list.sortedWith(compareBy({ (it.name)!!.toLowerCase() }))
+            val adapter = PlaylistDialogAdapter(list, model, tracks, mSelectPlaylistDialog, arrayOfSongs)
+            val layoutManager = PreCachingLayoutManager(context)
+            layoutManager.orientation = LinearLayoutManager.VERTICAL
+            layoutManager.setExtraLayoutSpace(DeviceUtils.getScreenHeight(context))
+            mylist.setHasFixedSize(true)
+            mylist.layoutManager = layoutManager
+            mylist.adapter = adapter
         }
-        list.sortedWith(compareBy({ (it.name)!!.toLowerCase() }))
-        val adapter =  PlaylistDialogAdapter(activity, list, model, songs, mSelectPlaylistDialog, arrayOfSongs)
-        val layoutManager = PreCachingLayoutManager(activity)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        layoutManager.setExtraLayoutSpace(DeviceUtils.getScreenHeight(activity))
-        mylist.setHasFixedSize(true)
-        mylist.layoutManager = layoutManager
-        mylist.adapter = adapter
     }
 
     fun addSongToPlayList(context: Context, playListId: Long, songId: Int) {
@@ -91,7 +87,7 @@ class PlaylistFunctions{
         val value = ContentValues()
         value.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, ++last)
         value.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songId)
-        context.contentResolver.insert(uri, value);
+        context.contentResolver.insert(uri, value)
     }
 
     fun removeSongs(context: Context, id: Long, path: String){
@@ -161,7 +157,7 @@ class PlaylistFunctions{
         val favorites_cols = arrayOf(BaseColumns._ID)
         val favorites_uri = Audio.Playlists.EXTERNAL_CONTENT_URI
         val cursor = context.contentResolver.query(favorites_uri, favorites_cols, favorites_where, null, null)
-        if (cursor.getCount() <= 0) {
+        if (cursor.count <= 0) {
             favorites_id = createPlaylist(context, "Favorites")
         } else {
             cursor.moveToFirst()

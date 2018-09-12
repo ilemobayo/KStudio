@@ -1,3 +1,136 @@
 The keytool utility prompts you to enter a password for the keystore. The default password for the debug keystore is android
 "C:\Program Files\Java\jdk1.8.0_162\bin\keytool.exe" -exportcert -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.k
 eystore
+
+
+
+font
+mToolbar.setTitleTextAppearance(this, R.style.RobotoBoldTextAppearance);
+
+
+1. You can register your ContentObserver in a Service. So that it may run even if the app is killed. But there will always be a risk of Service getting killed by Android System. This can be solved if we return START_STICKY in our onStartCommand() method of Service.
+2. Use AlarmManager to check for changes in Contacts Database from time to time.
+
+
+
+
+Do you have the fullscreen theme set in the manifest?
+
+android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+
+I don't think you'll be able to go fullscreen without this.
+
+I would use the following to add and remove the fullscreen flag:
+
+// Hide status bar
+getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+// Show status bar
+getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
+GLIDE SET LINEARLAYOUT BG
+Glide.with(this).load(imageViewPath).asBitmap().into(new SimpleTarget<Bitmap>(relLayoutWidth, relLayoutHeight) {
+    @Override
+    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+        Drawable drawable = new BitmapDrawable(context.getResources(), resource);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            yourRelativeLayout.setBackground(drawable);
+        }
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+        override fun onPlay() {
+            Log.e(TAG, "Play Media Button")
+            if (isPlaying) {
+                pause()
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                showNotification()
+            }else{
+                if (successfullyRetrievedAudioFocus()) {
+                    play()
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                    showNotification()
+                }
+            }
+            super.onPlay()
+        }
+
+        override fun onPause() {
+            Log.e(TAG, "Pause Media Button")
+            if (isPlaying) {
+                pause()
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                showNotification()
+            }
+            super.onPause()
+        }
+
+        override fun onSkipToNext() {
+            playNext()
+            showNotification()
+            super.onSkipToNext()
+        }
+
+        override fun onSkipToPrevious() {
+            playNext()
+            showNotification()
+            super.onSkipToPrevious()
+        }
+
+
+        override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+            val intentAction = mediaButtonEvent?.action
+            if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction))
+            {
+                return false
+            }
+            val mediaButtonEventKey = mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT) as KeyEvent
+            val keycode = mediaButtonEventKey.keyCode
+            val action = mediaButtonEventKey.action
+            when (keycode) {
+                KeyEvent.KEYCODE_HEADSETHOOK -> {
+
+                }
+                KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                    if (isPlaying) {
+                        pause()
+                        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        showNotification()
+                    }else{
+                        if (successfullyRetrievedAudioFocus()) {
+                            play()
+                            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                            showNotification()
+                        }
+                    }
+                }
+                KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    playNext()
+                    showNotification()
+                }
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    playLast()
+                    showNotification()
+                }
+                KeyEvent.KEYCODE_MEDIA_STOP -> {
+                    stopForeground(true)
+                }
+                else -> {
+
+                }
+            }
+
+
+            return super.onMediaButtonEvent(mediaButtonEvent)
+        }
+

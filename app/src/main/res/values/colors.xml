@@ -2,6 +2,7 @@
 <resources>
     <color name="status_bar_color">#FF000000</color>
     <color name="layout_border_color">#FF111111</color>
+    <color name="colorControlActivated">#50FF4081</color>
     <!-- Common -->
     <color name="transparent">@android:color/transparent</color>
     <color name="translusent">#11000000</color>
@@ -24,12 +25,14 @@
     <color name="yellow_dim">#ff002b</color>
     <color name="pink">#ff8ab7</color>
     <color name="white">#ffffff</color>
-    <color name="white_trans">#a0ffffff</color>
+    <color name="white_trans">#d8ffffff</color>
     <color name="silver">#e8e8e8</color>
     <color name="grey">#cfcece</color>
     <color name="grey_light">#e7e7e7</color>
+    <color name="grey_light_translusent">#f6d2d2d2</color>
     <color name="grey_light_a">#c4c4c4</color>
     <color name="grey_dim">#9e9e9e</color>
+    <color name="grey_black">#252222</color>
     <color name="grey_cream">#FFE2D9B6</color>
     <color name="black">#000000</color>
     <!--<color name="black_dark">#4e4e4e</color>-->

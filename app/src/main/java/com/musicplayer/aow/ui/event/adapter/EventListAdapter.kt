@@ -50,7 +50,7 @@ class EventListAdapter(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
-        view = LayoutInflater.from(parent!!.context).inflate(R.layout.item_event_list, parent, false)
+        view = LayoutInflater.from(parent.context).inflate(R.layout.item_event_list, parent, false)
         return ListViewHolder(view!!)
     }
 

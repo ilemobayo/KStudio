@@ -1,20 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="100dp"
+    android:background="@drawable/gradient_red_dim">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/san_fransisco_compact_display_bold"
         android:gravity="center_vertical|center_horizontal|bottom"
-        android:text="@string/kings_studio"
-        android:textColor="@color/red_dim"
         android:shadowColor="@color/black"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="4"
+        android:text="@string/kings_studio"
+        android:textColor="@color/white"
+        android:textSize="40sp"
         android:textStyle="bold"
-        android:textSize="40sp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/san_fransisco_compact_display_bold"
+        android:gravity="center_vertical|center_horizontal|bottom"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="4"
+        android:text="@string/application_motto"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 </android.support.constraint.ConstraintLayout>

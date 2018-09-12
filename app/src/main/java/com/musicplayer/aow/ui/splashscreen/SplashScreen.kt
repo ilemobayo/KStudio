@@ -24,9 +24,7 @@ class SplashScreen : Activity() {
 
     private fun permission(){
 
-        val intent = MainActivity.newIntent(applicationContext)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ActivityCompat.startActivity(this@SplashScreen, intent, null)
+
     }
 
     private fun startNextActivity()

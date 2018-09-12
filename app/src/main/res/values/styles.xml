@@ -1,8 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@color/white</item>
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <!--toolbar-->
         <item name="colorPrimary">@color/mp.theme.dark_blue.colorPrimary</item>
@@ -11,8 +10,11 @@
 
         <item name="android:textColorPrimary">@color/mp.theme.dark_blue.textColorPrimary</item>
         <item name="android:textColorSecondary">@color/mp.theme.dark_blue.textColorSecondary</item>
+        <item name="android:textAppearance">@style/TextDark</item>
+        <item name="android:textViewStyle">@style/TextStyle.TextView.Light</item>
+        <item name="android:toolbarStyle">@style/TextStyle.Toolbar.Light</item>
 
-        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlNormal">@color/red_dim</item>
         <item name="colorControlActivated">@color/mp.theme.dark_blue.colorControlActivated</item>
         <item name="colorControlHighlight">@color/mp.theme.dark_blue.colorControlHighlight</item>
 
@@ -26,10 +28,8 @@
 
         <!-- PopupMenu -->
         <item name="popupMenuStyle">@style/MP.Theme.Widget.PopupMenu</item>
-        <item name="textAppearanceLargePopupMenu">@style/MP.Theme.TextAppearance.LargePopupMenu
-        </item>
-        <item name="textAppearanceSmallPopupMenu">@style/MP.Theme.TextAppearance.SmallPopupMenu
-        </item>
+        <item name="textAppearanceLargePopupMenu">@style/MP.Theme.TextAppearance.LargePopupMenu</item>
+        <item name="textAppearanceSmallPopupMenu">@style/MP.Theme.TextAppearance.SmallPopupMenu</item>
 
         <!--Activity Transmission-->
         <item name="android:windowContentTransitions">true</item>
@@ -37,49 +37,143 @@
         <item name="android:windowActivityTransitions">true</item>
 
         <!-- Translusent -->
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!--<item name="android:statusBarColor">@android:color/white</item>-->
+        <item name="android:statusBarColor">@color/red_dim</item>
+
+        <!-- Background -->
+        <item name="android:windowBackground">@color/white</item>
 
         <!-- specify enter and exit transitions -->
         <!--<item name="android:windowEnterTransition">@transition/explode</item>-->
         <!--<item name="android:windowExitTransition">@transition/explode</item>-->
     </style>
 
-    <style name="SplashTheme" parent="Theme.Design.NoActionBar">
+    <!-- Base application theme. -->
+    <style name="AppTheme.Red" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!--toolbar-->
+        <item name="colorPrimary">@color/mp.theme.dark_blue.colorPrimary</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/mp.theme.dark_blue.colorAccent</item>
+
+        <item name="android:textColorPrimary">@color/mp.theme.dark_blue.textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/mp.theme.dark_blue.textColorSecondary</item>
+        <item name="android:textAppearance">@style/TextDark</item>
+        <item name="android:textViewStyle">@style/TextStyle.TextView.Light</item>
+        <item name="android:toolbarStyle">@style/TextStyle.Toolbar.Light</item>
+
+        <item name="colorControlNormal">@color/red_dim</item>
+        <item name="colorControlActivated">@color/mp.theme.dark_blue.colorControlActivated</item>
+        <item name="colorControlHighlight">@color/mp.theme.dark_blue.colorControlHighlight</item>
+
+        <!-- ActionMode -->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/MP.Theme.Widget.ActionMode</item>
+        <item name="actionModeCloseButtonStyle">@style/MP.Theme.Widget.ActionMode.CloseButton</item>
+
+        <!-- AlertDialog -->
+        <item name="alertDialogTheme">@style/MP.Theme.Widget.AlertDialog</item>
+
+        <!-- PopupMenu -->
+        <item name="popupMenuStyle">@style/MP.Theme.Widget.PopupMenu</item>
+        <item name="textAppearanceLargePopupMenu">@style/MP.Theme.TextAppearance.LargePopupMenu</item>
+        <item name="textAppearanceSmallPopupMenu">@style/MP.Theme.TextAppearance.SmallPopupMenu</item>
+
+        <!--Activity Transmission-->
+        <item name="android:windowContentTransitions">true</item>
+        <!-- enable window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- Translusent -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/red_dim</item>
+
+        <!-- Background -->
+        <!--<item name="android:windowBackground">@drawable/gradient_red_dim</item>-->
+
+        <!-- specify enter and exit transitions -->
+        <!--<item name="android:windowEnterTransition">@transition/explode</item>-->
+        <!--<item name="android:windowExitTransition">@transition/explode</item>-->
+    </style>
+
+    <style name="TextStyle.EditText.Light" parent="android:Widget.EditText">
+        <item name="android:fontFamily">serif</item>
+    </style>
+
+    <style name="TextStyle.Toolbar.Light" parent="android:Widget.Toolbar">
+        <item name="android:title">@string/application_name</item>
+        <item name="android:subtitle">@string/application_motto</item>
+        <item name="android:subtitleTextAppearance">@style/SanFransiscoCompactDisplayRegular</item>
+        <item name="android:titleTextStyle">@style/TextLight</item>
+        <item name="android:textAppearance">@style/TextLight</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:titleTextColor">@color/black</item>
+        <item name="android:subtitleTextColor">@color/black</item>
+    </style>
+
+    <style name="TextStyle.Toolbar.Red" parent="android:Widget.Toolbar">
+        <item name="android:title">@string/application_name</item>
+        <item name="android:subtitle">@string/application_motto</item>
+        <item name="android:subtitleTextAppearance">@style/SanFransiscoCompactDisplayRegular</item>
+        <item name="android:titleTextStyle">@style/TextLight</item>
+        <item name="android:textAppearance">@style/TextLight</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:titleTextColor">@color/white</item>
+        <item name="android:subtitleTextColor">@color/white</item>
+    </style>
+
+    <style name="TextStyle.TextView.Light" parent="android:Widget.TextView">
+        <!--<item name="android:fontFamily">serif</item>-->
+    </style>
+
+    <style name="TextLight" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextDark" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar.Fullscreen">
         <item name="windowNoTitle">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <!--<item name="android:windowTranslucentNavigation">true</item>-->
         <item name="android:windowBackground">@drawable/activity_splashscreen</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/white</item>
     </style>
 
     <style name="AppTheme.toolbar" parent="AppTheme">
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="AppTheme.Overlay.PopUp" parent="Platform.ThemeOverlay.AppCompat.Light">
-        <item name="android:windowBackground">@color/background_material_light</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
-        <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
-        <item name="android:colorBackground">@color/background_material_light</item>
-        <item name="android:colorBackgroundCacheHint">@color/abc_background_cache_hint_selector_material_light</item>
-        <item name="colorBackgroundFloating">@color/background_floating_material_light</item>
+        <item name="android:windowBackground" tools:ignore="PrivateResource">@color/background_material_light</item>
+        <item name="android:colorForeground" tools:ignore="PrivateResource">@color/foreground_material_light</item>
+        <item name="android:colorForegroundInverse" tools:ignore="PrivateResource">@color/foreground_material_dark</item>
+        <item name="android:colorBackground" tools:ignore="PrivateResource">@color/background_material_light</item>
+        <item name="android:colorBackgroundCacheHint" tools:ignore="PrivateResource">@color/abc_background_cache_hint_selector_material_light</item>
+        <item name="colorBackgroundFloating" tools:ignore="PrivateResource">@color/background_floating_material_light</item>
 
-        <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
-        <item name="android:textColorPrimaryInverse">@color/black</item>
-        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+        <item name="android:textColorPrimary" tools:ignore="PrivateResource">@color/abc_primary_text_material_light</item>
+        <item name="android:textColorPrimaryInverse" >@color/black</item>
+        <item name="android:textColorSecondary" tools:ignore="PrivateResource">@color/abc_secondary_text_material_light</item>
         <item name="android:textColorSecondaryInverse">@color/black</item>
-        <item name="android:textColorTertiary">@color/abc_secondary_text_material_light</item>
+        <item name="android:textColorTertiary" tools:ignore="PrivateResource">@color/abc_secondary_text_material_light</item>
         <item name="android:textColorTertiaryInverse">@color/black</item>
-        <item name="android:textColorPrimaryDisableOnly">@color/abc_primary_text_disable_only_material_light</item>
+        <item name="android:textColorPrimaryDisableOnly" tools:ignore="PrivateResource">@color/abc_primary_text_disable_only_material_light</item>
         <item name="android:textColorPrimaryInverseDisableOnly">@color/black</item>
-        <item name="android:textColorHint">@color/abc_hint_foreground_material_light</item>
+        <item name="android:textColorHint" tools:ignore="PrivateResource">@color/abc_hint_foreground_material_light</item>
         <item name="android:textColorHintInverse">@color/grey</item>
         <item name="android:textColorHighlight">@color/black_light</item>
 
         <item name="colorControlNormal">?android:attr/textColorSecondary</item>
-        <item name="colorControlHighlight">@color/ripple_material_light</item>
-        <item name="colorButtonNormal">@color/button_material_light</item>
-        <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+        <item name="colorControlHighlight" tools:ignore="PrivateResource">@color/ripple_material_light</item>
+        <item name="colorButtonNormal" tools:ignore="PrivateResource">@color/button_material_light</item>
+        <item name="colorSwitchThumbNormal" tools:ignore="PrivateResource">@color/switch_thumb_material_light</item>
 
         <!-- Used by MediaRouter -->
         <item name="isLightTheme">false</item>
@@ -182,7 +276,6 @@
         <item name="android:background">@drawable/selector_segmented_left</item>
     </style>
 
-x
     <style name="MP.Theme.Widget.SegmentedControl.Right">
         <item name="android:background">@drawable/selector_segmented_right</item>
     </style>
@@ -194,7 +287,9 @@ x
     </style>
 
     <style name="MyTextAppearanceTablayout" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
-        <item name="android:textSize">8dp</item>
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_semibold</item>
+        <item name="android:tabStripEnabled">false</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
@@ -208,7 +303,7 @@ x
 
     <style name="MP.Theme.TextAppearance.Light.Toolbar.Label" parent="MP.Theme.TextAppearance.Toolbar">
         <item name="android:textColor">@color/red</item>
-        <item name="android:textSize">12dp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="MP.Theme.TextAppearance.ActionMode.Title" parent="TextAppearance.AppCompat.Widget.ActionMode.Title">
@@ -341,5 +436,52 @@ x
         <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/color_text</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- FONT -->
+    <style name="SanFransiscoCompactDisplayBlack">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_black</item>
+    </style>
+    <style name="SanFransiscoCompactDisplayBold">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_bold</item>
+    </style>
+    <style name="SanFransiscoCompactDisplayLight">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_light</item>
+    </style>
+    <style name="SanFransiscoCompactDisplayRegular">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_regular</item>
+    </style>
+    <style name="SanFransiscoCompactDisplaySemibold">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_semibold</item>
+    </style>
+    <style name="SanFransiscoCompactDisplayThin">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_thin</item>
+    </style>
+    <style name="SanFransiscoCompactDisplayUltralight">
+        <item name="android:fontFamily">@font/san_fransisco_compact_display_ultralight</item>
+    </style>
+    <style name="SanFransiscoCompactTextHeavyItalic">
+        <item name="android:fontFamily">@font/san_fransisco_compact_text_heavyitalic</item>
+    </style>
+    <style name="SanFransiscoCompactTextMedium">
+        <item name="android:fontFamily">@font/san_fransisco_compact_text_medium</item>
+    </style>
+    <style name="SanFransiscoCompactTextMediumItalic">
+        <item name="android:fontFamily">@font/san_fransisco_compact_text_mediumitalic</item>
+    </style>
+    <style name="SanFransiscoUiDisplayHeavy">
+        <item name="android:fontFamily">@font/san_fransisco_ui_display_heavy</item>
+    </style>
+    <style name="SanFransiscoUiDisplaySemiBold">
+        <item name="android:fontFamily">@font/san_fransisco_ui_display_semibold</item>
+    </style>
+    <style name="SanFransiscoUiDisplayThin">
+        <item name="android:fontFamily">@font/san_fransisco_ui_display_thin</item>
+    </style>
+    <style name="SanFransiscoUiDisplayUltralight">
+        <item name="android:fontFamily">@font/san_fransisco_ui_display_ultralight</item>
+    </style>
+    <style name="SanFransiscoUiTextHeavyItalic">
+        <item name="android:fontFamily">@font/san_fransisco_ui_text_heavyitalic</item>
     </style>
 </resources>

@@ -1,8 +1,10 @@
 package com.musicplayer.aow.ui.settings
 
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.widget.Button
 import android.widget.LinearLayout
 import com.github.nisrulz.sensey.Sensey
 import com.musicplayer.aow.R
@@ -24,23 +26,12 @@ class SettingsActivity : BaseActivity() {
     private var shakeSwitchBtn: SwitchButton? = null
     private var flipSwitchBtn: SwitchButton? = null
     private var cacheSwitchBtn: SwitchButton? = null
+    private var fileServer: LinearLayout? = null
+    private var searchBtn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_settings)
-
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
-
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent);
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning);
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.color.black);
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -48,43 +39,46 @@ class SettingsActivity : BaseActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         toolbar.title = "Settings."
-        toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_arrow_back_black)
+        toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_arrow_back_black, theme)
         toolbar.setNavigationOnClickListener{
             finish()
         }
 
         sensor.init(applicationContext)
-        
+
         flipSwitchBtn = findViewById(R.id.flip_btn)
         shakeSwitchBtn = findViewById(R.id.shake_btn)
-        //cacheSwitchBtn = findViewById(R.id.cache_btn)
 
-        shakeSettings(shakeSwitchBtn!!)
-        flipSettings(flipSwitchBtn!!)
-        cacheSettings(cacheSwitchBtn!!)
+        try {
+            shakeSettings(shakeSwitchBtn!!)
+            flipSettings(flipSwitchBtn!!)
+        }catch (e: java.lang.Exception){
+
+        }
+
 
     }
 
     private fun shakeSettings(switch: SwitchButton){
         val action = appSettings!!.shakeaction
         val save: StorageUtil? = StorageUtil(applicationContext)
-        val shakeSettingsState = save!!.loadStringValue(action)
-        if (shakeSettingsState!!.equals("on")){
-            switch.isChecked = true
-        }
+        val shakeSettingsState = save?.loadStringValue(action)
         //implement on checked on each radio button
         switch.setOnCheckedChangeListener{ buttonView, isChecked ->
             if (isChecked) {
-                save.saveStringValue(action, "on")
-                val shakeSettings = save.loadStringValue(action)
+                save?.saveStringValue(action, "on")
+                val shakeSettings = save?.loadStringValue(action)
                 Log.e("Shake", shakeSettings)
-                sensor.startShakeDetection(appSettings!!.shakeGesture)
+                sensor.startShakeDetection(appSettings?.shakeGesture)
             }else {
-                save.saveStringValue(action, "off")
-                val shakeSettings = save.loadStringValue(action)
+                save?.saveStringValue(action, "off")
+                val shakeSettings = save?.loadStringValue(action)
                 Log.e("Shake", shakeSettings)
-                Sensey.getInstance().stopShakeDetection(appSettings!!.shakeGesture)
+                sensor.stopShakeDetection(appSettings?.shakeGesture)
             }
+        }
+        if (shakeSettingsState?.equals("on")!!){
+            switch.isChecked = true
         }
     }
 
@@ -92,25 +86,25 @@ class SettingsActivity : BaseActivity() {
         val action = appSettings!!.flipaction
         val save: StorageUtil? = StorageUtil(applicationContext)
         val shakeSettingsState = save!!.loadStringValue(action)
-        if (shakeSettingsState!!.equals("on")){
-            switch.isChecked = true
-        }
         //implement on checked on each radio button
         switch.setOnCheckedChangeListener{ buttonView, isChecked ->
             if (isChecked) {
                 save.saveStringValue(action, "on")
-                Sensey.getInstance().startFlipDetection(appSettings!!.flipGesture)
+                sensor.startFlipDetection(appSettings!!.flipGesture)
             }else {
                 save.saveStringValue(action, "off")
-                Sensey.getInstance().stopFlipDetection(appSettings!!.flipGesture)
+                sensor.stopFlipDetection(appSettings!!.flipGesture)
             }
+        }
+        if (shakeSettingsState!!.equals("on")){
+            switch.isChecked = true
         }
     }
 
     private fun cacheSettings(switch: SwitchButton){
         val action = appSettings!!.cacheaction
-        val save: StorageUtil? = StorageUtil(applicationContext)
-        val shakeSettingsState = save!!.loadStringValue(action)
+        var save: StorageUtil? = StorageUtil(applicationContext)
+        var shakeSettingsState = save!!.loadStringValue(action)
         if (shakeSettingsState!!.equals("on")){
             switch.isChecked = true
         }
@@ -122,15 +116,6 @@ class SettingsActivity : BaseActivity() {
                 save.saveStringValue(action, "off")
             }
         }
-    }
-
-    private fun fileServerSettings(click: LinearLayout){
-          click.setOnClickListener {
-              //var intent = Intent(applicationContext,ServerActivity::class.java)
-              //var intent = Intent(applicationContext,WiFiDirectActivity::class.java)
-              //startActivity(intent)
-          }
-
     }
 
 

@@ -46,7 +46,7 @@
             style="@style/MP.Theme.TextAppearance.List.Hint"
             android:id="@+id/text_view_info"
             android:layout_marginTop="@dimen/mp.margin.small"
-            tools:text="100 songs | /storage/emulated/0/Music"
+            tools:text="100 tracks | /storage/emulated/0/Music"
             />
     </LinearLayout>
 

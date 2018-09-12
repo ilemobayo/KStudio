@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import com.google.gson.Gson
 import com.musicplayer.aow.R
 import com.musicplayer.aow.bus.RxBus
@@ -11,7 +12,7 @@ import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
 import com.readystatesoftware.systembartint.SystemBarTintManager
-import kotlinx.android.synthetic.main.activity_playlist_songs.*
+import kotlinx.android.synthetic.main.activity_play_list_details.*
 
 class PlaylistSongsActivity : AppCompatActivity() {
 
@@ -44,7 +45,7 @@ class PlaylistSongsActivity : AppCompatActivity() {
         tintManager.setStatusBarTintResource(R.color.black)
 
         play_all.setOnClickListener {
-            RxBus.instance!!.post(PlayListNowEvent(playlist, 0))
+            RxBus.instance!!.playEvent.postValue(PlayListNowEvent(playlist, 0))
         }
 
         mList = findViewById(R.id.playlist_songs_recycler_views)
@@ -67,7 +68,7 @@ class PlaylistSongsActivity : AppCompatActivity() {
 
     fun loadData(playlist: PlayList) {
         this.playlist = playlist
-        playlist.songs?.sortedWith(compareBy({ (it.title)!!.toLowerCase() }))
+        playlist.tracks?.sortedWith(compareBy({ (it.title)!!.toLowerCase() }))
         val layoutManager = LinearLayoutManager(this)
         mList!!.addItemDecoration(
                 DividerItemDecoration(
@@ -77,8 +78,13 @@ class PlaylistSongsActivity : AppCompatActivity() {
                         false,
                         true)
         )
-        mList!!.setHasFixedSize(true)
-        mList!!.layoutManager = layoutManager
-        mList!!.adapter = PlaylistSongAdapter(this, playlist, this)
+        if(playlist.tracks!!.isEmpty() || playlist.tracks?.size!! <= 0) {
+            playlist_songs_recycler_views.visibility = View.GONE
+            empty.visibility = View.VISIBLE
+        }else {
+            mList!!.setHasFixedSize(true)
+            mList!!.layoutManager = layoutManager
+            mList!!.adapter = PlaylistSongAdapter(this, playlist, this)
+        }
     }
 }

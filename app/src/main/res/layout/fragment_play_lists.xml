@@ -8,13 +8,12 @@
 
     <android.support.design.widget.TabLayout
         android:id="@+id/playlist_tablayout"
-        android:background="@color/red_dim"
         android:layout_width="match_parent"
         android:layout_height="28dp"
-        app:tabIndicatorColor="@color/white"
+        app:tabIndicatorColor="@color/red_dim"
         app:tabTextAppearance="@style/MyTextAppearanceTablayout"
-        app:tabTextColor="@color/white"
-        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="@color/black"
+        app:tabSelectedTextColor="@color/red_dim"
         app:tabMode="fixed"
         app:tabGravity="fill"
         android:elevation="0dp"/>

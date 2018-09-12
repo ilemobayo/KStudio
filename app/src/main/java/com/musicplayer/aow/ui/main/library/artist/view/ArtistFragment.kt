@@ -1,79 +1,50 @@
-package com.musicplayer.aow.ui.main.library.artist
+package com.musicplayer.aow.ui.main.library.artist.view
 
 
-import android.database.Cursor
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.app.Fragment
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.CursorLoader
-import android.support.v4.content.Loader
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.musicplayer.aow.R
+import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.ArtistDatabase
 import com.musicplayer.aow.delegates.data.model.Artists
-import com.musicplayer.aow.ui.main.library.artist.adapter.ArtistAdapter
-import com.musicplayer.aow.utils.CursorDB
+import com.musicplayer.aow.delegates.softcode.adapters.AutoFitGridLayoutManager
+import com.musicplayer.aow.ui.main.library.artist.view.adapter.ArtistAdapter
+import com.musicplayer.aow.ui.main.library.artist.viewmodel.ArtistViewModel
 import kotlinx.android.synthetic.main.fragment_artist.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.onComplete
-import java.util.*
+import kotlin.collections.ArrayList
 
 class ArtistFragment : Fragment(){
 
-    private val MEDIA_URI = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
-    private val WHERE = null
-    private val ORDER_BY = MediaStore.Audio.Artists.ARTIST + " ASC"
-    private val PROJECTIONS = arrayOf(
-            MediaStore.Audio.Artists.ARTIST,
-            MediaStore.Audio.Artists._ID,
-            MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
-            MediaStore.Audio.Artists.NUMBER_OF_TRACKS)
+    private var artistDatabase: ArtistDatabase? = ArtistDatabase.getsInstance(Injection.provideContext()!!)
     private var adapter: ArtistAdapter? = null
-    var mModelData:ArrayList<Artists> = ArrayList()
+    private var artists: ArrayList<Artists>? = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_artist, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        adapter = ArtistAdapter(context!!.applicationContext, activity!!, artists)
         super.onViewCreated(view, savedInstanceState)
-        loaderManager.initLoader(0, null, mLoaderCallbacks)
-        data()
-    }
-
-    fun data(){
-        adapter = ArtistAdapter(context!!.applicationContext, activity!! , mModelData)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            artist_recycler_views.layoutManager = AutoFitGridLayoutManager(context!!.applicationContext, 430)
+        }else {
+            artist_recycler_views.layoutManager = AutoFitGridLayoutManager(context!!.applicationContext, 230)
+        }
         artist_recycler_views.adapter = adapter
-        artist_recycler_views.layoutManager = GridLayoutManager(activity, 3)
-    }
-
-    private val mLoaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(context!!, MEDIA_URI,
-                    PROJECTIONS, WHERE, null,
-                    ORDER_BY)
-        }
-
-        override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-            mModelData = ArrayList()
-            if (data != null) {
-                doAsync {
-                    while (data.moveToNext()) {
-                        mModelData.add(CursorDB().cursorToArtistsList(data))
-                    }
-                    onComplete {
-                        adapter?.swapCursor(mModelData)
-                    }
-                }
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<Cursor>) {
-            adapter?.swapCursor(null)
+        AppExecutors.instance?.diskIO()?.execute {
+            val albumList = artistDatabase?.artistDAO()?.fetchAllArtist()
+            albumList?.observe(this, Observer{
+                adapter?.swapCursor(it as java.util.ArrayList<Artists>)
+            })
         }
     }
 

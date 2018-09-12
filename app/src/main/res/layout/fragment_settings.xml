@@ -131,74 +131,74 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="vertical"-->
-            <!--android:visibility="visible">-->
-            <!--<View-->
-                <!--style="@style/MP.Theme.Widget.Divider.Line.Vertical"-->
-                <!--/>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
 
-            <!--<TextView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:padding="0dp"-->
-                <!--android:layout_marginTop="10dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:layout_marginLeft="8dp"-->
-                <!--android:background="@color/transparent"-->
-                <!--android:textSize="12dp"-->
-                <!--android:textStyle="bold"-->
-                <!--android:textColor="@color/black"-->
-                <!--android:text="Data Usage:"/>-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="8dp"
+                android:background="@color/transparent"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Data Usage (Cache Songs):"/>
 
-            <!--<View-->
-                <!--style="@style/MP.Theme.Widget.Divider.Line.Vertical"-->
-                <!--/>-->
+            <View
+                style="@style/MP.Theme.Widget.Divider.Line.Vertical"
+                />
 
-            <!--<RelativeLayout-->
-                <!--android:id="@+id/cache_section"-->
-                <!--android:layout_marginBottom="2dp"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:padding="8dp"-->
-                <!--android:background="@color/white">-->
-                <!--<LinearLayout-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentLeft="true"-->
-                    <!--android:layout_toLeftOf="@+id/cache_btn"-->
-                    <!--android:orientation="vertical">-->
-                    <!--<TextView-->
-                        <!--android:id="@+id/cache"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:textColor="@color/black"-->
-                        <!--android:layout_alignParentTop="true"-->
-                        <!--android:text="Reduce data usage"-->
-                        <!--android:layout_alignParentLeft="true"/>-->
-                    <!--<TextView-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:textColor="@color/black"-->
-                        <!--android:layout_alignParentTop="true"-->
-                        <!--android:text="Audio quality will be reduced."-->
-                        <!--android:textSize="8dp"-->
-                        <!--android:layout_alignParentLeft="true"/>-->
-                <!--</LinearLayout>-->
+            <RelativeLayout
+                android:id="@+id/cache_section"
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/white">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/cache_btn"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/cache"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Reduce data usage"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_alignParentTop="true"
+                        android:text="Storage space will be required to save cache streamed tracks and reduce latency."
+                        android:textSize="8dp"
+                        android:layout_alignParentLeft="true"/>
+                </LinearLayout>
 
-                <!--<com.suke.widget.SwitchButton-->
-                    <!--xmlns:card_view="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:id="@+id/cache_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="0dp"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:orientation="horizontal"-->
-                    <!--card_view:sb_show_indicator="false"/>-->
-            <!--</RelativeLayout>-->
-        <!--</LinearLayout>-->
+                <com.suke.widget.SwitchButton
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/cache_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal"
+                    card_view:sb_show_indicator="false"/>
+            </RelativeLayout>
+        </LinearLayout>
 
         <!--<LinearLayout-->
             <!--android:layout_width="match_parent"-->
@@ -262,16 +262,14 @@
                     <!--android:id="@+id/notification_btn"-->
                     <!--android:layout_width="wrap_content"-->
                     <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="0dp"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:orientation="horizontal"-->
-                    <!--card_view:sb_show_indicator="false"/>-->
-            <!--</RelativeLayout>-->
-        <!--</LinearLayout>-->
-
-        <View
-            style="@style/MP.Theme.Widget.Divider.Line.Vertical"
-            />
-        
+                    <!--android:layout_marginTop=b0`p"-->
+                    <!--androiD:layout[amm'nParentRiGht="true"-->
+   0        "    (  <!--anlroid:orientation="horhzontal")->
+   $   !            8(--cerd_vhe7:sbßshow[indicauor="fadse"/>-->
+            <!--</RelativeL!ùout>-->
+        <!--</LinearLayout:-->
+ "      <Vyew
+            ótyle="@styl%/MP.Theme.Widget,Divider.Line.Vertical"    0       />
+(       
     </LinearLayout>
-</LinearLayout>
+<LinearLayout>

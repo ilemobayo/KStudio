@@ -61,7 +61,7 @@ class AlbumImageView @JvmOverloads constructor(context: Context, attrs: Attribut
         } else {
             val oval = OvalShadow(mShadowRadius)
             circle = ShapeDrawable(oval)
-            ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, circle.paint)
+            ViewCompat.setLayerPaint(this, circle.paint)
             circle.paint.setShadowLayer(mShadowRadius.toFloat(), shadowXOffset.toFloat(), shadowYOffset.toFloat(), KEY_SHADOW_COLOR)
             val padding = mShadowRadius
             // set padding so the inner image sits correctly within the shadow.
@@ -85,7 +85,7 @@ class AlbumImageView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun elevationSupported(): Boolean {
-        return android.os.Build.VERSION.SDK_INT >= 21
+        return android.os.Build.VERSION.SDK_INT >= 23
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -95,7 +95,7 @@ class AlbumImageView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
     }
 
-    public override fun onDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         mPaint.color = MIDDLE_RECT_COLOR
         canvas.drawOval(mMiddleRect, mPaint)
@@ -166,10 +166,9 @@ class AlbumImageView @JvmOverloads constructor(context: Context, attrs: Attribut
      */
     private inner class OvalShadow internal constructor(shadowRadius: Int) : OvalShape() {
         private var mRadialGradient: RadialGradient? = null
-        private val mShadowPaint: Paint
+        private val mShadowPaint: Paint = Paint()
 
         init {
-            mShadowPaint = Paint()
             mShadowRadius = shadowRadius
             updateRadialGradient(rect().width().toInt())
         }
@@ -221,7 +220,7 @@ class AlbumImageView @JvmOverloads constructor(context: Context, attrs: Attribut
 
         private val ALBUM_TEXT = "MUSIC PLAYER"
         private val APP_NAME = "AOWPlayer"
-        private val APP_SLOGAN = "Make com.musicpalyer.com.musicplayer.aow simpler"
+        private val APP_SLOGAN = "Make com.musicplayer.aow simpler"
         private val COPY_RIGHT = "zuezhome © 2017"
         @SuppressLint("DefaultLocale")
         private val BUILD = String.format("build release %s-%d (%s)",

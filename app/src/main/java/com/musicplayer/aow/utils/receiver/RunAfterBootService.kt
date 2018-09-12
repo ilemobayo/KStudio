@@ -7,7 +7,6 @@ import android.util.Log
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.utils.StorageUtil
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 class RunAfterBootService : Service {
@@ -17,16 +16,10 @@ class RunAfterBootService : Service {
 
     private var timer: Timer? = null
     private var timerTask: TimerTask? = null
-    private val mSubscriptions: CompositeSubscription? = null
 
     constructor() : super() {
         //context = applicationContext
         Log.d("HERE", "here service created!")
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        //runCheck()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

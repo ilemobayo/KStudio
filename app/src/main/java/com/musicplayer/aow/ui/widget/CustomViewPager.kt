@@ -8,8 +8,8 @@ import android.view.MotionEvent
 class CustomViewPager : ViewPager {
     private var disable: Boolean = false
 
-    constructor(context: Context) : super(context) {}
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {}
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
         return if (disable) false else super.onInterceptTouchEvent(event)

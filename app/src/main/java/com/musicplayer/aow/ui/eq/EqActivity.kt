@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,16 +17,23 @@ import android.widget.*
 import com.jaredrummler.materialspinner.MaterialSpinner
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.MusicPlayerApplication
+import com.musicplayer.aow.delegates.player.Player
+import com.musicplayer.aow.ui.base.BaseActivity
+import com.musicplayer.aow.ui.eq.model.EqModel
 import com.musicplayer.aow.ui.widget.circularseekbar.CircularSeekBar
+import com.musicplayer.aow.ui.widget.knob.RoundKnobButton
+import com.musicplayer.aow.utils.StorageUtil
 import com.readystatesoftware.systembartint.SystemBarTintManager
+import kotlinx.android.synthetic.main.activity_eq.*
 
 
-class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
+class EqActivity : BaseActivity(), SeekBar.OnSeekBarChangeListener,
         CircularSeekBar.OnCircularSeekBarChangeListener,
         CompoundButton.OnCheckedChangeListener,
         View.OnClickListener
 {
 
+    val storageUtil = StorageUtil()
     var bass_boost_label: TextView? = null
     var bass_boost: CircularSeekBar? = null
     var virtualizer: CircularSeekBar? = null
@@ -63,19 +71,6 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_eq)
 
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
-
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent);
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning);
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.color.black);
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar2)
         setSupportActionBar(toolbar)
 
@@ -87,6 +82,8 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
             finish()
         }
 
+        eq = EqModel.instance?.updateEqualizer(Player.instance?.mPlayer?.audioSessionId!!)
+
         enabled = findViewById(R.id.enabled)
         enabled!!.setOnCheckedChangeListener (this)
 
@@ -97,27 +94,36 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
         bass_boost!!.setOnSeekBarChangeListener(this)
         bass_boost_label =  findViewById(R.id.bass_boost_label)
 
+        setUpKnob(true, bass_knob, bass_knob_value, 150, 150)
+
         virtualizer = findViewById(R.id.virtualizer_seekbar)
         virtualizer!!.setOnSeekBarChangeListener(this)
+        setUpKnob(false, virtualizer_knob, virtualizer_knob_value, 150, 150)
 
         reverb = findViewById(R.id.reverb)
         reverb!!.setItems("None", "Large Hall", "Large Room", "Medium Hall", "Medium Room", "Small Room", "Plate")
         reverb!!.setOnItemSelectedListener({ view, position, id, item ->
-
                 if (position==0) {
+                    storageUtil.saveStringValue("reverb", 0.toString())
                     rev!!.preset = PresetReverb.PRESET_NONE
                     rev!!.release()
                 } else if (position==1) {
+                    storageUtil.saveStringValue("reverb", 1.toString())
                     rev!!.preset = PresetReverb.PRESET_LARGEHALL
                 } else if (position==2) {
+                    storageUtil.saveStringValue("reverb", 2.toString())
                     rev!!.preset = PresetReverb.PRESET_LARGEROOM
                 } else if (position==3) {
+                    storageUtil.saveStringValue("reverb", 3.toString())
                     rev!!.preset = PresetReverb.PRESET_MEDIUMHALL
                 } else if (position==4) {
+                    storageUtil.saveStringValue("reverb", 4.toString())
                     rev!!.preset = PresetReverb.PRESET_MEDIUMROOM
                 } else if (position==5) {
+                    storageUtil.saveStringValue("reverb", 5.toString())
                     rev!!.preset = PresetReverb.PRESET_SMALLROOM
                 } else if (position==6) {
+                    storageUtil.saveStringValue("reverb", 6.toString())
                     rev!!.preset = PresetReverb.PRESET_PLATE
                 }
                  rev!!.enabled = true
@@ -139,7 +145,7 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
         slider_labels[4] = findViewById(R.id.slider_label_5)
         slider_level[4] = findViewById(R.id.slider_level_5)
 
-        eq = MusicPlayerApplication.instance!!.getEq()
+
         if (eq != null) {
             eq!!.enabled = true
             val num_bands = eq!!.numberOfBands
@@ -155,23 +161,10 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
 
                 //level meter
                 slider_level[i]!!.visibility = View.GONE
-//                val new_level = sliders[i]!!.progress
-//                if (new_level === 16) {
-//                    slider_level[i]!!.text = "0 dB"
-//                } else if (new_level < 16) {
-//
-//                    if (new_level === 0) {
-//                        slider_level[i]!!.text = "-" + "15 dB"
-//                    } else {
-//                        slider_level[i]!!.text = "-" + (16 - new_level) + " dB"
-//                    }
-//
-//                } else if (new_level > 16) {
-//                    slider_level[i]!!.text = "+" + (new_level - 16) + " dB"
-//                }
                 i++
             }
         }
+
         for (i in num_sliders until MAX_SLIDERS) {
             sliders[i]!!.visibility = View.GONE
             slider_labels[i]!!.visibility = View.GONE
@@ -221,8 +214,7 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
     /*=============================================================================
     onProgressChanged
     =============================================================================*/
-    override fun onProgressChanged(seekBar: SeekBar, level: Int,
-                                   fromTouch: Boolean) {
+    override fun onProgressChanged(seekBar: SeekBar, level: Int, fromTouch: Boolean) {
             if (eq != null) {
             val new_level = min_level + (max_level - min_level) * level / 100
 
@@ -231,17 +223,16 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
                     if (new_level == 16) {
                         slider_level[i]!!.text = "0 dB"
                     } else if (new_level < 16) {
-
                         if (new_level == 0) {
-                            slider_level[i]!!.text = "-" + "15 dB"
+                            slider_level[i]!!.text = "-15 dB"
                         } else {
-                            slider_level[i]!!.text = "-" + (16 - new_level) + " dB"
+                            slider_level[i]!!.text = "-${16 - new_level} dB"
                         }
-
                     } else if (new_level > 16) {
-                        slider_level[i]!!.text = "+" + (new_level - 16) + " dB"
+                        slider_level[i]!!.text = "+${new_level - 16} dB"
                     }
                     eq!!.setBandLevel(i.toShort(), new_level.toShort())
+                    storageUtil.saveStringValue("Band$i", new_level.toString())
                     break
                 }
             }
@@ -262,7 +253,7 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
     /*=============================================================================
     formatBandLabel
     =============================================================================*/
-    fun formatBandLabel(band: IntArray): String {
+    private fun formatBandLabel(band: IntArray): String {
         //return milliHzToString(band[0]) + "-" + milliHzToString(band[1])
         return milliHzToString(band[0])
     }
@@ -281,14 +272,20 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
     /*=============================================================================
     updateSliders
     =============================================================================*/
-    fun updateSliders() {
+    private fun updateSliders() {
         for (i in 0 until num_sliders) {
-            val level: Int
+            var level = storageUtil.loadStringValue("Band$i")
+
             if (eq != null)
-                level = eq!!.getBandLevel(i.toShort()).toInt()
+                if(level.equals("empty", true)){
+                    level = eq!!.getBandLevel(i.toShort()).toString()
+                    storageUtil.saveStringValue("Band$i", level.toString())
+                }
             else
-                level = 0
-            val pos = 100 * level / (max_level - min_level) + 50
+                if(level.equals("empty", true)){
+                    level = 0.toString()
+                }
+            val pos = 100 * level?.toInt()!! / (max_level - min_level) + 50
             sliders[i]!!.progress = pos
         }
     }
@@ -309,7 +306,32 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
     =============================================================================*/
     override fun onCheckedChanged(view: CompoundButton, isChecked: Boolean) {
         if (view === enabled as View) {
-            eq!!.enabled = isChecked
+            if (isChecked){
+                storageUtil.saveStringValue("Enabled", 1.toString())
+            } else {
+                storageUtil.saveStringValue("Enabled", 0.toString())
+            }
+            val enabled = storageUtil.loadStringValue("Enabled")
+            if (enabled == "empty" || enabled!! == 0.toString()){
+                eq!!.enabled = false
+                storageUtil.saveStringValue("Enabled", 0.toString())
+            } else {
+                eq!!.enabled = true
+                storageUtil.saveStringValue("Enabled", 1.toString())
+            }
+        }
+    }
+
+    private fun updateEnabled(): Boolean {
+        val enabled = storageUtil.loadStringValue("Enabled")
+        if (enabled == "empty" || enabled!! == 0.toString()){
+            eq!!.enabled = false
+            storageUtil.saveStringValue("Enabled", 0.toString())
+            return eq!!.enabled
+        } else {
+            eq!!.enabled = true
+            storageUtil.saveStringValue("Enabled", 1.toString())
+            return eq!!.enabled
         }
     }
 
@@ -328,7 +350,9 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
     fun updateUI() {
         updateSliders()
         updateBassBoost()
-        enabled!!.isChecked = eq!!.enabled
+        if (eq != null) {
+            enabled!!.isChecked = updateEnabled()
+        }
     }
 
     /*=============================================================================
@@ -376,6 +400,51 @@ class EqActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener,
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun testband(){
+        for (i in 0 until num_sliders) {
+            var level = storageUtil.loadStringValue("Band$i")
+
+            if (eq != null) {
+                if (level.equals("empty", true)) {
+                    level = eq!!.getBandLevel(i.toShort()).toString()
+                    storageUtil.saveStringValue("Band$i", level.toString())
+                }
+            } else {
+                Log.e(this.javaClass.name, "band$i level is empty")
+            }
+        }
+    }
+
+    private fun setUpKnob(bassBoost: Boolean = true, panel: RelativeLayout, txt: TextView, h: Int, w: Int){
+        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+        lp.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+
+        val rv = RoundKnobButton(this)
+        panel.addView(rv, lp)
+
+        rv.setRotorPercentage(100)
+        rv.setM_nWidth(w)
+        rv.setM_nHeight(h)
+        rv.redraw(this)
+        rv.SetListener(object : RoundKnobButton.RoundKnobButtonListener {
+            override fun onStateChange(newstate: Boolean) {
+
+            }
+
+            override fun onRotate(percentage: Int) {
+                if (bassBoost){
+                    bb!!.enabled = percentage > 0
+                    bb!!.setStrength((percentage * 10).toShort())
+                } else {
+                    bb!!.enabled = percentage > 0
+                    bb!!.setStrength((percentage * 10).toShort())
+                }
+                txt.text = "$percentage%"
+            }
+        })
     }
 
 }

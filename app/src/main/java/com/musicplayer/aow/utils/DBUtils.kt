@@ -20,7 +20,7 @@ object DBUtils {
 
     fun generateSongsPlayList(context: Context?): PlayList {
         val songs = PlayList()
-        songs.name = context?.getString(R.string.mp_play_list_songs)
+        songs.name = context?.getString(R.string.mp_play_list_tracks)
         return songs
     }
 

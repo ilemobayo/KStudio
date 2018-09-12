@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.album.model
+package com.musicplayer.aow.ui.main.library.album.view.model
 
 /**
  * Created by Arca on 11/20/2017.

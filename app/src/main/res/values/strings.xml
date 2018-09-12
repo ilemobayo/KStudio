@@ -4,6 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="kingsstudio">MusixPlay</string>
     <string name="application_name">Musixplay</string>
+    <string name="application_motto">We love your music</string>
     <string name="superstarkingszstudio">Superstar Loaded Music</string>
     <string name="todo">TODO</string>
     <string name="title_activity_settings">Settings</string>
@@ -94,7 +95,7 @@
     <string name="connect_peer_button">Connect</string>
     <string name="disconnect_peer_button">Disconnect</string>
     <string name="get_file_button">Launch Gallery</string>
-    <string name="empty"></string>
+    <string name="empty"> </string>
     <string name="yes">yes</string>
     <string name="no">no</string>
     <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
@@ -109,7 +110,7 @@
     <string name="btn_start"> Start </string>
     <string name="btn_stop"> Stop </string>
     <string name="kings_studio">Musixplay</string>
-    <string name="we_love_your_music">We love your music...</string>
+    <string name="we_love_your_music">We love your music…</string>
     <string name="title_activity_app_settings">Settings</string>
     <string name="title_activity_main2">Main2Activity</string>
 
@@ -157,7 +158,7 @@
     <string name="bass_boost">Bass boost</string>
     <string name="virtualizer">Virtualizer</string>
     <string name="reverb">Preset Reverb</string>
-    <string name="about">About...</string>
+    <string name="about">About Us</string>
     <string name="ok">OK</string>
     <string name="copyright_message">Copyright \u00A92013 Kingsz Studio.</string>
     <string name="equalizer">Equalizer</string>
@@ -192,13 +193,69 @@
     <string name="volume">volume:</string>
     <string name="search">Search</string>
     <string name="album_cover">Audio album cover art.</string>
-    <string name="gesture_control_settings">Gesture control settings:</string>
+    <string name="gesture_control_settings">Gesture control settings (Beta version):</string>
     <string name="enable_shake_detection">Enable shake detection</string>
-    <string name="shake_your_device_to_change_the_current_playback_song">Shake your device to change the current playback song.</string>
+    <string name="shake_your_device_to_change_the_current_playback_song">Shake your device to change the current playback track.</string>
     <string name="enable_flip_detection">Enable flip detection</string>
     <string name="turn_your_device_face_down_to_pause_current_playback">Turn your device face down to pause current playback.</string>
     <string name="remove">Remove</string>
     <string name="signout">signout</string>
     <string name="follow">Follow</string>
     <string name="artist">Artist</string>
+
+    <!-- EXO-PLAYER-->
+    <string name="playback_channel_name">Playback</string>
+    <string name="download_channel_name">Download</string>
+    <string name="create_playlist">Create playlist</string>
+    <string name="play_all">Play all</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="make_available_offline">Make Available Offline</string>
+    <string name="playlist">Playlist</string>
+    <string name="album">Album</string>
+    <string name="songs">Songs</string>
+    <string name="browse">Browse</string>
+    <string name="network_connection_error">Network connection error.</string>
+    <string name="discover">Discover</string>
+    <string name="podcast">Podcast</string>
+    <string name="game">Game</string>
+    <string name="preset">Preset</string>
+
+    <!-- Game -->
+    <string name="roulette_wheel">roulette wheel</string>
+    <string name="roulette_wheel_pointer">roulette wheel pointer</string>
+    <string name="bet_prompt">Choose your bet type</string>
+    <string-array name="bet_type_arrays">
+        <item>Straight Bet</item>
+        <item>Split Bet</item>
+        <item>Street Bet</item>
+        <item>Square Bet</item>
+        <item>Basket Bet</item>
+        <item>Avenue Bet</item>
+        <item>Dozen Bet</item>
+        <item>Column Bet</item>
+        <item>Outside Bet</item>
+    </string-array>
+    <string name="straight_bet">Straight Bet</string>
+    <string name="split_bet">Split Bet</string>
+    <string name="street_bet">Street Bet</string>
+    <string name="basket_bet">Basket Bet</string>
+    <string name="square_bet">Square Bet</string>
+    <string name="avenue_bet">Avenue Bet</string>
+    <string name="outside_bet">Outside Bet</string>
+    <string name="dozen_bet">Dozen Bet</string>
+    <string name="column_bet">Column Bet</string>
+    <string name="redblack_bet">Red/Black Bet</string>
+    <string name="evenodd_bet">Even/Odd Bet</string>
+    <string name="lowhigh_bet">Low/High Bet</string>
+    <string name="red">Red</string>
+    <string name="black">Black</string>
+    <string name="odd">Odd</string>
+    <string name="even">Even</string>
+    <string name="high_bet">High Bet</string>
+    <string name="low_bet">Low Bet</string>
+    <string name="first">1st</string>
+    <string name="second">2nd</string>
+    <string name="third">3rd</string>
+    <string name="payoff">Payoff</string>
 </resources>

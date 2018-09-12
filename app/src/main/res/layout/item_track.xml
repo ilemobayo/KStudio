@@ -53,8 +53,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:fontFamily="@font/san_fransisco_compact_display_semibold"
             tools:text="1"
-            android:textSize="13sp"
+            android:textSize="15sp"
             />
     </RelativeLayout>
 
@@ -73,8 +74,9 @@
         <TextView
             style="@style/MP.Theme.TextAppearance.List.Title"
             android:id="@+id/text_view_name"
+            android:fontFamily="@font/san_fransisco_compact_display_semibold"
             tools:text="Kings Studio"
-            android:textSize="13sp"
+            android:textSize="12sp"
             />
 
         <RelativeLayout
@@ -85,6 +87,7 @@
                 android:id="@+id/text_view_artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/san_fransisco_compact_display_regular"
                 tools:text="Musixplay"
                 android:textSize="12sp"
                 android:layout_alignParentStart="true"

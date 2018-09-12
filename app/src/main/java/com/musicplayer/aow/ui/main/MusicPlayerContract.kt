@@ -1,6 +1,6 @@
 package com.musicplayer.aow.ui.main
 
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.player.PlayMode
 import com.musicplayer.aow.delegates.player.PlaybackService
 import com.musicplayer.aow.ui.base.BasePresenter
@@ -18,9 +18,9 @@ interface MusicPlayerContract {
 
         fun onPlaybackServiceUnbound()
 
-        fun onSongSetAsFavorite(song: Song)
+        fun onSongSetAsFavorite(track: Track)
 
-        fun onSongUpdated(song: Song?)
+        fun onSongUpdated(track: Track?)
 
         fun updatePlayMode(playMode: PlayMode)
 
@@ -33,10 +33,10 @@ interface MusicPlayerContract {
 
         fun retrieveLastPlayMode()
 
-        fun setSongAsFavorite(song: Song, favorite: Boolean)
+        fun setSongAsFavorite(track: Track, favorite: Boolean)
 
-        fun bindPlaybackService()
+        //fun bindPlaybackService()
 
-        fun unbindPlaybackService()
+        //fun unbindPlaybackService()
     }
 }

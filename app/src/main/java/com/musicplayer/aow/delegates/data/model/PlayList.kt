@@ -1,16 +1,41 @@
 package com.musicplayer.aow.delegates.data.model
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.TypeConverters
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.net.Uri
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.NonNull
+import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
+import android.webkit.URLUtil
+import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.FileDataSource
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import com.litesuits.orm.db.annotation.Unique
+import com.musicplayer.aow.R
+import com.musicplayer.aow.delegates.exo.DownloadUtil
 import com.musicplayer.aow.delegates.player.PlayMode
 import com.musicplayer.aow.delegates.player.SongResolver
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.onComplete
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Entity(tableName = "playlist")
 @TypeConverters(DataConverter::class)
@@ -53,7 +78,7 @@ class PlayList : Parcelable {
 
     var updatedAt: String? = null
 
-    var songs: ArrayList<Song>? = ArrayList()
+    var tracks: ArrayList<Track>? = ArrayList()
 
     var playingIndex: Int = -1
 
@@ -66,15 +91,17 @@ class PlayList : Parcelable {
     // Utils
 
     var itemCount: Int = 0
-        get() = if (songs == null) 0 else songs!!.size
+        get() = if (tracks == null) 0 else tracks!!.size
 
     /**
-     * The current song being played or is playing based on the [.playingIndex]
+     * The current track being played or is playing based on the [.playingIndex]
      */
     @Ignore
-    var currentSong: Song? = null
+    var currentTrack: MutableLiveData<Track>? = null
         get() = if (playingIndex != NO_POSITION) {
-                songs!![playingIndex]
+           val data: MutableLiveData<Track> = MutableLiveData()
+           data.value = tracks!![playingIndex]
+           data
         } else null
 
     constructor() {
@@ -87,22 +114,22 @@ class PlayList : Parcelable {
     }
 
     @Ignore
-    constructor(song: Song) {
-        songs!!.add(song)
+    constructor(track: Track) {
+        tracks!!.add(track)
         numOfSongs = 1
     }
 
     @Ignore
-    constructor(songList: ArrayList<Song>?) {
-        songs!!.addAll(songList!!)
-        numOfSongs = songs!!.size
+    constructor(trackList: ArrayList<Track>?) {
+        tracks!!.addAll(trackList!!)
+        numOfSongs = tracks!!.size
     }
 
     @Ignore
-    constructor(songList: List<Song>, name: String) {
+    constructor(trackList: List<Track>, name: String) {
         this.name = name
-        songs!!.addAll(songList)
-        numOfSongs = songs!!.size
+        tracks!!.addAll(trackList)
+        numOfSongs = tracks!!.size
     }
 
     @Ignore
@@ -123,7 +150,7 @@ class PlayList : Parcelable {
         dest.writeByte(if (this.isFavorite) 1.toByte() else 0.toByte())
         dest.writeString(this.createdAt!!)
         dest.writeString(this.updatedAt!!)
-        dest.writeTypedList(this.songs)
+        dest.writeTypedList(this.tracks)
         dest.writeInt(this.playingIndex)
         dest.writeInt(if (this.playMode == null) -1 else this.playMode!!.ordinal)
     }
@@ -135,49 +162,49 @@ class PlayList : Parcelable {
         this.isFavorite = `in`.readByte().toInt() != 0
         this.createdAt = `in`.readString()
         this.updatedAt = `in`.readString()
-        this.songs = `in`.createTypedArrayList(Song.CREATOR)
+        this.tracks = `in`.createTypedArrayList(Track.CREATOR)
         this.playingIndex = `in`.readInt()
         val tmpPlayMode = `in`.readInt()
         this.playMode = if (tmpPlayMode == -1) null else PlayMode.values()[tmpPlayMode]
     }
 
-    fun addSong(song: Song?) {
-        if (song == null) return
+    fun addSong(track: Track?) {
+        if (track == null) return
 
-        songs!!.add(song)
-        numOfSongs = songs!!.size
+        tracks!!.add(track)
+        numOfSongs = tracks!!.size
     }
 
-    fun addSong(song: Song?, index: Int) {
-        if (song == null) return
+    fun addSong(track: Track?, index: Int) {
+        if (track == null) return
 
-        songs!!.add(index, song)
-        numOfSongs = songs!!.size
+        tracks!!.add(index, track)
+        numOfSongs = tracks!!.size
     }
 
-    fun addSong(songs: List<Song>?, index: Int) {
-        if (songs == null || songs.isEmpty()) return
+    fun addSong(tracks: List<Track>?, index: Int) {
+        if (tracks == null || tracks.isEmpty()) return
 
-        this.songs!!.addAll(index, songs)
-        this.numOfSongs = this.songs!!.size
+        this.tracks!!.addAll(index, tracks)
+        this.numOfSongs = this.tracks!!.size
     }
 
-    fun removeSong(song: Song?): Boolean {
-        if (song == null) return false
+    fun removeTrack(track: Track?): Boolean {
+        if (track == null) return false
 
-        val index = songs!!.indexOf(song)
+        val index = tracks!!.indexOf(track)
         if (index != -1) {
-            if (songs!!.removeAt(index) != null) {
-                numOfSongs = songs!!.size
-                return true
+            tracks!!.removeAt(index).apply {
+                numOfSongs = size
             }
+            return true
         } else {
-            val iterator = songs!!.iterator()
+            val iterator = tracks!!.iterator()
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                if (song.path == item.path) {
+                if (track.path == item.path) {
                     iterator.remove()
-                    numOfSongs = songs!!.size
+                    numOfSongs = tracks!!.size
                     return true
                 }
             }
@@ -189,7 +216,7 @@ class PlayList : Parcelable {
      * Prepare to play
      */
     fun prepare(): Boolean {
-        if (songs!!.isEmpty()) return false
+        if (tracks!!.isEmpty()) return false
         if (playingIndex == NO_POSITION) {
             playingIndex = 0
         }
@@ -197,96 +224,175 @@ class PlayList : Parcelable {
     }
 
     fun hasLast(): Boolean {
-        return songs != null && songs!!.size != 0
+        return tracks != null && tracks!!.size != 0
     }
 
-    fun last(): Song {
-        when (playMode) {
-            PlayMode.LOOP, PlayMode.LIST, PlayMode.SINGLE -> {
-                var newIndex = playingIndex - 1
-                if (newIndex < 0) {
-                    newIndex = songs!!.size - 1
-                }
-                playingIndex = newIndex
-            }
-            PlayMode.SHUFFLE -> playingIndex = randomPlayIndex()
-        }
-        return songs!![playingIndex]
+    fun last(previousIndex: Int): MutableLiveData<Track> {
+        playingIndex = previousIndex
+        currentTrack?.value = tracks!![playingIndex]
+        return currentTrack!!
     }
 
     /**
-     * @return Whether has next song to play.
+     * @return Whether has next track to play.
      *
      *
      * If this query satisfies these conditions
      * - comes from media player's complete listener
      * - current play mode is PlayMode.LIST (the only limited play mode)
-     * - current song is already in the end of the list
-     * then there shouldn't be a next song to play, for this condition, it returns false.
+     * - current track is already in the end of the list
+     * then there shouldn't be a next track to play, for this condition, it returns false.
      *
      *
      * If this query is from user's action, such as from play controls, there should always
-     * has a next song to play, for this condition, it returns true.
+     * has a next track to play, for this condition, it returns true.
      */
-    fun hasNext(fromComplete: Boolean): Boolean {
-        if (songs!!.isEmpty()) return false
-        if (fromComplete) {
-            if (playMode === PlayMode.LIST && playingIndex + 1 >= songs!!.size) return false
-        }
+    fun hasNext(): Boolean {
+        if (tracks!!.isEmpty()) return false
+
         return true
     }
 
     /**
      * Move the playingIndex forward depends on the play mode
      *
-     * @return The next song to play
+     * @return The next track to play
      */
-    operator fun next(): Song {
-        when (playMode) {
-            PlayMode.LOOP, PlayMode.LIST, PlayMode.SINGLE -> {
-                var newIndex = playingIndex + 1
-                if (newIndex >= songs!!.size) {
-                    newIndex = 0
-                }
-                playingIndex = newIndex
-            }
-            PlayMode.SHUFFLE -> playingIndex = randomPlayIndex()
-        }
-        return songs!![playingIndex]
+    fun next(nextIndex: Int): MutableLiveData<Track> {
+        playingIndex = nextIndex
+        currentTrack?.value = tracks!![playingIndex]
+        return currentTrack!!
     }
 
-    fun nextWithIndex(): SongResolver {
-        when (playMode) {
-            PlayMode.LOOP, PlayMode.LIST, PlayMode.SINGLE -> {
-                var newIndex = playingIndex + 1
-                if (newIndex >= songs!!.size) {
-                    newIndex = 0
-                }
-                playingIndex = newIndex
+    fun hasThisTrack(tPath: String? = ""): Boolean {
+        var found = false
+        tracks?.forEach {
+            if (it.path == tPath){
+                found = true
+                return true
             }
-            PlayMode.SHUFFLE -> playingIndex = randomPlayIndex()
         }
-        return SongResolver(songs!![playingIndex], playingIndex)
+        return found
     }
 
-    private fun randomPlayIndex(): Int {
-        val randomIndex = Random().nextInt(songs!!.size)
-        // Make sure not play the same song twice if there are at least 2 songs
-        if (songs!!.size > 1 && randomIndex == playingIndex) {
-            randomPlayIndex()
+    fun getConcatenatedSongLocal(context: Context, track: Track?): ExtractorMediaSource {
+        val dataSpec = DataSpec(Uri.parse(track?.path))
+        val fileDataSource = FileDataSource()
+        try
+        {
+            fileDataSource.open(dataSpec)
         }
-        return randomIndex
+        catch (e:FileDataSource.FileDataSourceException) {
+            e.printStackTrace()
+        }
+        val factory = DataSource.Factory { fileDataSource }
+        return ExtractorMediaSource(fileDataSource.uri,
+                factory, DefaultExtractorsFactory(), null, null)
+    }
+
+    fun getConcatenatedSong(context: Context, track: Track?): MediaSource{
+        val dataSourceFactory = DefaultDataSourceFactory(
+                context, Util.getUserAgent(context, context.getString(R.string.application_name)))
+        val cacheDataSourceFactory = CacheDataSourceFactory(
+                DownloadUtil.getCache(context),
+                dataSourceFactory,
+                CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        return ExtractorMediaSource.Factory(cacheDataSourceFactory)
+                .createMediaSource(Uri.parse(track?.path!!))
+    }
+
+    fun getConcatenatedPlaylist(context: Context): ConcatenatingMediaSource {
+        val dataSourceFactory = DefaultDataSourceFactory(
+                context, Util.getUserAgent(context, context.getString(R.string.application_name)))
+        val cacheDataSourceFactory = CacheDataSourceFactory(
+                DownloadUtil.getCache(context),
+                dataSourceFactory,
+                CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        val concatenatingMediaSource = ConcatenatingMediaSource()
+        tracks?.forEach {
+            val mediaSource = ExtractorMediaSource.Factory(cacheDataSourceFactory)
+                    .createMediaSource(Uri.parse(it.path))
+            concatenatingMediaSource.addMediaSource(mediaSource)
+        }
+        return concatenatingMediaSource
+    }
+
+    fun getConcatenatedPlaylistLocal(): ConcatenatingMediaSource {
+        val concatenatingMediaSource = ConcatenatingMediaSource()
+        tracks?.forEach {
+            val dataSpec = DataSpec(Uri.parse(it.path))
+            val fileDataSource = FileDataSource()
+            try
+            {
+                fileDataSource.open(dataSpec)
+            }
+            catch (e:FileDataSource.FileDataSourceException) {
+                e.printStackTrace()
+            }
+            val factory = DataSource.Factory { fileDataSource }
+            val mediaSource = ExtractorMediaSource(fileDataSource.uri,
+                    factory, DefaultExtractorsFactory(), null, null)
+            concatenatingMediaSource.addMediaSource(mediaSource)
+        }
+
+        return concatenatingMediaSource
+    }
+
+    fun getBitmap(context: Context, track: Track?, completion: (Bitmap?, Error?) -> Unit){
+        if (track?.albumArt != null && track.albumArt != "null") {
+            if (URLUtil.isHttpUrl(track.albumArt) || URLUtil.isHttpsUrl(track.albumArt)) {
+                doAsync {
+                    val bitmap = Glide.with(context)
+                            .asBitmap()
+                            .load(track.albumArt)
+                            .submit(250, 250)
+                            .get()
+                    onComplete {
+                        completion(bitmap, null)
+                    }
+                }
+            } else {
+                try{
+                    val metadataRetriever = MediaMetadataRetriever()
+                    metadataRetriever.setDataSource(track.path)
+                    val data = metadataRetriever.embeddedPicture
+                    // convert the byte array to a bitmap
+                    if(data != null)
+                    {
+                        val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                        if (bitmap != null){
+                            completion(bitmap, null)
+                        }else{
+                            completion(bitmap, null)
+                        }
+                    }else{
+                        completion(null, null)
+                    }
+                    metadataRetriever.release()
+                }catch (e:Exception){
+                    completion(null, null)
+                }
+            }
+        } else {
+            completion(null, null)
+        }
+    }
+
+    fun getMediaDescription(index: Int? = 0, track: Track): MediaDescriptionCompat {
+        val extras = Bundle()
+        return MediaDescriptionCompat.Builder()
+                .setMediaId(index.toString())
+                .setTitle(track.title)
+                .setDescription(track.artist)
+                //.setIconUri(Uri.parse(track.albumArt))
+                .setExtras(extras)
+                .build()
     }
 
     companion object {
 
         // Play List: Favorite
         val NO_POSITION = -1
-        val COLUMN_FAVORITE = "favorite"
-        val COLUMN_NAME = "name"
-        val ID = "id"
-        val PLAYING_INDEX = "playing"
-        val NUMBER_OF_SONGS = "sizeofsongs"
 
         val CREATOR: Parcelable.Creator<PlayList?> = object : Parcelable.Creator<PlayList?> {
             override fun createFromParcel(source: Parcel): PlayList? {
@@ -301,7 +407,7 @@ class PlayList : Parcelable {
         fun fromFolder(folder: Folder): PlayList {
             val playList = PlayList()
             playList.name = folder.name
-            playList.songs = folder.songs as ArrayList<Song>?
+            playList.tracks = folder.tracks as ArrayList<Track>?
             playList.numOfSongs = folder.numOfSongs
             return playList
         }

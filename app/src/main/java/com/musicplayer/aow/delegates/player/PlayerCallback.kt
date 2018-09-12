@@ -1,7 +1,7 @@
 package com.musicplayer.aow.delegates.player
 
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 
 interface PlayerCallback: IPlayback {
 
@@ -9,7 +9,7 @@ interface PlayerCallback: IPlayback {
 
     override val progress: Int
 
-    override val playingSong: Song?
+    override val playingTrack: Track?
 
     override var playingList: PlayList?
 
@@ -21,7 +21,7 @@ interface PlayerCallback: IPlayback {
 
     override fun play(list: PlayList, startIndex: Int): Boolean
 
-    override fun play(song: Song): Boolean
+    override fun play(track: Track): Boolean
 
     override fun playLast(): Boolean
 

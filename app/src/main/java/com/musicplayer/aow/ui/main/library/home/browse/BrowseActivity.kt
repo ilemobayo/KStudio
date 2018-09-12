@@ -3,23 +3,24 @@ package com.musicplayer.aow.ui.main.library.home.browse
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.Gson
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.bus.RxBus
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
@@ -34,6 +35,7 @@ import kotlinx.android.synthetic.main.browse_list_activity.*
 import org.jetbrains.anko.find
 import org.json.JSONArray
 import org.json.JSONException
+import com.musicplayer.aow.delegates.data.db.AppExecutors
 
 
 /**
@@ -50,19 +52,6 @@ class BrowseActivity: BaseActivity(){
 
         setContentView(R.layout.browse_list_activity)
         ButterKnife.bind(this)
-
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
-
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent)
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.color.black)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black)
@@ -107,29 +96,26 @@ class BrowseActivity: BaseActivity(){
                     val playNext = sheetView.find<LinearLayout>(R.id.menu_item_play_next)
                     val addToQueue = sheetView.find<LinearLayout>(R.id.menu_item_add_to_queue)
                     val delete = sheetView.find<LinearLayout>(R.id.menu_item_delete)
+                    delete.visibility = View.GONE
                     val album = sheetView.find<LinearLayout>(R.id.menu_item_go_to_album)
                     album.visibility = View.GONE
                     val artist = sheetView.find<LinearLayout>(R.id.menu_item_go_to_artist)
                     artist.visibility = View.GONE
                     val playlist = sheetView.find<LinearLayout>(R.id.menu_item_add_to_play_list)
-                    val _delete = sheetView.findViewById<ImageView>(R.id.delete_img)
-                    _delete.setImageResource(R.drawable.ic_file_download)
-                    val _delete_label = sheetView.find<TextView>(R.id.delete_label)
-                    _delete_label.text = context.getString(R.string.download)
                     play.setOnClickListener {
                         //Update UI
-                        RxBus.instance!!.post(PlayListNowEvent(PlayList(tracks.songs), 0))
+                        Player.instance?.play(PlayList(tracks.tracks), 0)
                         mBottomSheetDialog.dismiss()
                     }
                     //play next
                     playNext.setOnClickListener {
                         val playingIndex = Player.instance!!.mPlayList!!.playingIndex
-                        Player.instance!!.insertnext(playingIndex,tracks.songs!!)
+                        Player.instance!!.insertnext(playingIndex,tracks.tracks!!)
                         mBottomSheetDialog.dismiss()
                     }
                     //add to now playing
                     addToQueue.setOnClickListener {
-                        Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,tracks.songs!!)
+                        Player.instance!!.insertnext(Player.instance!!.mPlayList!!.numOfSongs,tracks.tracks!!)
                         mBottomSheetDialog.dismiss()
                     }
                     //Add to Playlist Operation
@@ -141,7 +127,7 @@ class BrowseActivity: BaseActivity(){
                         val sheetView =  LayoutInflater.from(context).inflate(R.layout.custom_dialog_select_playlist, null)
                         val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
 
-                        SoftCodeAdapter().addSongToPlaylist(this,context, mylist, mSelectPlaylistDialog, Song(), tracks.songs, true)
+                        SoftCodeAdapter().addSongToPlaylist(context, mylist, mSelectPlaylistDialog, Track(), tracks.tracks, true)
 
                         mSelectPlaylistDialog.setContentView(sheetView)
                         mSelectPlaylistDialog.show()
@@ -149,7 +135,7 @@ class BrowseActivity: BaseActivity(){
                     }
                     //Delete Operation
                     delete.setOnClickListener {
-                        //
+
                         mBottomSheetDialog.dismiss()
                     }
                 }
@@ -157,12 +143,15 @@ class BrowseActivity: BaseActivity(){
 
                 Glide.with(this)
                         .load(tracks.picture)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .fitCenter()
-                        .error(R.drawable.gradient_info)
+                        .apply(
+                                RequestOptions()
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .dontAnimate()
+                                        .dontTransform()
+                        )
                         .into(album_art)
 
-                recycler_views.layoutManager = LinearLayoutManager(applicationContext)
+                recycler_views.layoutManager = LinearLayoutManager(this)
                 recycler_views.addItemDecoration(DividerItemDecoration(this.getDrawable(R.drawable.drawble_divider),false, false))
                 recycler_views.adapter = BrowseAdapter(applicationContext, tracks, this )
             }
@@ -170,69 +159,65 @@ class BrowseActivity: BaseActivity(){
 
     }
 
-    fun favorite(playList: PlayList, song: Song, isPlaylist: Boolean){
+    fun favorite(playList: PlayList, track: Track, isPlaylist: Boolean){
         if(isPlaylist) {
-            val fSong = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId(playList.mxp_id!!)
-            fSong?.observe(this, object: Observer<PlayList>{
-                override fun onChanged(t: PlayList?) {
+            AppExecutors.instance?.diskIO()?.execute {
+                val fSong = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId(playList.mxp_id!!)
+                fSong?.observe(this, object : Observer<PlayList> {
+                    override fun onChanged(t: PlayList?) {
+                        var fav: Boolean
+                        fav = t != null
+                        item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+                        item_button_option_like.setOnClickListener {
+                            //save to favorite
+                            if (fav) {
+                                deleteFromFavorite(playList, track, isPlaylist)
+                            } else {
+                                addToFavorite(playList, track, isPlaylist)
+                            }
+                        }
+                    }
+                })
+            }
+        }else{
+            AppExecutors.instance?.diskIO()?.execute {
+                val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(track.path!!)
+                fSong?.observe(this, Observer<Track> { t ->
                     var fav = true
                     fav = t != null
                     item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
                     item_button_option_like.setOnClickListener {
                         //save to favorite
-                        if (fav){
-                            deleteFromFavorite(playList, song, isPlaylist)
+                        if (fav) {
+                            deleteFromFavorite(playList, track, isPlaylist)
                         } else {
-                            addToFavorite(playList, song, isPlaylist)
+                            addToFavorite(playList, track, isPlaylist)
                         }
                     }
-                }
-            })
-        }else{
-            val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(song.path!!)
-            fSong?.observe(this, object: Observer<Song>{
-                override fun onChanged(t: Song?) {
-                    var fav = true
-                    fav = t != null
-                    item_button_option_like.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
-                    item_button_option_like.setOnClickListener {
-                        //save to favorite
-                        if (fav){
-                            deleteFromFavorite(playList, song, isPlaylist)
-                        } else {
-                            addToFavorite(playList, song, isPlaylist)
-                        }
-                    }
-                }
-            })
+                })
+            }
         }
 
     }
 
-    fun isFavorite(playList: PlayList = PlayList(), song: Song = Song(), isPlaylist: Boolean = true): Boolean{
+    private fun addToFavorite(playList: PlayList = PlayList(), track: Track = Track(), isPlaylist: Boolean = true){
         if(isPlaylist) {
-            val fSong = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId(playList.mxp_id!!)
-            return fSong?.value != null
+            AppExecutors.instance?.diskIO()?.execute {
+                playList.currentTrack?.value = Track()
+                playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
+            }
         }else{
-            val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(song.path!!)
-            return fSong?.value != null
+            AppExecutors.instance?.diskIO()?.execute { songFavDatabase?.songFavDAO()?.insertOneSong(track) }
         }
     }
 
-    private fun addToFavorite(playList: PlayList = PlayList(), song: Song = Song(), isPlaylist: Boolean = true){
+    private fun deleteFromFavorite(playList: PlayList = PlayList(), track: Track = Track(), isPlaylist: Boolean = true){
         if(isPlaylist) {
-            playList.currentSong = Song()
-            playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
+            AppExecutors.instance?.diskIO()?.execute {
+                playListFavDatabase?.playlistFavDAO()?.deletePlayList(playList)
+            }
         }else{
-            songFavDatabase?.songFavDAO()?.insertOneSong(song)
-        }
-    }
-
-    private fun deleteFromFavorite(playList: PlayList = PlayList(), song: Song = Song(), isPlaylist: Boolean = true){
-        if(isPlaylist) {
-            playListFavDatabase?.playlistFavDAO()?.deletePlayList(playList)
-        }else{
-            songFavDatabase?.songFavDAO()?.deleteSong(song)
+            AppExecutors.instance?.diskIO()?.execute{ songFavDatabase?.songFavDAO()?.deleteSong(track) }
         }
     }
 
@@ -242,11 +227,21 @@ class BrowseActivity: BaseActivity(){
             if (placeholder.type.equals("playlist", true)  || placeholder.type.equals("album", true)){
                 item_owner.text = placeholder.owner
                 item_element_list.text = placeholder.description
+                item_element_list.setOnClickListener{
+                    val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+                    dialog.setTitle("Description")
+                    dialog.setMessage(placeholder.description)
+                    dialog.setNegativeButton("Close",
+                            {dialog, which ->
+
+                            }).create()
+                    dialog.show()
+                }
                 tracks.name = placeholder.name
                 tracks.picture = placeholder.picture
                 tracks.mxp_id = placeholder._id
                 placeholder.member.forEach {
-                    val song = Song(it.name,
+                    val song = Track(it.name,
                             it.name,
                             it.owner,
                             "name",
@@ -258,17 +253,30 @@ class BrowseActivity: BaseActivity(){
                             "",
                             it.picture)
                     song.mxp_id = it._id
-                    tracks.songs?.add(song)
+                    if(tracks.picture == null) {
+                        tracks.picture = it.picture
+                    }
+                    tracks.tracks?.add(song)
                 }
                 //set favorite
-                favorite(tracks, Song(), true)
+                favorite(tracks, Track(), true)
             }else{
                 item_owner.text = placeholder.owner
                 item_element_list.text = placeholder.description
+                item_element_list.setOnClickListener{
+                    val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+                    dialog.setTitle("Description")
+                    dialog.setMessage(placeholder.description)
+                    dialog.setNegativeButton("Close",
+                            {dialog, which ->
+
+                            }).create()
+                    dialog.show()
+                }
                 tracks.name = placeholder.name
                 tracks.picture = placeholder.picture
                 tracks.mxp_id = placeholder._id
-                val song = Song(placeholder.name,
+                val song = Track(placeholder.name,
                         placeholder.name,
                         placeholder.owner,
                         "name",
@@ -280,7 +288,7 @@ class BrowseActivity: BaseActivity(){
                         "",
                         placeholder.picture)
                 song.mxp_id = placeholder._id
-                tracks.songs?.add(song)
+                tracks.tracks?.add(song)
 
                 //set favorite
                 favorite(PlayList(), song, false)
@@ -290,10 +298,19 @@ class BrowseActivity: BaseActivity(){
             if (placeholder.type.equals("playlist", true)  || placeholder.type.equals("album", true)){
                 item_owner.text = placeholder.owner
                 item_element_list.text = placeholder.description
+                item_element_list.setOnClickListener{
+                    val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+                    dialog.setTitle("Description")
+                    dialog.setMessage(placeholder.description)
+                    dialog.setNegativeButton("Close",
+                            {dialog, which ->
+
+                            }).create()
+                    dialog.show()
+                }
                 tracks.name = placeholder.name
                 tracks.picture = placeholder.picture
                 tracks.mxp_id = placeholder._id
-
                 val mItem = JSONArray(placeholder.member)
                 for (i in 0..(mItem.length().minus(1))) {
                     try {
@@ -314,7 +331,7 @@ class BrowseActivity: BaseActivity(){
                             mMemberItem.description = members.getString("description")
                             mMemberItem.dateCreated = members.getString("date_created")
 
-                            val song = Song(
+                            val song = Track(
                                     mMemberItem.name,
                                     mMemberItem.name,
                                     mMemberItem.owner,
@@ -327,7 +344,7 @@ class BrowseActivity: BaseActivity(){
                                     "",
                                     mMemberItem.picture)
                             song.mxp_id = mMemberItem._id
-                            tracks.songs?.add(song)
+                            tracks.tracks?.add(song)
                         }
                     }catch (e: JSONException){
 
@@ -335,14 +352,24 @@ class BrowseActivity: BaseActivity(){
                 }
 
                 //set favorite
-                favorite(tracks, Song(), true)
+                favorite(tracks, Track(), true)
             }else{
                 item_owner.text = placeholder.owner
                 item_element_list.text = placeholder.description
+                item_element_list.setOnClickListener{
+                    val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+                    dialog.setTitle("Description")
+                    dialog.setMessage(placeholder.description)
+                    dialog.setNegativeButton("Close",
+                            {dialog, which ->
+
+                            }).create()
+                    dialog.show()
+                }
                 tracks.name = placeholder.name
                 tracks.picture = placeholder.picture
                 tracks.mxp_id = placeholder._id
-                val song = Song(placeholder.name,
+                val song = Track(placeholder.name,
                         placeholder.name,
                         placeholder.owner,
                         "name",
@@ -354,7 +381,7 @@ class BrowseActivity: BaseActivity(){
                         "",
                         placeholder.picture)
                 song.mxp_id = placeholder._id
-                tracks.songs?.add(song)
+                tracks.tracks?.add(song)
 
                 //set favorite
                 favorite(PlayList(), song, false)

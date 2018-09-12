@@ -16,20 +16,14 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.musicplayer.aow.R
-import com.musicplayer.aow.bus.RxBus
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.delegates.event.ChangePlaystate
-import com.musicplayer.aow.delegates.event.PlayListNowEvent
-import com.musicplayer.aow.delegates.event.PlaySongEvent
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.ui.main.library.activities.ArtistSongs
 import com.musicplayer.aow.utils.CursorDB
 import com.musicplayer.aow.utils.TimeUtils.formatDuration
 import org.jetbrains.anko.find
-import rx.android.schedulers.AndroidSchedulers
-import rx.subscriptions.CompositeSubscription
 
 
 /**
@@ -38,29 +32,28 @@ import rx.subscriptions.CompositeSubscription
 class AlbumSongListAdapter(var context: Context, song: PlayList?, var activity: Activity):RecyclerView.Adapter<AlbumSongListAdapter.SongListViewHolder>() {
 
     private var view:View? = null
-    private var mSubscriptions: CompositeSubscription? = null
     val TAG = this.javaClass.name
-    private var mSongModel: ArrayList<Song>? = song?.songs as ArrayList<Song>
+    private var mTrackModel: ArrayList<Track>? = song?.tracks as ArrayList<Track>
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: SongListViewHolder, position: Int) {
         holder.favorite.visibility = View.GONE
-        val model = mSongModel?.get(position)
-        val songName = model?.title
+        val model = mTrackModel!!.get(position)
+        val songName = model.title
         val tPosition = position
         holder.sPosition.text = tPosition.plus(1).toString()
-        var songDuration = formatDuration(model?.duration!!)
+        var songDuration = formatDuration(model.duration!!)
         val songArtist = model.artist
         holder.songTV.text = songName
         holder.songArtist.text = songArtist
 
         //implementation of item click
         holder.mListItem.setOnClickListener {
-            RxBus.instance!!.post(PlaySongEvent(mSongModel?.get(position)!!))
+            Player.instance?.play(PlayList(mTrackModel), position)
         }
 
         if (Player.instance!!.isPlaying) {
-            if (Player.instance!!.playingSong!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
+            if (Player.instance!!.playingTrack!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                 holder.songTV.setTextColor(context.resources.getColor(R.color.red_dim))
                 holder.songArtist.setTextColor(context.resources.getColor(R.color.red_dim))
             } else {
@@ -71,7 +64,7 @@ class AlbumSongListAdapter(var context: Context, song: PlayList?, var activity: 
 
         broadcastChange(holder, model)
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
         holder.option.setOnClickListener {
             if (view != null) {
@@ -94,7 +87,7 @@ class AlbumSongListAdapter(var context: Context, song: PlayList?, var activity: 
 
                 play.setOnClickListener {
                     //Update UI
-                    RxBus.instance!!.post(PlayListNowEvent(PlayList(mSongModel), position))
+                    Player.instance?.play(PlayList(mTrackModel), position)
                     mBottomSheetDialog.dismiss()
                 }
                 //play next
@@ -126,7 +119,7 @@ class AlbumSongListAdapter(var context: Context, song: PlayList?, var activity: 
                     val sheetView =  LayoutInflater.from(context).inflate(R.layout.custom_dialog_select_playlist, null)
                     val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
 
-                    SoftCodeAdapter().addSongToPlaylist(activity,context, mylist, mSelectPlaylistDialog, model)
+                    SoftCodeAdapter().addSongToPlaylist(context, mylist, mSelectPlaylistDialog, model)
 
                     mSelectPlaylistDialog.setContentView(sheetView)
                     mSelectPlaylistDialog.show()
@@ -142,58 +135,58 @@ class AlbumSongListAdapter(var context: Context, song: PlayList?, var activity: 
 
     }
 
-    fun swapCursor(playList: ArrayList<Song>?): ArrayList<Song>? {
-        if (mSongModel === playList) {
+    fun swapCursor(playList: ArrayList<Track>?): ArrayList<Track>? {
+        if (mTrackModel === playList) {
             return null
         }
-        val oldCursor = mSongModel
-        this.mSongModel = playList
+        val oldCursor = mTrackModel
+        this.mTrackModel = playList
         if (playList != null) {
             this.notifyDataSetChanged()
         }
         return oldCursor
     }
 
-    private fun removeAt(position: Int, song: Song) {
-        mSongModel?.remove(song)
+    private fun removeAt(position: Int, track: Track) {
+        mTrackModel?.remove(track)
         notifyItemRemoved(position)
-        notifyItemRangeChanged(position, mSongModel?.size!!)
+        notifyItemRangeChanged(position, mTrackModel?.size!!)
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongListViewHolder {
-        view = LayoutInflater.from(parent!!.context).inflate(R.layout.item_track, parent, false)
+        view = LayoutInflater.from(parent.context).inflate(R.layout.item_track, parent, false)
         return SongListViewHolder(view!!)
     }
 
     //we get the count of the list
     override fun getItemCount(): Int {
-        return mSongModel?.size!!
+        return mTrackModel?.size!!
     }
 
-    private fun broadcastChange(holder: SongListViewHolder?, model: Song){
-        if (mSubscriptions == null) {
-            mSubscriptions = CompositeSubscription()
-        }
-        mSubscriptions!!.add(
-                RxBus.instance?.toObservable()
-                        ?.observeOn(AndroidSchedulers.mainThread())
-                        ?.doOnNext({ o ->
-                            if (o is ChangePlaystate) {
-                                if (o != false) {
-                                    if (Player.instance!!.isPlaying) {
-                                        if (Player.instance!!.playingSong!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
-                                            holder!!.songTV.setTextColor(context.resources.getColor(R.color.red_dim))
-                                            holder.songArtist.setTextColor(context.resources.getColor(R.color.red_dim))
-                                        } else {
-                                            holder!!.songTV.setTextColor(context.resources.getColor(R.color.black))
-                                            holder.songArtist.setTextColor(context.resources.getColor(R.color.black))
-                                        }
-                                    }
-                                }
-                            }
-                        })?.subscribe(RxBus.defaultSubscriber())!!
-        )
+    private fun broadcastChange(holder: SongListViewHolder?, model: Track){
+//        if (mSubscriptions == null) {
+//            mSubscriptions = CompositeSubscription()
+//        }
+//        mSubscriptions!!.add(
+//                RxBus.instance?.toObservable()
+//                        ?.observeOn(AndroidSchedulers.mainThread())
+//                        ?.doOnNext({ o ->
+//                            if (o is ChangePlaystate) {
+//                                if (o != false) {
+//                                    if (Player.instance!!.isPlaying) {
+//                                        if (Player.instance!!.playingTrack!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
+//                                            holder!!.songTV.setTextColor(context.resources.getColor(R.color.red_dim))
+//                                            holder.songArtist.setTextColor(context.resources.getColor(R.color.red_dim))
+//                                        } else {
+//                                            holder!!.songTV.setTextColor(context.resources.getColor(R.color.black))
+//                                            holder.songArtist.setTextColor(context.resources.getColor(R.color.black))
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        })?.subscribe(RxBus.defaultSubscriber())!!
+//        )
     }
 
     class SongListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){

@@ -1,19 +1,19 @@
 package com.musicplayer.aow.delegates.player
 
-import android.media.MediaPlayer
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 
 
 interface IPlayback {
 
-    val mPlayer: MediaPlayer?
+    val mPlayer: SimpleExoPlayer?
 
     val isPlaying: Boolean
 
     val progress: Int
 
-    val playingSong: Song?
+    val playingTrack: Track?
 
     var playingList: PlayList?
 
@@ -25,7 +25,7 @@ interface IPlayback {
 
     fun play(list: PlayList, startIndex: Int): Boolean
 
-    fun play(song: Song): Boolean
+    fun play(track: Track): Boolean
 
     fun playLast(): Boolean
 
@@ -47,11 +47,11 @@ interface IPlayback {
 
     interface Callback {
 
-        fun onSwitchLast(last: Song?)
+        fun onSwitchLast(last: Track?)
 
-        fun onSwitchNext(next: Song?)
+        fun onSwitchNext(next: Track?)
 
-        fun onComplete(next: Song?)
+        fun onComplete(next: Track?)
 
         fun onPlayStatusChanged(isPlaying: Boolean)
 

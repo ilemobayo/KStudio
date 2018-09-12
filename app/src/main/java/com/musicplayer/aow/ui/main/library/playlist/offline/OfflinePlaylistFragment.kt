@@ -1,6 +1,8 @@
 package com.musicplayer.aow.ui.main.library.playlist.offline
 
 
+import android.arch.lifecycle.Observer
+import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.MediaStore
@@ -11,6 +13,8 @@ import android.support.v4.content.Loader
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +23,8 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
@@ -32,27 +38,22 @@ import org.jetbrains.anko.onComplete
 
 class OfflinePlaylistFragment : Fragment() {
     val TAG = this.javaClass.name
-    private val MEDIA_URI = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
-    private val WHERE = null
-    private val ORDER_BY = null
-    private val PROJECTIONS = null
     internal var progress_bar: ProgressBar? = null
     internal var recycler_view: RecyclerView? = null
     private var btn_create_playlist: Button? = null
     var adapter: OfflinePlaylistAdapter? = null
     var modelData:ArrayList<PlayList> = ArrayList()
+    private var playlisDatabase: PlaylistDatabase? = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //create favorite playlist if not created before
-        SoftCodeAdapter().getFavoritesId(context!!)
         return inflater.inflate(R.layout.fragment_offline_playlist, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapter = OfflinePlaylistAdapter(context!!.applicationContext, modelData, this.layoutInflater)
-        loaderManager.initLoader(0, null, mLoaderCallbacks)
 
         progress_bar = view.find(R.id.progress_bar)
         progress_bar!!.visibility = View.INVISIBLE
@@ -65,8 +66,6 @@ class OfflinePlaylistFragment : Fragment() {
 
         loadData()
     }
-
-
 
     private fun showChangeLangDialog() {
         try {
@@ -82,8 +81,12 @@ class OfflinePlaylistFragment : Fragment() {
             dialogBuilder.setPositiveButton(getString(R.string.save), { dialog, which ->
                 //do something with edt.getText().toString();
                 val newPlayList = PlayList()
+                newPlayList.mxp_id = SoftCodeAdapter().generatString(32)
                 newPlayList.name = edt.text.toString()
-                SoftCodeAdapter().createPlaylist(Injection.provideContext()!!, edt.text.toString())
+                AppExecutors.instance?.diskIO()?.execute {
+                    playlisDatabase?.playlistDAO()?.insertOnePlayList(newPlayList)
+                }
+                //SoftCodeAdapter().createPlaylist(Injection.provideContext()!!, edt.text.toString())
             })
             dialogBuilder.setNegativeButton(getString(R.string.cancel), { dialog, which -> })
             dialogBuilder.create().show()
@@ -108,33 +111,12 @@ class OfflinePlaylistFragment : Fragment() {
         recycler_view!!.setHasFixedSize(true)
         recycler_view!!.layoutManager = layoutManager
         recycler_view!!.adapter = adapter
-    }
-
-    private val mLoaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(context!!.applicationContext, MEDIA_URI,
-                    PROJECTIONS, WHERE, null,
-                    ORDER_BY)
-        }
-
-        override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-            modelData = ArrayList()
-            if (data != null) {
-                doAsync {
-                    while (data.moveToNext()) {
-                        modelData.add(CursorDB().cursorToPlayList(data))
-                    }
-                    onComplete {
-                        adapter?.swapCursor(modelData)
-                    }
-                }
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<Cursor>) {
-            adapter?.swapCursor(null)
+        AppExecutors.instance?.diskIO()?.execute {
+            val tracks = playlisDatabase?.playlistDAO()?.fetchAllPlayListWithNoRecentlyPlayed()
+            tracks?.observe(this, Observer{
+                adapter?.swapCursor(it as java.util.ArrayList<PlayList>)
+            })
         }
     }
-
 
 }

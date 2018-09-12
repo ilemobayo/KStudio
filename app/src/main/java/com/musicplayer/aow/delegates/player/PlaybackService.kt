@@ -3,43 +3,78 @@ package com.musicplayer.aow.delegates.player
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.MediaPlayer
-import android.os.Binder
-import android.os.IBinder
+import android.media.MediaMetadataRetriever
+import android.os.*
 import android.provider.MediaStore
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaBrowserServiceCompat
+import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaButtonReceiver
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.text.TextUtils
 import android.util.Log
+import android.view.KeyEvent
 import android.webkit.URLUtil
-import android.widget.RemoteViews
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.AppExecutors
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.ui.main.MainActivity
+import com.musicplayer.aow.delegates.data.model.Track
+import com.musicplayer.aow.delegates.exo.C
+import com.musicplayer.aow.delegates.exo.C.PLAYBACK_CHANNEL_ID
+import com.musicplayer.aow.delegates.exo.C.PLAYBACK_NOTIFICATION_ID
+import com.musicplayer.aow.delegates.player.mediasession.MediaStyleHelper
+import com.musicplayer.aow.delegates.player.mediasession.PlayerNotificationManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.onComplete
+import org.jetbrains.anko.runOnUiThread
 
-class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.OnAudioFocusChangeListener {
+class PlaybackService : MediaBrowserServiceCompat(), IPlayback, IPlayback.Callback, AudioManager.OnAudioFocusChangeListener {
 
-    override val mPlayer: MediaPlayer?
-        get() = null
+    private var playerNotificationManager: PlayerNotificationManager? = null
+    private var mediaSessionConnector: MediaSessionConnector? = null
 
-    private var notification: Notification? = null
-    private var mContentViewBig: RemoteViews? = null
-    private var mContentViewSmall: RemoteViews? = null
+    private val mAudioManager = Injection.provideContext()?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private var mPlaybackAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
+    private var mFocusRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        mAudioManager.requestAudioFocus(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(mPlaybackAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(this)
+                .build())
+    } else {
+        //VERSION.SDK_INT < O
+        mAudioManager.requestAudioFocus(this,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+    }
+    override val mPlayer: SimpleExoPlayer?
+        get() = Player.instance?.mPlayer
+
+    private var mediaSession: MediaSessionCompat? = MediaSessionCompat(Injection.provideContext()!!, C.MEDIA_SESSION_TAG)
+    private var mMediaContentObserver: MyContentObserver? = null
+    private var mFileObserver: FileObserver? = null
 
     var mediaPlayer: Player? = Player.instance
-
-    private val mBinder = LocalBinder()
 
     override var isPlaying: Boolean = false
         get() = mediaPlayer!!.isPlaying
@@ -47,102 +82,40 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     override var progress: Int = 0
         get() = mediaPlayer!!.progress
 
-    override var playingSong: Song? = null
-        get() = mediaPlayer!!.playingSong
+    override var playingTrack: Track? = null
+        get() = mediaPlayer!!.playingTrack
 
     override var playingList: PlayList? = null
         get() = mediaPlayer!!.playingList
 
-    private val smallContentView: RemoteViews
-        get() {
-            if (mContentViewSmall == null) {
-                mContentViewSmall = RemoteViews(packageName, R.layout.remote_view_music_player_small)
-                setUpRemoteView(mContentViewSmall!!)
-            }
-            updateRemoteViews(mContentViewSmall!!, mediaPlayer!!.playingSong)
-            return mContentViewSmall!!
-        }
-
-    private val bigContentView: RemoteViews
-        get() {
-            if (mContentViewBig == null) {
-                mContentViewBig = RemoteViews(packageName, R.layout.remote_view_music_player)
-                setUpRemoteView(mContentViewBig!!)
-            }
-            updateRemoteViews(mContentViewBig!!, mediaPlayer!!.playingSong)
-            return mContentViewBig!!
-        }
-
-    inner class LocalBinder : Binder() {
-        val service: PlaybackService
-            get() = this@PlaybackService
-    }
-
     override fun onCreate() {
         super.onCreate()
-        mediaPlayer = Player.instance
-        mediaPlayer!!.registerCallback(this)
+        initMediaPlayer()
+        initMediaSession()
         initNoisyReceiver()
+        initObservers()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
-            val action = intent.action
-            if (ACTION_PLAY_TOGGLE == action) {
-                if (successfullyRetrievedAudioFocus()) {
-                    if (isPlaying) {
-                        pause()
-                    } else {
-                        play()
-                    }
-                }
-            } else if (ACTION_PLAY_NEXT == action) {
-                if (successfullyRetrievedAudioFocus()) {
-                    playNext()
-                }
-            } else if (ACTION_PLAY_LAST == action) {
-                if (successfullyRetrievedAudioFocus()) {
-                    playLast()
-                }
-            } else if (ACTION_STOP_SERVICE == action) {
-                if (isPlaying) {
-                    pause()
-                }
-                stopForeground(true)
-            }
-
-        }
-        return START_STICKY
+        MediaButtonReceiver.handleIntent(mediaSession, intent)
+//        return super.onStartCommand(intent, flags, startId)
+        return Service.START_STICKY
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return mBinder
-    }
-
-    override fun onUnbind(intent: Intent): Boolean {
-        return false
-    }
-
-    fun recreate(){
-        mediaPlayer = Player.instance
-        mediaPlayer!!.registerCallback(this)
-        initNoisyReceiver()
-    }
-
-    override fun stopService(name: Intent): Boolean {
-        stopForeground(true)
-        unregisterCallback(this)
-        return super.stopService(name)
-    }
+//    override fun stopService(name: Intent): Boolean {
+//        stopForeground(true)
+//        unregisterCallback(this)
+//        return super.stopService(name)
+//    }
 
     override fun onDestroy() {
         releasePlayer()
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.abandonAudioFocus(this)
-        unregisterReceiver(mNoisyReceiver)
-//        val intent = Intent("com.musicplayer.musixplay")
-//        intent.putExtra("run", "carter")
-//        sendBroadcast(intent)
+        abandonAudioFocus()
+        mediaSession?.release()
+        mediaSessionConnector?.setPlayer(null, null);
+        releaseObservers()
+        mMediaContentObserver = null
+        stopForeground(true)
         super.onDestroy()
     }
 
@@ -162,8 +135,8 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
         return mediaPlayer!!.play(list, startIndex)
     }
 
-    override fun play(song: Song): Boolean {
-        return mediaPlayer!!.play(song)
+    override fun play(track: Track): Boolean {
+        return mediaPlayer!!.play(track)
     }
 
     override fun playLast(): Boolean {
@@ -199,24 +172,25 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     override fun releasePlayer() {
+        mediaPlayer!!.pause()
         mediaPlayer!!.releasePlayer()
     }
 
     // Playback Callbacks
-    override fun onSwitchLast(last: Song?) {
-        //showNotification()
+    override fun onSwitchLast(last: Track?) {
+        showNotification()
     }
 
-    override fun onSwitchNext(next: Song?) {
-        //showNotification()
+    override fun onSwitchNext(next: Track?) {
+        showNotification()
     }
 
-    override fun onComplete(next: Song?) {
-        //showNotification()
+    override fun onComplete(next: Track?) {
+        showNotification()
     }
 
     override fun onPlayStatusChanged(isPlaying: Boolean) {
-        //showNotification()
+        showNotification()
     }
 
     override fun onTriggerLoading(isLoading: Boolean) {
@@ -224,112 +198,339 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     override fun onPrepared(isPrepared: Boolean) {
-        
+
     }
 
-    // Notification
+    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
+
+        override fun onPlay() {
+            Log.e(TAG, "Play Media Button")
+            if (successfullyRetrievedAudioFocus()) {
+                play()
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                showNotification()
+            }
+            super.onPlay()
+        }
+
+        override fun onPause() {
+            Log.e(TAG, "Pause Media Button")
+            if (isPlaying) {
+                pause()
+                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                showNotification()
+            }
+            super.onPause()
+        }
+
+        override fun onSkipToNext() {
+            Log.e(TAG, "play next")
+            playNext()
+            showNotification()
+            super.onSkipToNext()
+        }
+
+        override fun onSkipToPrevious() {
+            Log.e(TAG, "play previous")
+            playLast()
+            showNotification()
+            super.onSkipToPrevious()
+        }
+
+        override fun onStop() {
+            Log.e(TAG, "stop foreground")
+            stopForeground(true)
+            releasePlayer()
+            super.onStop()
+        }
+
+        override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
+            super.onPlayFromMediaId(mediaId, extras)
+            if (successfullyRetrievedAudioFocus()) {
+                play(mediaPlayer?.playingList!!, mediaId?.toInt()!!)
+                showNotification()
+            }
+        }
+
+        override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+            val intentAction = mediaButtonEvent?.action
+            if (Intent.ACTION_MEDIA_BUTTON != intentAction)
+            {
+                return false
+            }
+            val mediaButtonEventKey = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT) as KeyEvent
+            val keycode = mediaButtonEventKey.keyCode
+            when (keycode) {
+                KeyEvent.KEYCODE_HEADSETHOOK -> {
+
+                }
+                KeyEvent.KEYCODE_MEDIA_PLAY ->{
+                    if (successfullyRetrievedAudioFocus()) {
+                        play()
+                        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                        showNotification()
+                    }
+                }
+                KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                    if (isPlaying) {
+                        pause()
+                        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        showNotification()
+                        stopForeground(false)
+                    }
+                }
+                KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                    if (isPlaying) {
+                        pause()
+                        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        showNotification()
+                        stopForeground(false)
+                    }else{
+                        if (successfullyRetrievedAudioFocus()) {
+                            play()
+                            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                            showNotification()
+                        }
+                    }
+                }
+                KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    playNext()
+                    showNotification()
+                }
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    playLast()
+                    showNotification()
+                }
+                KeyEvent.KEYCODE_MEDIA_STOP -> {
+                    stopForeground(true)
+                    releasePlayer()
+                }
+            }
+            return super.onMediaButtonEvent(mediaButtonEvent)
+        }
+
+    }
+
+    private fun initMediaPlayer() {
+        mediaPlayer = Player.instance
+        mediaPlayer!!.registerCallback(this)
+        mediaPlayer!!.attachEventListener()
+    }
 
     /**
      * Show a notification while this service is running.
      */
-    private fun showNotification() {
-        // The PendingIntent to launch our activity if the user selects this notification
-        val contentIntent = PendingIntent.getActivity(
-                applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0)
-
-        // Set the info for the views that show in the notification panel.
-        notification = NotificationCompat.Builder(applicationContext,"musixplay")
-                .setSmallIcon(R.drawable.ic_logo)  // the status icon
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
-                .setDeleteIntent(
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(
-                                applicationContext, PlaybackStateCompat.ACTION_STOP)
-                )
-                .setCustomContentView(smallContentView)
-                .setCustomBigContentView(bigContentView)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .build()
-
-        // Send the notification.
-        startForeground(NOTIFICATION_ID, notification)
-    }
-
-    private fun setUpRemoteView(remoteView: RemoteViews) {
-//        remoteView.setImageViewResource(R.id.image_view_play_toggle, if (isPlaying) {
-//            R.drawable.ic_remote_view_pause
-//        }else{
-//            R.drawable.ic_remote_view_play
-//        }
-//        )
-        remoteView.setImageViewResource(R.id.image_view_close, R.drawable.ic_remote_view_close)
-        remoteView.setImageViewResource(R.id.image_view_play_last, R.drawable.ic_remote_view_play_last)
-        remoteView.setImageViewResource(R.id.image_view_play_next, R.drawable.ic_remote_view_play_next)
-        remoteView.setOnClickPendingIntent(R.id.button_close, getPendingIntent(ACTION_STOP_SERVICE))
-        remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntent(ACTION_PLAY_LAST))
-        remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntent(ACTION_PLAY_NEXT))
-        remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntent(ACTION_PLAY_TOGGLE))
-    }
-
-    private fun updateRemoteViews(remoteView: RemoteViews, currentSong: Song?) {
-        remoteView.setImageViewResource(R.id.image_view_play_toggle,
-                if (isPlaying) {
-                    R.drawable.ic_remote_view_pause
-                }else{
-                    R.drawable.ic_remote_view_play
-                }
-        )
-        if (currentSong != null) {
-            remoteView.setTextViewText(R.id.text_view_name, currentSong.displayName)
-            remoteView.setTextViewText(R.id.text_view_artist, currentSong.artist)
-
-            if(URLUtil.isHttpUrl(currentSong.albumArt) || URLUtil.isHttpsUrl(currentSong.albumArt)){
-                doAsync {
-                    val img = Glide.with(applicationContext)
-                            .load(currentSong.albumArt)
-                            .asBitmap()
-                            .into(50, 50)
-                            .get()
-                    onComplete {
-                        remoteView.setImageViewBitmap(R.id.image_view_album,img)
-                    }
-                }
-                Log.e(this.javaClass.name, currentSong.albumArt + "     " + currentSong.title)
-            }else {
-                doAsync {
-                    var bit: Bitmap? = null
-                    val alb = Injection.provideContext()!!
-                            .contentResolver.query(
-                            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                            arrayOf(
-                                    MediaStore.Audio.Albums._ID,
-                                    MediaStore.Audio.Albums.ALBUM_ART),
-                            MediaStore.Audio.Albums._ID + "=?",
-                            arrayOf(currentSong.albumArt!!),
-                            null)
-                    if (alb.moveToFirst()) {
-                        val data = alb.getString(alb.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
-                        bit = Glide.with(applicationContext)
-                                .load(data).asBitmap()
-                                .error(R.drawable.gradient_info)
-                                .into(50, 50)
+    fun showNotification(){
+        if (isPlaying) {
+            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+        }
+        val song = mediaPlayer!!.playingTrack
+        if (song != null) {
+            if (song.albumArt != null && song.albumArt != "null") {
+                if (URLUtil.isHttpUrl(song.albumArt) || URLUtil.isHttpsUrl(song.albumArt)) {
+                    doAsync {
+                        val img = Glide.with(applicationContext)
+                                .asBitmap()
+                                .load(song.albumArt)
+                                .apply(
+                                        RequestOptions()
+                                                .placeholder(R.drawable.gradient_info)
+                                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                )
+                                .submit(250, 250)
                                 .get()
-                    }
-                    alb.close()
-                    onComplete {
-                        if (bit != null) {
-                            remoteView.setImageViewBitmap(R.id.image_view_album,bit)
-                        }else{
-                            remoteView.setImageViewResource(R.id.image_view_album, R.drawable.gradient_danger)
+                        onComplete {
+                            buildNotification(song, img)
                         }
                     }
-
+                } else {
+                    doAsync {
+                        val img = Glide.with(applicationContext)
+                                .asBitmap()
+                                .load(song.albumArt)
+                                .apply(
+                                        RequestOptions()
+                                                .placeholder(R.drawable.gradient_danger)
+                                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                )
+                                .submit(400, 400)
+                                .get()
+                        onComplete {
+                            if (img != null) {
+                                buildNotification(song, img)
+                            } else {
+                                buildNotification(song)
+                            }
+                        }
+                    }
                 }
-                Log.e(this.javaClass.name, currentSong.albumArt + "     " + currentSong.title)
+            } else {
+                buildNotification(song)
             }
         }
+    }
+
+    private fun mediaSessionMetadata(track: Track?, bitmap: Bitmap? = null): MediaMetadataCompat? {
+        val metadataBuilder = MediaMetadataCompat.Builder()
+        if (bitmap != null) {
+            //Notification icon in card
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, bitmap)
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+            //lock screen icon for pre lollipop
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap)
+        }else{
+            //Notification icon in card
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+            //lock screen icon for pre lollipop
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+        }
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, track?.title)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, track?.artist)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, track?.description)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, playingList?.playingIndex?.toLong()!!)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playingList?.playingIndex?.toLong()!!)
+        return metadataBuilder.build()
+    }
+
+    private fun buildNotification(track: Track, bitmap: Bitmap? = null) {
+        mediaSession?.setMetadata(mediaSessionMetadata(track, bitmap))
+        val builder = MediaStyleHelper.from(applicationContext, mediaSession!!)
+        builder.addAction(
+                NotificationCompat.Action(
+                        android.R.drawable.ic_media_previous,
+                        "Previous",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                applicationContext, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)))
+
+        if (isPlaying) {
+            builder.addAction(
+                    NotificationCompat.Action(
+                            android.R.drawable.ic_media_pause,
+                            "Pause",
+                            MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                    applicationContext, PlaybackStateCompat.ACTION_PAUSE)))
+            builder.setOngoing(true)
+        }else{
+            builder.addAction(
+                    NotificationCompat.Action(
+                            android.R.drawable.ic_media_play,
+                            "Play",
+                            MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                    applicationContext, PlaybackStateCompat.ACTION_PLAY)))
+            builder.setOngoing(false)
+        }
+
+        builder.addAction(
+                NotificationCompat.Action(
+                        android.R.drawable.ic_media_next,
+                        "Next",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                applicationContext, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)))
+
+        builder.addAction(android.R.drawable.ic_notification_clear_all, "Stop",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                applicationContext, PlaybackStateCompat.ACTION_STOP))
+
+        builder.setStyle(
+                android.support.v4.media.app.NotificationCompat.MediaStyle()
+                        .setMediaSession(mediaSession?.sessionToken)
+                        .setShowCancelButton(true)
+                        .setShowActionsInCompactView(1,2)
+                        .setCancelButtonIntent(
+                                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                        applicationContext, PlaybackStateCompat.ACTION_STOP)))
+        builder.setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(applicationContext,
+                PlaybackStateCompat.ACTION_STOP))
+
+        builder.setSmallIcon(R.drawable.ic_logo)
+        builder.color = ContextCompat.getColor(applicationContext, R.color.red_dim)
+        startForeground(NOTIFICATION_ID, builder.build())
+    }
+
+    private fun setMediaPlaybackState(state: Int) {
+        mediaSession?.setPlaybackState(PlaybackStateCompat.Builder().
+            setActions(
+                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                        PlaybackStateCompat.ACTION_PAUSE or
+                        PlaybackStateCompat.ACTION_STOP or
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).
+                setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 0f).build())
+    }
+
+    private fun initMediaSession() {
+        val state = PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                                PlaybackStateCompat.ACTION_PLAY or
+                                PlaybackStateCompat.ACTION_PAUSE or
+                                PlaybackStateCompat.ACTION_STOP or
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+                .setState(PlaybackStateCompat.STATE_STOPPED, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 0f)
+        val mediaButtonReceiver = ComponentName(applicationContext, MediaButtonReceiver::class.java)
+        val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON).setClass(applicationContext, MediaButtonReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, 0)
+        mediaSession = MediaSessionCompat(applicationContext, C.MEDIA_SESSION_TAG, mediaButtonReceiver, pendingIntent)
+
+        mediaSession!!.setCallback(mediaSessionCallback)
+        mediaSession!!.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
+        mediaSession!!.setPlaybackState(state.build())
+
+        mediaSession!!.isActive = true
+        mediaPlayer?.mediaSessionToken = mediaSession?.sessionToken
+        sessionToken = mediaPlayer?.mediaSessionToken
+    }
+
+    private fun initObservers(){
+        val URI_AUDIO_MEDIA = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val URI_AUDIO_PLAYLIST = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
+        val URI_AUDIO_ALBUM = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+        val URI_AUDIO_ARTIST = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
+        mMediaContentObserver = MyContentObserver(Handler(), applicationContext)
+        contentResolver.registerContentObserver(URI_AUDIO_MEDIA,true, mMediaContentObserver)
+        contentResolver.registerContentObserver(URI_AUDIO_PLAYLIST,true, mMediaContentObserver)
+        contentResolver.registerContentObserver(URI_AUDIO_ALBUM,true, mMediaContentObserver)
+        contentResolver.registerContentObserver(URI_AUDIO_ARTIST,true, mMediaContentObserver)
+
+        //mFileObserver = MyFileObserver(applicationContext, applicationContext?.externalCacheDir?.absolutePath + "/onlinedata")
+        //mFileObserver?.startWatching()
+    }
+
+    private fun releaseObservers(){
+        contentResolver.unregisterContentObserver(mMediaContentObserver)
+        mMediaContentObserver = null
+        //mFileObserver?.stopWatching()
+        mFileObserver = null
+    }
+
+
+    //Not important for general audio service, required for class
+    override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
+        return if (TextUtils.equals(clientPackageName, packageName)) {
+            MediaBrowserServiceCompat.BrowserRoot("__ROOT__", null)
+        } else {
+            MediaBrowserServiceCompat.BrowserRoot("__ROOT__", null)
+        }
+    }
+
+    //Not important for general audio service, required for class
+    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
+        val list: ArrayList<MediaBrowserCompat.MediaItem> = ArrayList()
+        result.detach()
+        mediaPlayer?.mPlayList?.tracks?.forEachIndexed { index, track ->
+            list.add(MediaBrowserCompat.MediaItem(
+                    mediaPlayer?.mPlayList?.getMediaDescription(index,track)!!,
+                    MediaBrowserCompat.MediaItem.FLAG_BROWSABLE or MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+        }
+
+        result.sendResult(list)
     }
 
     private fun initNoisyReceiver() {
@@ -339,12 +540,8 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
     }
 
     private fun successfullyRetrievedAudioFocus(): Boolean {
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        val result = audioManager.requestAudioFocus(this,
-                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
-
-        return result == AudioManager.AUDIOFOCUS_GAIN
+        initNoisyReceiver()
+        return mFocusRequest == AudioManager.AUDIOFOCUS_GAIN
     }
 
     private val mNoisyReceiver = object : BroadcastReceiver() {
@@ -355,19 +552,41 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
         }
     }
 
+    private fun abandonAudioFocus(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(mPlaybackAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(this)
+                    .build()
+            mAudioManager.abandonAudioFocusRequest(focusRequest)
+        }else{
+            mAudioManager.abandonAudioFocus(this)
+        }
+        unregisterReceiver(mNoisyReceiver)
+    }
+
+    fun registerAudioFocus(){
+
+    }
+
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS -> {
-                if (isPlaying) {
+                if (mediaPlayer != null && isPlaying) {
                     pause()
+                    abandonAudioFocus()
                 }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                pause()
+                if (mediaPlayer != null && isPlaying) {
+                    pause()
+                    abandonAudioFocus()
+                }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
                 if (mediaPlayer != null) {
-                    mediaPlayer!!.mPlayer!!.setVolume(0.3f, 0.3f)
+                    mediaPlayer?.mPlayer?.volume = 0.3f
                 }
             }
             AudioManager.AUDIOFOCUS_GAIN -> {
@@ -375,24 +594,15 @@ class PlaybackService : Service(), IPlayback, IPlayback.Callback, AudioManager.O
                     if (!isPlaying) {
                         play()
                     }
-                    mediaPlayer!!.mPlayer!!.setVolume(1.0f, 1.0f)
+                    mediaPlayer?.mPlayer?.volume = 1.0f
                 }
             }
         }
     }
 
-    // PendingIntent
-    private fun getPendingIntent(action: String): PendingIntent {
-        return PendingIntent.getService(applicationContext, 0, Intent(action), 0)
-    }
-
     companion object {
         private const val TAG = "PlayerService"
-        private const val ACTION_PLAY_TOGGLE = "com.musicplayer.aow.ACTION.PLAY_TOGGLE"
-        private const val ACTION_PLAY_LAST = "com.musicplayer.aow.ACTION.PLAY_LAST"
-        private const val ACTION_PLAY_NEXT = "com.musicplayer.aow.ACTION.PLAY_NEXT"
-        private const val ACTION_STOP_SERVICE = "com.musicplayer.aow.ACTION.STOP_SERVICE"
-        private const val NOTIFICATION_ID = 1
+        private const val NOTIFICATION_ID = 101
     }
 }
 

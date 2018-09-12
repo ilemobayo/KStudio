@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.songs.dialog.adapter
+package com.musicplayer.aow.ui.main.library.songs.view.dialog.adapter
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -16,7 +16,6 @@ import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.musicplayer.aow.R
 import com.musicplayer.aow.delegates.data.model.PlayList
 import org.jetbrains.anko.find
-import rx.subscriptions.CompositeSubscription
 
 /**
  * Created by Arca on 3/25/2018.
@@ -26,7 +25,6 @@ class PlaylistDialogSLAdapter (context: Context, playlist: List<PlayList>, songs
     val TAG = "PlayListAdapter"
     var context = context.applicationContext
     private val mSongModel = playlist
-    private val mSubscriptions: CompositeSubscription? = null
     private var view: View? = null
     private var dialog = dialog
     private var songs = songs
@@ -52,12 +50,12 @@ class PlaylistDialogSLAdapter (context: Context, playlist: List<PlayList>, songs
         //implementation of item click
         holder.item.setOnClickListener {
             //add to playlist here
-            model.addSong(songs.songs, model.numOfSongs)
+            model.addSong(songs.tracks, model.numOfSongs)
             //close parent dialog
             dialog.dismiss()
         }
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
     }
 

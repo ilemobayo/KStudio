@@ -40,10 +40,9 @@ class SearchSectionAdapter(private val mContext: Context, private val itemsList:
 
         doAsync {
             val img = Glide.with(mContext)
-                    .load(singleItem.picture).asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .error(R.drawable.gradient_info)
-                    .into(150, 150)
+                    .asBitmap()
+                    .load(singleItem.picture)
+                    .submit(150, 150)
                     .get()
             onComplete {
                 holder.itemImage.setImageBitmap(img)

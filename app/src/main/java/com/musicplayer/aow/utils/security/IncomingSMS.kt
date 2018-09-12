@@ -22,15 +22,15 @@ class IncomingSms : BroadcastReceiver() {
             if (bundle != null) {
                 val pdusObj = bundle.get("pdus") as Array<Any>
                 for (i in pdusObj.indices) {
-                    val currentMessage = SmsMessage.createFromPdu(pdusObj[i] as ByteArray)
-                    val phoneNumber = currentMessage.getDisplayOriginatingAddress()
-                    val message = currentMessage.getDisplayMessageBody()
-                    Log.e("SmsReceiver", "senderNum: $phoneNumber; message: $message")
-                    // Show Alert
-                    val duration = Toast.LENGTH_LONG
-                    val toast = Toast.makeText(context,
-                            "senderNum: $phoneNumber, message: $message", duration)
-                    toast.show()
+//                    val currentMessage = SmsMessage.createFromPdu(pdusObj[i] as ByteArray, "")
+//                    val phoneNumber = currentMessage.displayOriginatingAddress
+//                    val message = currentMessage.displayMessageBody
+//                    Log.e("SmsReceiver", "senderNum: $phoneNumber; message: $message")
+//                    // Show Alert
+//                    val duration = Toast.LENGTH_LONG
+//                    val toast = Toast.makeText(context,
+//                            "senderNum: $phoneNumber, message: $message", duration)
+//                    toast.show()
                 } // end for loop
             } // bundle is null
         } catch (e: Exception) {

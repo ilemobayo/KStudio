@@ -3,7 +3,7 @@ package com.musicplayer.aow.ui.nowplaying
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.player.Player
 
 /**
@@ -18,11 +18,11 @@ class NowPlaying {
 
     fun setSongs(){
         val playerList = Player.instance!!.mPlayList!!
-        playlist.songs = playerList.songs
+        playlist.tracks = playerList.tracks
     }
 
-    fun setSongs(songs: ArrayList<Song>?){
-        playlist.songs = songs
+    fun setSongs(tracks: ArrayList<Track>?){
+        playlist.tracks = tracks
     }
 
     fun setPlayList(playList: PlayList){
@@ -31,7 +31,7 @@ class NowPlaying {
 
     fun setUpdate(){
         val playerList = Player.instance!!.mPlayList!!
-        playlist.songs = playerList.songs
+        playlist.tracks = playerList.tracks
     }
 
     companion object {

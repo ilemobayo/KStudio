@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.songs.`interface`
+package com.musicplayer.aow.ui.main.library.songs.view.`interface`
 
 import android.view.View
 
@@ -7,4 +7,6 @@ import android.view.View
  */
 interface CustomItemClickListener{
     fun onCustomItemClick(view: View, position: Int)
+    fun onLongTap(index : Int)
+    fun onTap(index : Int)
 }

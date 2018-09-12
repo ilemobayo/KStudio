@@ -27,9 +27,10 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
             android:layout_toStartOf="@+id/btnMore"
+            android:fontFamily="@font/san_fransisco_compact_display_bold"
             android:text="Playlists"
-            android:textStyle="bold"
-            android:textSize="18sp"
+            android:textStyle="normal"
+            android:textSize="15sp"
             android:textColor="@color/black"/>
 
         <Button

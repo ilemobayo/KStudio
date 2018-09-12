@@ -1,15 +1,11 @@
-package com.musicplayer.aow.ui.mvvm.repository
+package com.musicplayer.aow.ui.main.library.songs.model
 
 import android.provider.MediaStore
 import com.musicplayer.aow.application.Injection
-import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.utils.CursorDB
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.onComplete
 
-class SongsRepository{
-
+class SongsModel{
     private val context = Injection.provideContext()
     private val MEDIA_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     private val WHERE = (MediaStore.Audio.Media.IS_MUSIC + "=1 AND "
@@ -30,29 +26,29 @@ class SongsRepository{
             MediaStore.Audio.Media.IS_MUSIC,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.SIZE)
-    private var songs: PlayList = PlayList()
+    var tracks: ArrayList<Track> = ArrayList()
 
-    fun getSongs(completion: (ArrayList<Song>, Error?) -> Unit){
+    fun getSongs(completion: (ArrayList<Track>, Error?) -> Unit){
         val data = context!!.contentResolver.query(MEDIA_URI,
                 PROJECTIONS, WHERE, null,
                 ORDER_BY)
-        songs = PlayList()
+        tracks = ArrayList()
         if (data != null) {
             while (data.moveToNext()) {
-                songs.addSong(CursorDB().cursorToMusic(data))
+                tracks.add(CursorDB().cursorToMusic(data))
             }
         }
         data.close()
-        completion(songs.songs!!, null)
+        completion(tracks, null)
     }
 
 
     companion object {
-        var sInstance: SongsRepository? = null
-        fun instance(): SongsRepository {
+        var sInstance: SongsModel? = null
+        fun instance(): SongsModel {
             if (sInstance == null) {
-                synchronized(SongsRepository) {
-                    sInstance = SongsRepository()
+                synchronized(SongsModel) {
+                    sInstance = SongsModel()
                 }
             }
             return sInstance!!

@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingRight="2dp"
+    android:paddingStart="0dp"
+    android:paddingEnd="2dp"
     android:focusableInTouchMode="false"
     android:focusable="false"
     >
@@ -28,7 +29,6 @@
             app:cardCornerRadius="5dp"
             app:cardUseCompatPadding="true"
             android:focusableInTouchMode="false"
-            android:focusedByDefault="false"
             android:focusable="false"
             app:cardElevation="2dp"
             app:cardMaxElevation="2dp"
@@ -39,10 +39,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="centerCrop"
-                android:focusedByDefault="false"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
-                android:src="@color/grey_light"
+                android:src="@color/grey_light_a"
                 />
         </android.support.v7.widget.CardView>
 
@@ -56,9 +55,10 @@
             >
             <TextView
                 android:id="@+id/tvTitle"
+                android:fontFamily="@font/san_fransisco_compact_display_semibold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:layout_gravity="center"
                 android:text="@string/unknown"
                 android:textColor="@android:color/black"
@@ -67,9 +67,10 @@
 
             <TextView
                 android:id="@+id/artist"
+                android:fontFamily="@font/san_fransisco_compact_display_regular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:layout_gravity="center"
                 android:textColor="@color/grey_dim"
                 android:text="@string/unknown"

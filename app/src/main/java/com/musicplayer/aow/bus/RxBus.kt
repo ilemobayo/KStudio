@@ -1,9 +1,6 @@
 package com.musicplayer.aow.bus
 
-import android.util.Log
-import rx.Observable
-import rx.Subscriber
-import rx.subjects.PublishSubject
+import android.arch.lifecycle.MutableLiveData
 
 /**
  * Created with Android Studio.
@@ -16,32 +13,13 @@ import rx.subjects.PublishSubject
 
 class RxBus {
 
-    /**
-     * PublishSubject<Object> subject = PublishSubject.create();
-     * // observer1 will receive all onNext and onCompleted events
-     * subject.subscribe(observer1);
-     * subject.onNext("one");
-     * subject.onNext("two");
-     * // observer2 will only receive "three" and onCompleted
-     * subject.subscribe(observer2);
-     * subject.onNext("three");
-     * subject.onCompleted();
-    </Object> */
-    private val mEventBus = PublishSubject.create<Any>()
-
-    fun post(event: Any) {
-        mEventBus.onNext(event)
-    }
-
-    fun toObservable(): Observable<Any> {
-        return mEventBus
-    }
+    var playEvent: MutableLiveData<Any> = MutableLiveData()
 
     companion object {
 
-        private val TAG = "RxBus"
+        private val TAG = "LiveDataBus"
 
-        @Volatile private var sInstance: RxBus? = null
+        @Volatile private var sInstance: RxBus? = RxBus()
 
         val instance: RxBus?
             get() {
@@ -59,20 +37,20 @@ class RxBus {
          * A simple logger for RxBus which can also prevent
          * potential crash(OnErrorNotImplementedException) caused by error in the workflow.
          */
-        fun defaultSubscriber(): Subscriber<Any> {
-            return object : Subscriber<Any>() {
-                override fun onCompleted() {
-                    Log.d(TAG, "Duty off!!!")
-                }
-
-                override fun onError(e: Throwable) {
-                    Log.e(TAG, "Error? Please solve this as soon as possible!", e)
-                }
-
-                override fun onNext(o: Any) {
-                    Log.d(TAG, "New event received: " + o)
-                }
-            }
-        }
+//        fun defaultSubscriber(): Subscriber<Any> {
+//            return object : Subscriber<Any>() {
+//                override fun onCompleted() {
+//                    Log.d(TAG, "Duty off!!!")
+//                }
+//
+//                override fun onError(e: Throwable) {
+//                    Log.e(TAG, "Error? Please solve this as soon as possible!", e)
+//                }
+//
+//                override fun onNext(o: Any) {
+//                    Log.d(TAG, "New event received: " + o)
+//                }
+//            }
+//        }
     }
 }

@@ -9,8 +9,8 @@
         android:endColor="@color/grey_light"
         android:angle="-90" />
     <size
-        android:width="18dp"
-        android:height="18dp" />
+        android:width="22dp"
+        android:height="22dp" />
     <stroke
         android:width="0.1dp"
         android:color="#777" />

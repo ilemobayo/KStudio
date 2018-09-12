@@ -36,13 +36,13 @@ class AudioFocus: AudioManager.OnAudioFocusChangeListener{
 
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
                 if (mPlayer != null && mPlayer!!.mPlayer != null) {
-                    mPlayer!!.mPlayer!!.setVolume(0.3f, 0.3f)
+                    mPlayer!!.mPlayer!!.setVolume(0.3f)
                 }
             }
 
             AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK -> {
                 if (mPlayer != null && mPlayer!!.mPlayer != null) {
-                    mPlayer!!.mPlayer!!.setVolume(1.0f, 1.0f)
+                    mPlayer!!.mPlayer!!.setVolume(1.0f)
                 }
             }
 
@@ -51,7 +51,7 @@ class AudioFocus: AudioManager.OnAudioFocusChangeListener{
                     if (!mPlayer!!.isPlaying) {
                         mPlayer!!.play()
                     }
-                    mPlayer!!.mPlayer!!.setVolume(1.0f, 1.0f)
+                    mPlayer!!.mPlayer!!.setVolume(1.0f)
                 }
             }
 

@@ -3,11 +3,11 @@ package com.musicplayer.aow.ui.main.library
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
-import com.musicplayer.aow.ui.main.library.album.AlbumFragment
-import com.musicplayer.aow.ui.main.library.artist.ArtistFragment
+import com.musicplayer.aow.ui.main.library.album.view.AlbumFragment
+import com.musicplayer.aow.ui.main.library.artist.view.ArtistFragment
 import com.musicplayer.aow.ui.main.library.home.DiscoveryFragment
 import com.musicplayer.aow.ui.main.library.playlist.PlayListsFragment
-import com.musicplayer.aow.ui.main.library.songs.AllSongsFragment
+import com.musicplayer.aow.ui.main.library.songs.view.AllSongsFragment
 
 /**
  * Created by Arca on 11/19/2017.

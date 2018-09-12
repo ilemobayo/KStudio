@@ -2,7 +2,6 @@ package com.musicplayer.aow.delegates.softcode.adapters.placeholder
 
 import com.google.gson.annotations.SerializedName
 import java.util.*
-import kotlin.collections.ArrayList
 
 class PlaceHolderSearchData(
         @SerializedName("id") var _id: String = "",

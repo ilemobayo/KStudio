@@ -18,7 +18,7 @@
 
     <!-- Play Lists -->
     <string name="mp.play_list.favorite">Favorite</string>
-    <string name="mp.play_list.songs">All songs</string>
+    <string name="mp.play_list.tracks">All tracks</string>
     <string name="mp.play_list.nowplaying">Now playing</string>
     <string name="mp.play_list.footer.add">Add play list</string>
     <string name="mp.play_list.footer.end_summary_formatter">%d play lists in total</string>
@@ -30,13 +30,13 @@
     <string name="mp.play_list.dialog.add_to">Add to play list</string>
 
     <plurals name="mp_play_list_items_formatter">
-        <item quantity="one">%d song</item>
-        <item quantity="other">%d songs</item>
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
     </plurals>
 
     <!-- Play Lists - Details -->
     <string name="mp.play_list.details.empty">No music here, go add some!</string>
-    <string name="mp.play_list.details.footer.end_summary_formatter">%d songs in total</string>
+    <string name="mp.play_list.details.footer.end_summary_formatter">%d tracks in total</string>
 
     <!-- Main -->
     <string-array name="mp_main_titles">
@@ -52,9 +52,9 @@
     <string name="mp.local_files.segmented.folder">For You</string>
 
     <string name="mp.local_files.music_list.empty">No music found on this device</string>
-    <string name="mp.local_files.music_list.end_summary_formatter">%d songs in total</string>
+    <string name="mp.local_files.music_list.end_summary_formatter">%d tracks in total</string>
     <string name="mp.local_files.folder_list.end_summary_formatter">%d folders in total</string>
-    <string name="mp.local_files.folder_list.item_info_formatter" formatted="false">%d songs | %s</string>
+    <string name="mp.local_files.folder_list.item_info_formatter" formatted="false">%d tracks | %s</string>
     <string name="mp.local_files.folder_list.add_folder">Add Folder</string>
 
     <string name="mp.local_files.file_system.empty">No files under this directory</string>
@@ -90,7 +90,7 @@
     <string name="enabled">Enabled</string>
     <string name="flat">Flat</string>
     <string name="bass_boost">Bass boost</string>
-    <string name="about">About...</string>
+    <string name="about">About Us</string>
     <string name="ok">OK</string>
     <string name="copyright_message">Musixplay v1.9.0, Copyright \u00A92013 Kingsz Studio.</string>
 </resources>

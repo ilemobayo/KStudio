@@ -22,10 +22,25 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import android.view.Gravity
+import android.widget.Toast
+import com.musicplayer.aow.ui.main.MainActivity
+import android.app.SearchManager
+import android.content.Intent
+import com.musicplayer.aow.ui.main.search.adapter.MySuggestionProvider
+import android.provider.SearchRecentSuggestions
+import android.media.MediaCodec.MetricsConstants.MODE
+
+
+
+
+
+
 
 
 class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
+    private val lastSearches: List<String>? = null
     var searchView: SearchView? = null
     private var host_address: String? = "http://musixplaylb-1373597421.eu-west-2.elb.amazonaws.com/play"
 
@@ -41,31 +56,39 @@ class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener {
             finish()
         }
 
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
-
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent)
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.color.black)
 
         search_recyclerview.layoutManager =  LinearLayoutManager(
                 applicationContext,
                 LinearLayoutManager.VERTICAL,
                 false   )
 
-        val intent = intent
-        if (intent != null) {
-            // To get the data use
-            val data = intent.getStringExtra("query")
-            if (data != null) {
-                callPlaylist(data)
-            }
+        // Get the intent, verify the action and get the query
+//        val intent = intent
+//        if (Intent.ACTION_SEARCH == intent.action) {
+//            val query = intent.getStringExtra(SearchManager.QUERY)
+//            callPlaylist(query)
+//        }
+        handleIntent(intent)
+
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (Intent.ACTION_SEARCH == intent.action) {
+            val query = intent.getStringExtra(SearchManager.QUERY)
+            //save query
+            val suggestions = SearchRecentSuggestions(this,
+                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
+            suggestions.saveRecentQuery(query, null)
+            callPlaylist(query)
+            //clear query
+//            val suggestions = SearchRecentSuggestions(this,
+//                    MySuggestionProvider.AUTHORITY, HelloSuggestionProvider.MODE)
+//            suggestions.clearHistory()
         }
     }
 
@@ -108,6 +131,10 @@ class SearchActivity : BaseActivity(), SearchView.OnQueryTextListener {
         callPlaylist(query)
         search_msg.text = "Searching..."
         return false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     private fun callPlaylist(query: String){

@@ -3,12 +3,13 @@ package com.musicplayer.aow.ui.main.library.home.browse
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.support.design.widget.BottomSheetDialog
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +18,21 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.github.ybq.android.spinkit.SpinKitView
+import com.google.android.exoplayer2.offline.DownloadService
+import com.google.android.exoplayer2.offline.ProgressiveDownloadAction
+import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.upstream.cache.CacheUtil
+import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.l4digital.fastscroll.FastScroller
 import com.musicplayer.aow.R
 import com.musicplayer.aow.bus.RxBus
+import com.musicplayer.aow.delegates.data.db.AppExecutors
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlayListNowEvent
+import com.musicplayer.aow.delegates.exo.AudioDownloadService
+import com.musicplayer.aow.delegates.exo.DownloadUtil
 import com.musicplayer.aow.delegates.player.IPlayback
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
@@ -30,6 +40,7 @@ import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.song.Song
 import com.musicplayer.aow.ui.main.library.activities.AlbumSongs
 import com.musicplayer.aow.ui.main.library.home.artist.ArtistOnline
 import org.jetbrains.anko.find
+import java.io.File
 
 
 /**
@@ -45,50 +56,56 @@ class BrowseAdapter(
     val TAG = this.javaClass.name
     private var view:View? = null
     private var songFavDatabase: SongFavDatabase? = SongFavDatabase.getsInstance(context.applicationContext)
-    private var songPlayList = song
-    private var mSongModel: ArrayList<Song>? = song.songs as ArrayList<Song>
+    private var mTrackModel: ArrayList<Track>? = song.tracks as ArrayList<Track>
     private var mPlayer = Player.instance
     private var callback: IPlayback.Callback? = null
 
     override fun getSectionText(position: Int): String {
-        return mSongModel?.get(position)?.title!!.first().toString()
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView?) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        if (callback != null){
-            mPlayer?.unregisterCallback(callback!!)
-        }
+        return mTrackModel?.get(position)?.title!!.first().toString()
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        val model = mSongModel?.get(position)
+        val model = mTrackModel?.get(position)
         if (model != null) {
-            val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(model.path!!)
-            fSong?.observe(this.activity, object: Observer<Song> {
-                override fun onChanged(t: Song?) {
-                    var fav = true
-                    fav = t != null
-                    holder.favorite.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
-                    holder.favorite.setOnClickListener {
-                        //save to favorite
-                        if (fav){
-                            deleteFromFavorite(model)
-                        } else {
-                            addToFavorite(model)
+            if (Player.instance?.mPlayList != null) {
+                if (Player.instance?.mPlayList?.currentTrack?.value?.path?.toLowerCase().equals(model.path?.toLowerCase())) {
+                    holder.position.visibility = View.INVISIBLE
+                    holder.button_play_toggle.visibility = View.VISIBLE
+                    holder.loading.visibility = View.INVISIBLE
+                } else {
+                    holder.position.visibility = View.VISIBLE
+                    holder.button_play_toggle.visibility = View.INVISIBLE
+                    holder.loading.visibility = View.INVISIBLE
+                }
+            }
+
+            AppExecutors.instance?.diskIO()?.execute {
+                val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(model.path!!)
+                fSong?.observe(this.activity, object : Observer<Track> {
+                    override fun onChanged(t: Track?) {
+                        var fav = true
+                        fav = t != null
+                        holder.favorite.setImageResource(if (fav) R.drawable.ic_favorite_yes else R.drawable.ic_favorite_no)
+                        holder.favorite.setOnClickListener {
+                            //save to favorite
+                            if (fav) {
+                                deleteFromFavorite(model)
+                            } else {
+                                addToFavorite(model)
+                            }
                         }
                     }
-                }
-            })
+                })
+            }
 
             //implementation of item click
             holder.mListItem.setOnClickListener {
-                RxBus.instance!!.post(PlayListNowEvent(PlayList(mSongModel), position))
+                Player.instance?.play(PlayList(mTrackModel), position)
             }
             callback = object : IPlayback.Callback {
-                override fun onSwitchLast(last: Song?) {
+                override fun onSwitchLast(last: Track?) {
                     if (Player.instance!!.mPlayList != null) {
-                        if (Player.instance!!.mPlayList!!.currentSong!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
+                        if (Player.instance!!.mPlayList!!.currentTrack!!.value?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                             holder.position.visibility = View.INVISIBLE
                             holder.button_play_toggle.visibility = View.VISIBLE
                             holder.loading.visibility = View.INVISIBLE
@@ -99,9 +116,9 @@ class BrowseAdapter(
                         }
                     }
                 }
-                override fun onSwitchNext(next: Song?) {
+                override fun onSwitchNext(next: Track?) {
                     if (Player.instance!!.mPlayList != null) {
-                        if (Player.instance!!.mPlayList!!.currentSong!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
+                        if (Player.instance!!.mPlayList!!.currentTrack!!.value?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                             holder.position.visibility = View.INVISIBLE
                             holder.button_play_toggle.visibility = View.VISIBLE
                             holder.loading.visibility = View.INVISIBLE
@@ -112,12 +129,12 @@ class BrowseAdapter(
                         }
                     }
                 }
-                override fun onComplete(next: Song?) {
+                override fun onComplete(next: Track?) {
                     holder.position.visibility = View.VISIBLE
                     holder.button_play_toggle.visibility = View.INVISIBLE
                     holder.loading.visibility = View.INVISIBLE
                     if (Player.instance!!.mPlayList != null) {
-                        if (Player.instance!!.mPlayList!!.currentSong!!.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
+                        if (Player.instance!!.mPlayList!!.currentTrack!!.value?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                             holder.position.visibility = View.INVISIBLE
                             holder.button_play_toggle.visibility = View.VISIBLE
                             holder.loading.visibility = View.INVISIBLE
@@ -129,9 +146,8 @@ class BrowseAdapter(
                     }
                 }
                 override fun onPlayStatusChanged(isPlaying: Boolean) {
-                    if (Player.instance!!.mPlayList != null) {
-                        if (Player.instance!!.mPlayList!!.currentSong?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
-                            Log.e(TAG,"trigger status change ${Player.instance!!.mPlayList!!.currentSong?.path}")
+                    if (Player.instance?.mPlayList != null) {
+                        if (Player.instance?.mPlayList?.currentTrack?.value?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                             holder.position.visibility = View.INVISIBLE
                             holder.button_play_toggle.visibility = View.VISIBLE
                             holder.loading.visibility = View.INVISIBLE
@@ -144,8 +160,7 @@ class BrowseAdapter(
                 }
                 override fun onTriggerLoading(isLoading: Boolean) {
                     if (Player.instance?.mPlayList != null) {
-                        if (Player.instance!!.mPlayList!!.currentSong?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
-                            Log.e(TAG,"trigger loading ${Player.instance!!.mPlayList!!.currentSong?.path}")
+                        if (Player.instance?.mPlayList?.currentTrack?.value?.path!!.toLowerCase().equals(model.path!!.toLowerCase())) {
                             holder.position.visibility = View.INVISIBLE
                             holder.button_play_toggle.visibility = View.INVISIBLE
                             holder.loading.visibility = View.VISIBLE
@@ -166,16 +181,31 @@ class BrowseAdapter(
         }
     }
 
-    fun loadViews(model: Song,holder: TrackViewHolder?, position: Int){
+    fun loadViews(model: Track, holder: TrackViewHolder?, position: Int){
         val songArtist = model.artist
         holder!!.songTV.text = model.title
         holder.songArtist.text = "$songArtist"
         val tPosition = position
         holder.position.text = tPosition.plus(1).toString()
 
-        broadcastChange(holder, model)
+        // create the data spec of a given media file
+        val uri = Uri.parse(model.path)
+        val dataSpec = DataSpec(uri)
+        val cache = DownloadUtil.getCache(context)
+        // get information about what is cached for the given data spec
+        val counters = CacheUtil.CachingCounters();
+        CacheUtil.getCached(dataSpec, cache, counters);
+        if (counters.contentLength == counters.totalCachedBytes()) {
+            // all bytes cached
+            holder.position.setTextColor(Color.GREEN)
+        } else if (counters.totalCachedBytes().toInt() == 0){
+            // not cached at all
+        } else {
+            // partially cached
+            holder.position.setTextColor(Color.RED)
+        }
 
-        //here we set item click for songs
+        //here we set item click for tracks
         //to set options
         holder.option.setOnClickListener {
             if (view != null) {
@@ -198,10 +228,11 @@ class BrowseAdapter(
                 val _delete = sheetView.findViewById<ImageView>(R.id.delete_img)
                 _delete.setImageResource(R.drawable.ic_file_download)
                 val _delete_label = sheetView.find<TextView>(R.id.delete_label)
-                _delete_label.text = context.getString(R.string.download)
+                _delete_label.text = context.getString(R.string.make_available_offline)
+                delete.visibility = View.GONE
                 play.setOnClickListener {
                     //Update UI
-                    RxBus.instance!!.post(PlayListNowEvent(PlayList(mSongModel), position))
+                    Player.instance?.play(PlayList(mTrackModel), position)
                     mBottomSheetDialog.dismiss()
                 }
                 //play next
@@ -229,54 +260,50 @@ class BrowseAdapter(
                     ContextCompat.startActivity(context, intent, null)
                     mBottomSheetDialog.dismiss()
                 }
+
                 //Add to Playlist Operation
                 playlist.setOnClickListener {
                     mBottomSheetDialog.dismiss()
+
                     //Dialog with ListView
                     val context = view!!.context
                     val mSelectPlaylistDialog = BottomSheetDialog(context)
                     val sheetView =  LayoutInflater.from(context).inflate(R.layout.custom_dialog_select_playlist, null)
                     val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
 
-                    SoftCodeAdapter().addSongToPlaylist(activity,context, mylist, mSelectPlaylistDialog, model)
+                    SoftCodeAdapter().addSongToPlaylist(context, mylist, mSelectPlaylistDialog, model)
 
                     mSelectPlaylistDialog.setContentView(sheetView)
                     mSelectPlaylistDialog.show()
                     mSelectPlaylistDialog.setOnDismissListener {}
                 }
+
                 //Delete Operation
                 delete.setOnClickListener {
-                    SoftCodeAdapter().downloadFileAsync(context,model.path!!, model)
+                    val action = ProgressiveDownloadAction(
+                            Uri.parse(mTrackModel!![position].path),
+                            false,
+                            null,
+                            "")
+
+                    DownloadService.startWithAction(
+                            context.applicationContext,
+                            AudioDownloadService::class.java,
+                            action,
+                            true)
+
                     mBottomSheetDialog.dismiss()
                 }
             }
         }
     }
 
-    fun isFavorite(song: Song): Boolean{
-        val fSong = songFavDatabase?.songFavDAO()?.fetchOneSongPath(song.path!!)
-        return fSong != null
+    private fun addToFavorite(track: Track){
+        AppExecutors.instance?.diskIO()?.execute{ songFavDatabase?.songFavDAO()?.insertOneSong(track) }
     }
 
-    private fun addToFavorite(song: Song){
-        songFavDatabase?.songFavDAO()?.insertOneSong(song)
-    }
-
-    private fun deleteFromFavorite(song: Song){
-        songFavDatabase?.songFavDAO()?.deleteSong(song)
-    }
-
-
-    private fun broadcastChange(holder: TrackViewHolder?, model: Song){
-        if (Player.instance?.isPlaying != null) {
-            if (Player.instance?.mPlayList?.currentSong != null) {
-                if (Player.instance!!.mPlayList!!.currentSong?.path?.toLowerCase().equals(model.path!!.toLowerCase())) {
-                    holder?.position?.visibility = View.INVISIBLE
-                    holder?.button_play_toggle?.visibility = View.INVISIBLE
-                    holder?.loading?.visibility = View.VISIBLE
-                }
-            }
-        }
+    private fun deleteFromFavorite(track: Track){
+        AppExecutors.instance?.diskIO()?.execute{ songFavDatabase?.songFavDAO()?.deleteSong(track) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -286,7 +313,7 @@ class BrowseAdapter(
 
     //we get the count of the list
     override fun getItemCount(): Int {
-        return mSongModel!!.size
+        return mTrackModel!!.size
     }
 
     override fun getItemId(position: Int): Long {

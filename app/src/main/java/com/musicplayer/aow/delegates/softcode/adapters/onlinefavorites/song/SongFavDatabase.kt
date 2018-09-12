@@ -4,9 +4,9 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 
-@Database(entities = arrayOf(Song::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(Track::class), version = 1, exportSchema = false)
 abstract class SongFavDatabase: RoomDatabase() {
     abstract fun songFavDAO(): SongFavDAO
 
@@ -14,14 +14,14 @@ abstract class SongFavDatabase: RoomDatabase() {
 
         private val LOG_TAG = SongFavDatabase::class.java.simpleName
         private val LOCK = Any()
-        private val DATABASE_NAME = "song"
+        private val DATABASE_NAME = "trackfavorite"
         private var sInstance: SongFavDatabase? = null
 
         fun getsInstance(context: Context): SongFavDatabase? {
             if (sInstance == null) {
                 synchronized(LOCK) {
                     sInstance = Room.databaseBuilder(context.applicationContext, SongFavDatabase::class.java,
-                            SongFavDatabase.DATABASE_NAME).allowMainThreadQueries().build()
+                            SongFavDatabase.DATABASE_NAME).build()
                 }
             }
             return sInstance

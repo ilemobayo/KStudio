@@ -1,6 +1,7 @@
 package com.musicplayer.aow.ui.main.library.home.artist
 
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -12,6 +13,7 @@ import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.delegates.softcode.adapters.placeholder.PlaceHolderSearchData
 import com.musicplayer.aow.ui.main.search.SearchActivity
 import com.musicplayer.aow.ui.main.search.adapter.SearchAdapter
+import com.readystatesoftware.systembartint.SystemBarTintManager
 import kotlinx.android.synthetic.main.activity_artist_online.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.onComplete
@@ -27,6 +29,19 @@ class ArtistOnline : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_online)
+        //window.setBackgroundDrawable(null)
+        val tintManager = SystemBarTintManager(this)
+        // enable status bar tint
+        tintManager.isStatusBarTintEnabled = true
+        // enable navigation bar tint
+        tintManager.setNavigationBarTintEnabled(true)
+
+        // set a custom tint color for all system bars
+        tintManager.setTintColor(R.color.transparent)
+        // set a custom navigation bar resource
+        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
+        // set a custom status bar drawable
+        tintManager.setStatusBarTintResource(R.color.black)
 
         setupToolbar()
 
@@ -46,8 +61,20 @@ class ArtistOnline : AppCompatActivity() {
             // To get the data use
             val data = intent.getStringExtra("artist")
             if (data != null) {
-                item_name.text = data
-                item_element_list.text = intent.getStringExtra("des")
+                val mData = data
+                val des = intent.getStringExtra("des")
+                item_name.text = mData
+                item_element_list.text = des
+                item_element_list.setOnClickListener{
+                    val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+                    dialog.setTitle("Description")
+                    dialog.setMessage(des)
+                    dialog.setNegativeButton("Close",
+                            {dialog, which ->
+
+                            }).create()
+                    dialog.show()
+                }
                 callPlaylist(data)
             }
         }

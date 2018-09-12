@@ -1,4 +1,4 @@
-package com.musicplayer.aow.ui.main.library.songs.dialog.indicator
+package com.musicplayer.aow.ui.main.library.songs.view.dialog.indicator
 
 /**
  * Created by Arca on 1/23/2018.

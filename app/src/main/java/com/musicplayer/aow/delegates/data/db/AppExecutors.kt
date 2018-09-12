@@ -15,9 +15,8 @@ import java.util.concurrent.Executors
  */
 class AppExecutors internal constructor(private val diskIO: Executor, private val networkIO: Executor, private val mainThread: Executor) {
 
-    constructor() : this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
-            MainThreadExecutor()) {
-    }
+    constructor(): this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
+            MainThreadExecutor())
 
     fun diskIO(): Executor {
         return diskIO
@@ -42,5 +41,20 @@ class AppExecutors internal constructor(private val diskIO: Executor, private va
     companion object {
 
         private val THREAD_COUNT = 3
+
+        @Volatile private var sInstance: AppExecutors? = null
+
+        val instance: AppExecutors?
+            get() {
+                if (sInstance == null) {
+                    synchronized(AppExecutors.Companion) {
+                        if (sInstance == null) {
+                            sInstance = AppExecutors(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(THREAD_COUNT),
+                                    MainThreadExecutor())
+                        }
+                    }
+                }
+                return sInstance
+            }
     }
 }

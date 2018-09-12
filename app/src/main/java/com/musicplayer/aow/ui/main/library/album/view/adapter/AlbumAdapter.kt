@@ -1,9 +1,7 @@
-package com.musicplayer.aow.ui.main.library.album.adapter
+package com.musicplayer.aow.ui.main.library.album.view.adapter
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
@@ -16,16 +14,13 @@ import android.widget.TextView
 import com.musicplayer.aow.R
 import com.musicplayer.aow.R.id.menu_item_add_to_queue
 import com.musicplayer.aow.R.id.menu_item_play_next
-import com.musicplayer.aow.bus.RxBus
 import com.musicplayer.aow.delegates.data.model.Album
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.delegates.event.PlayListNowEvent
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.player.Player
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.utils.images.BitmapDraws
 import org.jetbrains.anko.find
-import rx.subscriptions.CompositeSubscription
 import java.util.*
 
 
@@ -35,10 +30,8 @@ import java.util.*
 class AlbumAdapter(var context: Context, var activity: Activity, albumList: ArrayList<Album>?) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
     private var view:View? = null
-    private val mSubscriptions: CompositeSubscription? = null
     var mAlbumModel = albumList
 
-    @TargetApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         val model = mAlbumModel?.get(position)
         holder.albumName.text = model?.albumName
@@ -79,7 +72,7 @@ class AlbumAdapter(var context: Context, var activity: Activity, albumList: Arra
                 val delete = sheetView.find<LinearLayout>(R.id.menu_item_delete)
 
                 play.setOnClickListener {
-                    RxBus.instance!!.post(PlayListNowEvent(PlayList(songs), 0))
+                    Player.instance?.play(PlayList(songs), 0)
                     mBottomSheetDialog.dismiss()
                 }
 
@@ -101,7 +94,7 @@ class AlbumAdapter(var context: Context, var activity: Activity, albumList: Arra
                     val sheetView =  LayoutInflater.from(nContext).inflate(R.layout.custom_dialog_select_playlist, null)
                     val mylist = sheetView.find<RecyclerView>(R.id.recycler_playlist_views)
 
-                    SoftCodeAdapter().addSongToPlaylist(activity,nContext, mylist, mSelectPlaylistDialog, Song(), songs, true)
+                    SoftCodeAdapter().addSongToPlaylist(nContext, mylist, mSelectPlaylistDialog, Track(), songs, true)
 
                     mSelectPlaylistDialog.setContentView(sheetView)
                     mSelectPlaylistDialog.show()

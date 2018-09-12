@@ -27,6 +27,9 @@ interface PlaylistFavDAO {
     @Query("SELECT * FROM playlist WHERE name != :name")
     fun fetchAllPlayListWithNoRecentlyPlayed (name: String = "Recently Played"): LiveData<List<PlayList>>
 
+    @Query("SELECT * FROM playlist WHERE name != :name")
+    fun fetchAllPlayListWithNoRecentlyPlayedList (name: String = "Recently Played"): List<PlayList>
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updatePlayListFav (playList: PlayList)
 

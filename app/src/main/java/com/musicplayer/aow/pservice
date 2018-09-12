@@ -1,0 +1,479 @@
+override val mPlayer: SimpleExoPlayer?
+        get() = null
+
+    private var mediaSession: MediaSessionCompat? = null
+    private var mediaSessionConnector: MediaSessionConnector? = null
+    private var playerNotificationManager: PlayerNotificationManager? = null
+
+    var mediaPlayer: Player? = Player.instance
+
+    private val mBinder = LocalBinder()
+
+    override var isPlaying: Boolean = false
+        get() = mediaPlayer!!.isPlaying
+
+    override var progress: Int = 0
+        get() = mediaPlayer!!.progress
+
+    override var playingSong: Song? = null
+        get() = mediaPlayer!!.playingSong
+
+    override var playingList: PlayList? = null
+        get() = mediaPlayer!!.playingList
+
+    inner class LocalBinder : Binder() {
+        val service: PlaybackService
+            get() = this@PlaybackService
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        initMediaPlayer()
+        initMediaSession()
+        initNoisyReceiver()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        MediaButtonReceiver.handleIntent(mediaSession, intent)
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return mBinder
+    }
+
+    override fun onUnbind(intent: Intent): Boolean {
+        return false
+    }
+
+    override fun stopService(name: Intent): Boolean {
+        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID)
+        stopForeground(true)
+        unregisterCallback(this)
+        return super.stopService(name)
+    }
+
+    override fun onDestroy() {
+        releasePlayer()
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.abandonAudioFocus(this)
+        unregisterReceiver(mNoisyReceiver)
+        mediaSession?.release()
+        mediaSessionConnector?.mediaSession?.release()
+        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID)
+        super.onDestroy()
+    }
+
+    override fun setPlayList(list: PlayList) {
+        mediaPlayer!!.setPlayList(list)
+    }
+
+    override fun play(): Boolean {
+        return mediaPlayer!!.play()
+    }
+
+    override fun play(list: PlayList): Boolean {
+        return mediaPlayer!!.play(list)
+    }
+
+    override fun play(list: PlayList, startIndex: Int): Boolean {
+        return mediaPlayer!!.play(list, startIndex)
+    }
+
+    override fun play(track: Song): Boolean {
+        return mediaPlayer!!.play(track)
+    }
+
+    override fun playLast(): Boolean {
+        return mediaPlayer!!.playLast()
+    }
+
+    override fun playNext(): Boolean {
+        return mediaPlayer!!.playNext()
+    }
+
+    override fun pause(): Boolean {
+        return mediaPlayer!!.pause()
+    }
+
+    override fun seekTo(progress: Int): Boolean {
+        return mediaPlayer!!.seekTo(progress)
+    }
+
+    override fun setPlayMode(playMode: PlayMode) {
+        mediaPlayer!!.setPlayMode(playMode)
+    }
+
+    override fun registerCallback(callback: IPlayback.Callback) {
+        mediaPlayer!!.registerCallback(callback)
+    }
+
+    override fun unregisterCallback(callback: IPlayback.Callback) {
+        mediaPlayer!!.unregisterCallback(callback)
+    }
+
+    override fun removeCallbacks() {
+        mediaPlayer!!.removeCallbacks()
+    }
+
+    override fun releasePlayer() {
+        mediaPlayer!!.releasePlayer()
+    }
+
+    // Playback Callbacks
+    override fun onSwitchLast(last: Song?) {
+        showNotification()
+    }
+
+    override fun onSwitchNext(next: Song?) {
+        showNotification()
+    }
+
+    override fun onComplete(next: Song?) {
+        showNotification()
+    }
+
+    override fun onPlayStatusChanged(isPlaying: Boolean) {
+        showNotification()
+    }
+
+    override fun onTriggerLoading(isLoading: Boolean) {
+
+    }
+
+    override fun onPrepared(isPrepared: Boolean) {
+
+    }
+
+    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
+
+        override fun onPlay() {
+            Log.e(TAG, "Play Media Button")
+            super.onPlay()
+        }
+
+        override fun onPause() {
+            Log.e(TAG, "Pause Media Button")
+            super.onPause()
+        }
+
+        override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+            val intentAction = mediaButtonEvent?.action
+            if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction))
+            {
+                return false
+            }
+            val mediaButtonEventKey = mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT) as KeyEvent
+            val keycode = mediaButtonEventKey.keyCode
+            val action = mediaButtonEventKey.action
+            when (keycode) {
+                KeyEvent.KEYCODE_HEADSETHOOK -> {
+
+                }
+                KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                    if (isPlaying) {
+                        pause()
+                        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        showNotification()
+                    }else{
+                        if (successfullyRetrievedAudioFocus()) {
+                            play()
+                            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                            showNotification()
+                        }
+                    }
+                }
+                KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    playNext()
+                }
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    playLast()
+                }
+                KeyEvent.KEYCODE_MEDIA_STOP -> {
+
+                }
+                else -> {
+
+                }
+            }
+
+
+            return super.onMediaButtonEvent(mediaButtonEvent)
+        }
+
+        override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
+            super.onCommand(command, extras, cb)
+            if (COMMAND_EXAMPLE.equals(command!!, ignoreCase = true)) {
+                //Custom command here
+            }
+        }
+
+    }
+
+    private fun initMediaPlayer() {
+        mediaPlayer = Player.instance
+        mediaPlayer!!.registerCallback(this)
+        mediaPlayer!!.attachEventListener()
+    }
+
+    /**
+     * Show a notification while this service is running.
+     */
+
+    fun showNotification(){
+        val track = mediaPlayer!!.playingSong
+        if (track != null) {
+            if (track.albumArt != null && track.albumArt != "null") {
+                if (URLUtil.isHttpUrl(track.albumArt) || URLUtil.isHttpsUrl(track.albumArt)) {
+                    doAsync {
+                        val img = Glide.with(applicationContext)
+                                .load(track.albumArt).asBitmap()
+                                .into(250, 250)
+                                .get()
+                        onComplete {
+                            buildNotification(track, img)
+                        }
+                    }
+                } else {
+                    try{
+                        val metadataRetriever = MediaMetadataRetriever()
+                        metadataRetriever.setDataSource(track.path)
+                        val data = metadataRetriever.embeddedPicture
+                        // convert the byte array to a bitmap
+                        if(data != null)
+                        {
+                            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                            if (bitmap != null){
+                                buildNotification(track, bitmap)
+                            }else{
+                                buildNotification(track)
+                            }
+                        }else{
+                            buildNotification(track)
+                        }
+                        metadataRetriever.release()
+                    }catch (e:Exception){
+                        buildNotification(track)
+                    }
+                }
+            } else {
+                buildNotification(track)
+            }
+        }
+    }
+
+    private fun mediaSessionMetadata(track: Song?, bitmap: Bitmap? = null): MediaMetadataCompat? {
+        val metadataBuilder = MediaMetadataCompat.Builder()
+        if (bitmap != null) {
+            //Notification icon in card
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, bitmap)
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+            //lock screen icon for pre lollipop
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap)
+        }else{
+            //Notification icon in card
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+            //lock screen icon for pre lollipop
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
+                    BitmapFactory.decodeResource(resources, R.drawable.gradient_danger))
+        }
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, track?.title)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, track?.artist)
+        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, track?.description)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 1)
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 1)
+        return metadataBuilder.build()
+    }
+
+    private fun buildNotification(track: Song, bitmap: Bitmap? = null) {
+        mediaSession!!.setMetadata(mediaSessionMetadata(track, bitmap))
+        val builder = MediaStyleHelper.from(this, mediaSession!!)
+
+        builder.addAction(
+                NotificationCompat.Action(
+                        android.R.drawable.ic_media_previous,
+                        "Previous",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                this, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)))
+
+        if (isPlaying) {
+            builder.addAction(
+                    NotificationCompat.Action(
+                            android.R.drawable.ic_media_pause,
+                            "Pause",
+                            MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                    this, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
+        }else{
+            builder.addAction(
+                    NotificationCompat.Action(
+                            android.R.drawable.ic_media_play,
+                            "Play",
+                            MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                    this, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
+        }
+
+        builder.addAction(
+                NotificationCompat.Action(
+                        android.R.drawable.ic_media_next,
+                        "Next",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                                this, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)))
+
+
+        builder.setStyle(
+                android.support.v4.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0)
+                        .setMediaSession(mediaSession!!.sessionToken))
+
+        builder.setSmallIcon(R.drawable.ic_logo)
+        builder.color = ContextCompat.getColor(this, R.color.grey_black)
+        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID,builder.build())
+    }
+
+    private fun setMediaPlaybackState(state: Int) {
+        val playbackstateBuilder = PlaybackStateCompat.Builder()
+        if (state == PlaybackStateCompat.STATE_PLAYING) {
+            playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_PAUSE)
+        } else {
+            playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_PLAY)
+        }
+        playbackstateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 0f)
+        mediaSession!!.setPlaybackState(playbackstateBuilder.build())
+    }
+
+    private fun initMediaSession() {
+        val mediaButtonReceiver = ComponentName(this, MediaButtonReceiver::class.java)
+        val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
+        mediaButtonIntent.setClass(this, MediaButtonReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0)
+        mediaSession = MediaSessionCompat(this, C.MEDIA_SESSION_TAG, mediaButtonReceiver, pendingIntent)
+
+        mediaSession!!.setCallback(mediaSessionCallback)
+        mediaSession!!.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
+        mediaSession!!.isActive = true
+
+        val state = PlaybackStateCompat.Builder()
+                        .setActions(
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                                        PlaybackStateCompat.ACTION_PLAY or
+                                        PlaybackStateCompat.ACTION_PAUSE or
+                                        PlaybackStateCompat.ACTION_STOP or
+                                        PlaybackStateCompat.ACTION_FAST_FORWARD or
+                                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+                        .build()
+        mediaSession!!.setPlaybackState(state)
+
+        mediaSessionConnector = MediaSessionConnector(mediaSession)
+        //mediaSessionConnector?.setPlayer(mPlayer, null)
+        mediaSessionConnector?.setQueueNavigator(object: TimelineQueueNavigator(mediaSession) {
+            override fun onSkipToPrevious(player: com.google.android.exoplayer2.Player?) {
+                Log.e(TAG, "mediasessionconnector description previous")
+                super.onSkipToPrevious(player)
+            }
+            override fun onSkipToNext(player: com.google.android.exoplayer2.Player?) {
+                Log.e(TAG, "mediasessionconnector description next")
+                super.onSkipToNext(player)
+            }
+            override fun getMediaDescription(player: com.google.android.exoplayer2.Player?, windowIndex: Int): MediaDescriptionCompat {
+                Log.e(TAG, "mediasessionconnector description")
+                return playingList?.getMediaDescription(applicationContext, playingList?.currentSong?.value!!)!!
+            }
+        })
+        mediaSessionConnector?.setPlayer(mediaPlayer?.mPlayer, null)
+        //Log.e(TAG, "mediasessionconnector session ${mediaSessionConnector?.mediaSession?.sessionToken} vs ${mediaSession?.sessionToken}")
+        //mediaPlayer!!.mPlayList!!.getMediaDescription(applicationContext, mediaPlayer!!.mPlayList!!.tracks?.get(windowIndex)!!)
+        sessionToken = mediaSessionConnector?.mediaSession?.sessionToken
+    }
+
+    //Not important for general audio service, required for class
+    override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): MediaBrowserServiceCompat.BrowserRoot? {
+        return if (TextUtils.equals(clientPackageName, packageName)) {
+            MediaBrowserServiceCompat.BrowserRoot(getString(R.string.application_name), null)
+        } else null
+
+    }
+
+    //Not important for general audio service, required for class
+    override fun onLoadChildren(parentId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
+        result.sendResult(null)
+    }
+
+    private fun setUpRemoteView(remoteView: RemoteViews) {
+
+    }
+
+    private fun updateRemoteViews(remoteView: RemoteViews, currentSong: Song?, mPlayer: Player) {
+
+
+    }
+
+    private fun initNoisyReceiver() {
+        //Handles headphones coming unplugged. cannot be done through a manifest receiver
+        val filter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        registerReceiver(mNoisyReceiver, filter)
+    }
+
+    private fun successfullyRetrievedAudioFocus(): Boolean {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        val result = audioManager.requestAudioFocus(this,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+
+        return result == AudioManager.AUDIOFOCUS_GAIN
+    }
+
+    private val mNoisyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (isPlaying) {
+                pause()
+            }
+        }
+    }
+
+    override fun onAudioFocusChange(focusChange: Int) {
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                if (mediaPlayer != null && isPlaying) {
+                    pause()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                if (mediaPlayer != null && isPlaying) {
+                    pause()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                if (mediaPlayer != null) {
+                    mediaPlayer?.mPlayer?.volume = 0.3f
+                }
+            }
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                if (mediaPlayer != null) {
+                    if (!isPlaying) {
+                        play()
+                    }
+                    mediaPlayer?.mPlayer?.volume = 1.0f
+                }
+            }
+        }
+    }
+
+    // PendingIntent
+    private fun getPendingIntent(action: String): PendingIntent {
+        return PendingIntent.getService(applicationContext, 0, Intent(action), 0)
+    }
+
+    companion object {
+        private const val TAG = "PlayerService"
+        val COMMAND_EXAMPLE = "command_"
+        private const val ACTION_PLAY_TOGGLE = "com.musicplayer.aow.ACTION.PLAY_TOGGLE"
+        private const val ACTION_PLAY_LAST = "com.musicplayer.aow.ACTION.PLAY_LAST"
+        private const val ACTION_PLAY_NEXT = "com.musicplayer.aow.ACTION.PLAY_NEXT"
+        private const val ACTION_STOP_SERVICE = "com.musicplayer.aow.ACTION.STOP_SERVICE"
+        private const val NOTIFICATION_ID = 101
+    }

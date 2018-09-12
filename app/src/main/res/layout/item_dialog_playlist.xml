@@ -44,7 +44,7 @@
             style="@style/MP.Theme.TextAppearance.List.Hint"
             android:id="@+id/text_view_info"
             android:layout_marginTop="@dimen/mp.margin.small"
-            tools:text="100 songs"
+            tools:text="100 tracks"
             />
     </LinearLayout>
 </RelativeLayout>

@@ -27,9 +27,9 @@ class ProfileActivity : AppCompatActivity() {
 
         doAsync {
             val img = Glide.with(applicationContext)
-                    .load(userdata.photoUrl).asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(550, 550)
+                    .asBitmap()
+                    .load(userdata.photoUrl)
+                    .submit(550, 550)
                     .get()
             onComplete {
                 photo.setImageBitmap(img)

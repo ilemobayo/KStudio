@@ -59,7 +59,7 @@ class DividerItemDecoration : RecyclerView.ItemDecoration {
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                state: RecyclerView.State?) {
+                                state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         if (mDivider == null) {
             return
@@ -75,7 +75,7 @@ class DividerItemDecoration : RecyclerView.ItemDecoration {
         }
     }
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (mDivider == null) {
             super.onDrawOver(c, parent, state)
             return

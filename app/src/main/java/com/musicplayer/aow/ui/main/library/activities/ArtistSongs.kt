@@ -1,5 +1,6 @@
 package com.musicplayer.aow.ui.main.library.activities
 
+import android.arch.lifecycle.Observer
 import android.database.Cursor
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -20,8 +21,10 @@ import android.widget.Toast
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.bus.RxBus
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.TrackDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.event.PlayAlbumNowEvent
 import com.musicplayer.aow.delegates.softcode.SoftCodeAdapter
 import com.musicplayer.aow.ui.main.library.activities.artistsonglist.ArtistSongsListAdapter
@@ -36,32 +39,14 @@ import java.util.*
 /**
  * Created by Arca on 12/1/2017.
  */
-class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  {
+class ArtistSongs : AppCompatActivity() {
 
-    private var ARTIST: String = ""
-    private val MEDIA_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-    private var WHERE = (MediaStore.Audio.Media.SIZE + ">0 AND " + MediaStore.Audio.Media.ARTIST + "=\"$ARTIST\"")
-    private val ORDER_BY = MediaStore.Audio.Media.TITLE + " ASC"
-    private val PROJECTIONS = arrayOf(
-            MediaStore.Audio.Media.DATA, // the real path
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.MIME_TYPE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.DATE_MODIFIED,
-            MediaStore.Audio.Media.IS_RINGTONE,
-            MediaStore.Audio.Media.IS_MUSIC,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.SIZE)
+    private var trackDatabase: TrackDatabase? = TrackDatabase.getsInstance(Injection.provideContext()!!)
     private var songs: PlayList = PlayList()
 
     private var adapter: ArtistSongsListAdapter? = null
-    private var artistModelData: ArrayList<Song> = ArrayList()
-    var songsList:List<Song>? = null
+    private var artistModelData: ArrayList<Track> = ArrayList()
+    var songsList:List<Track>? = null
     private var artistArtMain: ImageView? = null
     var playArtistFab: Button? = null
     private var mArtistList: RecyclerView? = null
@@ -90,7 +75,6 @@ class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  
             if (data != null) {
                 val bundle = Bundle()
                 bundle.putString("name", data)
-                supportLoaderManager.initLoader(0, bundle, this)
                 toolbar.title = data
                 collapsingToolbarLayout.title = data
                 collapsingToolbarLayout.setContentScrimColor(Color.WHITE)
@@ -107,14 +91,14 @@ class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  
                             null)
                     onComplete {
                         if (alb.moveToFirst()) {
-                            val data = alb.getString(alb.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
-                            val albumArt = BitmapDraws.createFromPath(data)
+                            val aData = alb.getString(alb.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
+                            val albumArt = BitmapDraws.createFromPath(aData)
                             if (albumArt != null) {
                                 artistArtMain!!.setImageDrawable(albumArt)
                                 //color from image
-                                Palette.from(SoftCodeAdapter().convertToBitmap(albumArt, 50, 50))
+                                Palette.from(SoftCodeAdapter().convertToBitmap(albumArt, 50, 50)!!)
                                         .generate(Palette.PaletteAsyncListener { palette ->
-                                            val vibrant = palette.vibrantSwatch
+                                            val vibrant = palette!!.vibrantSwatch
                                             val vibrantLV = palette.lightVibrantSwatch
                                             val vibrantDV = palette.darkVibrantSwatch
                                             val vibrantM = palette.mutedSwatch
@@ -126,7 +110,7 @@ class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  
                                             }
                                             setHomeUpIconColor(vibrant.bodyTextColor)
                                             setOverflowButtonColor(vibrantLV.rgb)
-                                            collapsingToolbarLayout.setContentScrimColor(vibrant.rgb);
+                                            collapsingToolbarLayout.setContentScrimColor(vibrant.rgb)
                                             collapsingToolbarLayout.setStatusBarScrimColor(vibrantDV.population)
                                         })
                             }else{
@@ -137,7 +121,20 @@ class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  
                     }
 
                 }
-                data()
+                //sort the track list in ascending order
+                songsList = artistModelData.sortedWith(compareBy({ (it.title)!!.toLowerCase() }))
+                adapter = ArtistSongsListAdapter(this, songs, this)
+                mArtistList!!.adapter = adapter
+                val layoutManager = LinearLayoutManager(this)
+                mArtistList!!.setHasFixedSize(true)
+                mArtistList!!.layoutManager = layoutManager
+                AppExecutors.instance?.diskIO()?.execute {
+                    val tracks = trackDatabase?.trackDAO()?.fetchAllTrackArtist(data)
+                    tracks?.observe(this, Observer<List<Track>> {
+                        songs = PlayList(it as java.util.ArrayList<Track>)
+                        adapter?.swapCursor(songs.tracks)
+                    })
+                }
             }
         }
 
@@ -157,48 +154,6 @@ class ArtistSongs : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>  
         val upArrow = resources.getDrawable(R.drawable.ic_arrow_back)
         upArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN)
         toolbar.navigationIcon = upArrow
-    }
-
-    fun data(){
-        //sort the song list in ascending order
-        songsList = artistModelData.sortedWith(compareBy({ (it.title)!!.toLowerCase() }))
-        //play as playlist when album art is clicked
-        playArtistFab!!.setOnClickListener {
-            Toast.makeText(this," hello", Toast.LENGTH_SHORT).show()
-            RxBus.instance!!.post(PlayAlbumNowEvent(songsList!!))
-        }
-
-        adapter = ArtistSongsListAdapter(this, songs, this)
-        mArtistList!!.adapter = adapter
-        val layoutManager = LinearLayoutManager(this)
-        mArtistList!!.setHasFixedSize(true)
-        mArtistList!!.layoutManager = layoutManager
-    }
-
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-        ARTIST = args?.getString("name")!!
-        WHERE = (MediaStore.Audio.Media.SIZE + ">0 AND " + MediaStore.Audio.Media.ARTIST + "=\"$ARTIST\"")
-        return CursorLoader(applicationContext, MEDIA_URI,
-                PROJECTIONS, WHERE, null,
-                ORDER_BY)
-    }
-
-    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-        songs = PlayList()
-        if (data != null) {
-            doAsync {
-                while (data.moveToNext()) {
-                    songs.addSong(CursorDB().cursorToMusic(data))
-                }
-                onComplete {
-                    adapter?.swapCursor(songs.songs as ArrayList<Song>)
-                }
-            }
-        }
-    }
-
-    override fun onLoaderReset(loader: Loader<Cursor>) {
-        adapter?.swapCursor(null)
     }
 
 }

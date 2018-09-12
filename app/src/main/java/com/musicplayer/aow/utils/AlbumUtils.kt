@@ -1,7 +1,7 @@
 package com.musicplayer.aow.utils
 
 import android.graphics.*
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import java.io.File
 
 object AlbumUtils {
@@ -12,8 +12,8 @@ object AlbumUtils {
         return parseAlbum(File(song))
     }
 
-    fun parseAlbum(song: Song): Bitmap? {
-        return parseAlbum(File(song.path!!))
+    fun parseAlbum(track: Track): Bitmap? {
+        return parseAlbum(File(track.path!!))
     }
 
     fun parseAlbum(file: File): Bitmap? {

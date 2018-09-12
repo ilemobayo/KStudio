@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".delegates.game.RouletteActivity"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="The Wheels"
+        app:subtitle="Roulette wheel (Musixplay Games)"
+        app:titleTextColor="@color/red_dim"
+        android:fitsSystemWindows="true"
+        android:layout_alignParentTop="true"/>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/board"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/control_plane"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/bet_type_label"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="Bet type:"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/bet_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/bet_type_label"
+                android:orientation="horizontal"
+                android:text="Straight Bet"
+                android:textSize="12sp"
+                android:textColor="@color/red_dim"
+                android:textAlignment="textStart"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/my_bet_label"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="Your bet:"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/your_bet_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/my_bet_label"
+                android:orientation="horizontal"
+                android:text="0"
+                android:textSize="12sp"
+                android:textColor="@color/red_dim"
+                android:textAlignment="textStart"
+                />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/player_money"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:paddingBottom="10dp"
+            android:drawableStart="@drawable/ic_money_dollar"
+            android:drawablePadding="5dp"
+            tools:text="50000"
+            android:gravity="center|start"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="1dp"
+            android:layout_marginTop="5dp">
+
+            <ImageView
+                android:id="@+id/imRoulette"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/roulette_wheel"
+                android:contentDescription="@string/roulette_wheel" />
+
+            <ImageView
+                android:id="@+id/imPointer"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_alignTop="@+id/imRoulette"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="18dp"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/roulette_pointer"
+                android:contentDescription="@string/roulette_wheel_pointer" />
+
+            <RelativeLayout
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imRoulette"
+                android:layout_marginTop="10dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true">
+
+                <LinearLayout
+                    android:id="@+id/wager_input"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/wager_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="My wager (Naira)"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        />
+                    <EditText
+                        android:id="@+id/wager"
+                        android:layout_width="wrap_content"
+                        android:layout_height="39dp"
+                        android:layout_gravity="center"
+                        android:textAlignment="center"
+                        android:text=""
+                        android:ems="5"
+                        android:imeOptions="actionDone"
+                        android:inputType="number">
+                    </EditText>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/wheel_board"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="3"
+                    android:layout_below="@id/wager_input"
+                    android:layout_centerInParent="true">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Bet (N)"
+                            android:textAlignment="center"
+                            android:textColor="@color/black"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/final_wager"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0"
+                            android:textAlignment="center"
+                            android:textColor="@color/red_dim"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/spinn_board"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/gradient_success">
+                        <TextView
+                            android:id="@+id/textView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="00 Green"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/number_selected"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="00"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="50sp"/>
+                        <TextView
+                            android:id="@+id/number_cat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="odd"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/number_color"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Green"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:background="@color/green"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="To win (N)"
+                            android:textAlignment="center"
+                            android:textColor="@color/black"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/winning_amount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0"
+                            android:textAlignment="center"
+                            android:textColor="@color/red_dim"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/win_or_loss_plane"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/wheel_board"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:text="Play"
+                    android:textAlignment="center"
+                    android:textColor="@color/red_dim"
+                    android:textSize="16sp"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/board_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/control_plane"
+        android:fitsSystemWindows="true"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/roulette_table_plane"
+            android:layout_width="wrap_content"
+            android:layout_height="405dp"
+            android:layout_alignParentStart="true"
+            layout="@layout/roulette_table"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_toEndOf="@+id/roulette_table_plane"
+            android:layout_alignParentEnd="true"
+            android:layout_height="match_parent"
+            android:layout_above="@id/infomation_block"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bet type:"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:background="@color/green"/>
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:entries="@string/bet_prompt"
+                android:prompt="@string/bet_prompt"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="2"
+                android:padding="1dp"
+                android:baselineAligned="false">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="@string/payoff"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/payoff"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="1 to 1"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:background="@color/green"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bet"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:background="@color/green"/>
+
+                <RelativeLayout
+                    android:id="@+id/straight_bet_plane"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+                    <TextView
+                        android:id="@+id/straight_bet_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Straight bet number:"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+                    <NumberPicker
+                        android:id="@+id/straight_bet_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/straight_bet_header"
+                        android:layout_centerHorizontal="true"
+                        android:orientation="vertical" />
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/split_bet_plane"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/split_bet_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Split bet numbers:"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:weightSum="2"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="1st number:"
+                            android:textAlignment="textStart"
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
+                        <TextView
+                            android:id="@+id/split_bet_picker_one"
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            tools:text="23"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:weightSum="2"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="2nd number:"
+                            android:textAlignment="textStart"
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
+                        <TextView
+                            android:id="@+id/split_bet_picker_two"
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            tools:text="23"/>
+                    </LinearLayout>
+                    <Button
+                        android:id="@+id/split_clear"
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/button_gradient"
+                        android:text="clear"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/infomation_block"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true">
+            <TextView
+                android:id="@+id/info_label"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="Note:"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/txt_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/info_label"
+                tools:text="Information"
+                android:textSize="13sp"
+                android:textColor="@color/red_dim"
+                android:textAlignment="textStart"
+                />
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/control_plane"
+        android:layout_width="match_parent"
+        android:weightSum="3"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+        <Button
+            android:id="@+id/btn_place_bet"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="28dp"
+            android:background="@drawable/button_gradient"
+            android:inputType="textCapWords"
+            android:text="Bet"/>
+        <Button
+            android:id="@+id/btn_spin"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="28dp"
+            android:background="@drawable/button_gradient"
+            android:inputType="textCapWords"
+            android:text="Play"/>
+        <Button
+            android:id="@+id/btn_board_table"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="28dp"
+            android:background="@drawable/button_gradient"
+            android:inputType="textCapWords"
+            android:text="Table"/>
+    </LinearLayout>
+
+</RelativeLayout>

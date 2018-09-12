@@ -9,7 +9,7 @@ import com.musicplayer.aow.application.Injection
 import com.musicplayer.aow.delegates.data.model.Album
 import com.musicplayer.aow.delegates.data.model.Artists
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import java.io.File
 
 
@@ -73,108 +73,108 @@ class CursorDB {
                 null,null, null)
     }
 
-    fun cursorToMusic(cursor: Cursor, mMap: ArrayMap<Any,String>, indexPosition: Int): Song {
+    fun cursorToMusic(cursor: Cursor, mMap: ArrayMap<Any, String>, indexPosition: Int): Track {
         val realPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-        val song: Song?
-        song = Song()
-        song.id = indexPosition
-        song.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
+        val track: Track?
+        track = Track()
+        track.id = indexPosition
+        track.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
         var displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
         if (displayName.endsWith(".mp3")) {
             displayName = displayName.substring(0, displayName.length - 4)
         }
-        song.displayName = displayName
-        if (song.displayName == null){
-            song.displayName = "Unknown"
+        track.displayName = displayName
+        if (track.displayName == null){
+            track.displayName = "Unknown"
         }
-        song.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
-        if (song.artist == null){
-            song.artist = "Unknown"
+        track.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
+        if (track.artist == null){
+            track.artist = "Unknown"
         }
-        song.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
-        if (song.album == null){
-            song.album = "Unknown"
+        track.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
+        if (track.album == null){
+            track.album = "Unknown"
         }
         if (mMap.containsKey(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)))){
-            song.albumArt = mMap[cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))]
+            track.albumArt = mMap[cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))]
         }else{
-            song.albumArt = ""
+            track.albumArt = ""
         }
-        song.path = realPath
-        song.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
-        song.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
+        track.path = realPath
+        track.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
+        track.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
 
-        return song
+        return track
     }
 
 
-    fun cursorToMusic(cursor: Cursor): Song {
+    fun cursorToMusic(cursor: Cursor): Track {
         val realPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-        val song: Song?
-        song = Song()
-        song.id  = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)).toInt()
-        song.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
+        val track: Track?
+        track = Track()
+        track.id  = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)).toInt()
+        track.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
         var displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
         if (displayName.endsWith(".mp3")) {
             displayName = displayName.substring(0, displayName.length - 4)
         }
-        song.displayName = displayName
-        if (song.displayName == null){
-            song.displayName = "Unknown"
+        track.displayName = displayName
+        if (track.displayName == null){
+            track.displayName = "Unknown"
         }
-        song.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
-        if (song.artist == null){
-            song.artist = "Unknown"
+        track.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
+        if (track.artist == null){
+            track.artist = "Unknown"
         }
-        song.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
-        if (song.album == null){
-            song.album = "Unknown"
+        track.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
+        if (track.album == null){
+            track.album = "Unknown"
         }
         
-        song.albumArt = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))
+        track.albumArt = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))
 
-        song.path = realPath
-        song.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
-        song.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
+        track.path = realPath
+        track.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
+        track.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
 
-        return song
+        return track
     }
 
     fun cursorToMusicId(cursor: Cursor): String {
         return cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID))
     }
 
-    fun cursorToMusicPlaylist(cursor: Cursor): Song {
+    fun cursorToMusicPlaylist(cursor: Cursor): Track {
         val realPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-        val song: Song?
-        song = Song()
-        song.id  = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)).toInt()
-        song._id = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID)).toLong()
-        song.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
+        val track: Track?
+        track = Track()
+        track.id  = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)).toInt()
+        track._id = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID)).toLong()
+        track.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
         var displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
         if (displayName.endsWith(".mp3")) {
             displayName = displayName.substring(0, displayName.length - 4)
         }
-        song.displayName = displayName
-        if (song.displayName == null){
-            song.displayName = "Unknown"
+        track.displayName = displayName
+        if (track.displayName == null){
+            track.displayName = "Unknown"
         }
-        song.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
-        if (song.artist == null){
-            song.artist = "Unknown"
+        track.artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
+        if (track.artist == null){
+            track.artist = "Unknown"
         }
-        song.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
-        if (song.album == null){
-            song.album = "Unknown"
+        track.album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
+        if (track.album == null){
+            track.album = "Unknown"
         }
 
-        song.albumArt = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))
+        track.albumArt = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ID))
 
-        song.path = realPath
-        song.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
-        song.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
+        track.path = realPath
+        track.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
+        track.size = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE))
 
-        return song
+        return track
     }
 
     fun cursorToAlbumList(cursor: Cursor): Album {
@@ -307,7 +307,7 @@ class CursorDB {
 
 
     companion object {
-        public var sInstance: CursorDB? = null
+        var sInstance: CursorDB? = null
         val instance: CursorDB?
             get() {
                 if (sInstance == null) {

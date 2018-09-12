@@ -7,17 +7,19 @@ import android.arch.lifecycle.Observer
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.os.RemoteException
 import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -41,43 +43,44 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
-import com.musicplayer.aow.bus.RxBus
+import com.musicplayer.aow.delegates.data.db.AppExecutors
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import com.musicplayer.aow.delegates.data.source.PreferenceManager
-import com.musicplayer.aow.delegates.event.PlayAlbumNowEvent
-import com.musicplayer.aow.delegates.event.PlayListNowEvent
-import com.musicplayer.aow.delegates.event.PlaySongEvent
 import com.musicplayer.aow.delegates.firebase.ForceUpdateChecker
-import com.musicplayer.aow.delegates.player.*
-import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
+import com.musicplayer.aow.delegates.game.RouletteActivity
+import com.musicplayer.aow.delegates.player.IPlayback
+import com.musicplayer.aow.delegates.player.PlayMode
+import com.musicplayer.aow.delegates.player.PlaybackService
+import com.musicplayer.aow.delegates.player.Player
+import com.musicplayer.aow.ui.about.AboutUsActivity
 import com.musicplayer.aow.ui.auth.AuthActivity
 import com.musicplayer.aow.ui.base.BaseActivity
 import com.musicplayer.aow.ui.eq.EqActivity
 import com.musicplayer.aow.ui.main.library.LibraryAdapter
+import com.musicplayer.aow.ui.main.library.home.podcast.PodcastActivity
 import com.musicplayer.aow.ui.main.search.SearchActivity
 import com.musicplayer.aow.ui.music.MusicPlayerActivity
-import com.musicplayer.aow.ui.nowplaying.NowPlayingActivity
 import com.musicplayer.aow.ui.settings.SettingsActivity
-import com.musicplayer.aow.utils.ApplicationSettings
-import com.readystatesoftware.systembartint.SystemBarTintManager
+import com.musicplayer.aow.utils.StorageUtil
+import com.musicplayer.aow.utils.ViewUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.bottomsheet_layout.*
 import kotlinx.android.synthetic.main.current_playing_panel.*
+import org.jetbrains.anko.contentView
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.onComplete
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
 
 
 class MainActivity : BaseActivity(),
         MusicPlayerContract.View,
         IPlayback.Callback,
-        View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener,
         ForceUpdateChecker.OnUpdateNeededListener{
 
+    //Job queue
+    //private var jobManager: JobManager? = null
     /**
      * MEDIASESSION INTEGRATION
      */
@@ -85,17 +88,13 @@ class MainActivity : BaseActivity(),
     private val STATE_PLAYING = 1
 
     private var mCurrentState: Int = 0
-
     private var mMediaBrowserCompat: MediaBrowserCompat? = null
-    private var mMediaControllerCompat: MediaControllerCompat? = null
 
     private var auth: FirebaseAuth? = null
-    //init objects
-    private var audioFocus = AudioFocus.instance
 
     //Music BottomSheet Init Componet
     private var mPlayer: IPlayback? = null
-    private val mHandler = Handler()
+    private var mediaPlayer = Player.instance
     private var mPresenter: MusicPlayerContract.Presenter? = null
     private var mDrawerToggle: ActionBarDrawerToggle? = null
 
@@ -104,32 +103,17 @@ class MainActivity : BaseActivity(),
     private var artistPlayback: TextView? = null
 
     //room for resntly played
-    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
-
+    private var playlistDatabase = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
-        //GPU overdraw optimaization
-        //window.setBackgroundDrawable(null)
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = false
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
+        mMediaBrowserCompat = MediaBrowserCompat(
+                applicationContext, // a Context
+                ComponentName(applicationContext, PlaybackService::class.java),
+                mConnectionCallbacks,
+                null)
 
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent)
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning)
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.color.black)
-
-        
-        //mediasession
-        mMediaBrowserCompat = MediaBrowserCompat(applicationContext, ComponentName(this, PlayerService::class.java),
-                mMediaBrowserCompatConnectionCallback, null)
 
         namePlayback = findViewById(R.id.text_view_name)
         artistPlayback = findViewById(R.id.text_view_artist)
@@ -145,12 +129,9 @@ class MainActivity : BaseActivity(),
         volumeControlStream = AudioManager.STREAM_MUSIC
         //END OF BOTTOMSHEET
 
-        tablayout()
+        //tablayout()
         //check for permission
         requestReadStoragePermission(this)
-        
-        //Firebase update with remote config
-        ForceUpdateChecker.with(applicationContext).onUpdateNeeded(this).check()
 
     }
 
@@ -158,39 +139,15 @@ class MainActivity : BaseActivity(),
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         mDrawerToggle!!.syncState()
-
-        //load resently played
-        doAsync {
-            onComplete {
-                loadResent()
-            }
-        }
-
-        //on clicking the speaker load the music activity
-        mini_control_player.setOnClickListener {
-            openPlayBack()
-        }
-
-        //Play/Pause button
-        button_play_toggle.setOnClickListener{
-            onPlayToggleAction()
-        }
-        //play Next
-        button_play_next.setOnClickListener{
-            onPlayNextAction()
-        }
+        //appWidget(this.applicationContext)
     }
 
     private fun setupToolbar() {
         toolbar.title = resources.getString(R.string.application_name)
-        auth = FirebaseAuth.getInstance()
-        val userdata = auth!!.currentUser
-        if(userdata != null) {
-            toolbar.subtitle = userdata.email
-        }
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         supportActionBar!!.setDisplayShowTitleEnabled(true)
+        supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_home_up)
     }
 
     private fun setupDrawerToggle() {
@@ -201,11 +158,28 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onBackPressed() {
-        moveTaskToBack(true)
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            moveTaskToBack(true)
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            //super.onBackPressed()
+            val dialogN = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+            dialogN.setTitle("Exit Musixplay")
+            dialogN.setMessage("To stop this application from running in the background, press Exit else press No to keep it running in the background.")
+            dialogN.setPositiveButton("Exit",
+                    { _, _ ->
+                        if (mMediaBrowserCompat != null) {
+                            if (mMediaBrowserCompat!!.isConnected) {
+                                mMediaBrowserCompat!!.disconnect()
+                            }
+                        }
+                        finish()
+                    })
+
+            dialogN.setNegativeButton("No",
+                    { _, _ ->
+                        moveTaskToBack(true)
+                    }).create()
+            dialogN.show()
         }
     }
 
@@ -226,9 +200,9 @@ class MainActivity : BaseActivity(),
             searchView.setSearchableInfo(searchManager.getSearchableInfo(this.componentName))
         }
         return true
-        //return super.onCreateOptionsMenu(menu)
-        //return false
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
@@ -237,69 +211,161 @@ class MainActivity : BaseActivity(),
         //return super.onOptionsItemSelected(item)
         return when (item.itemId) {
             R.id.nav_search -> {
-                val intent = Intent(applicationContext, SearchActivity::class.java)
-                startActivity(intent)
+                //val intent = Intent(applicationContext, SearchActivity::class.java)
+                //startActivity(intent)
+                onSearchRequested()
                 true
             }
-//            R.id.nav_browse -> {
-//                true
-//            }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+//    override fun onSearchRequested(): Boolean {
+//        return super.onSearchRequested()
+//    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_account -> {
-                val intent = Intent(applicationContext, AuthActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(applicationContext, AuthActivity::class.java))
             }
-            R.id.nav_now_playing -> {
-                val intent = Intent(applicationContext, NowPlayingActivity::class.java)
-                startActivity(intent)
+            R.id.nav_podcast -> {
+                startActivity(Intent(applicationContext, PodcastActivity::class.java))
             }
-//            R.id.nav_identify -> {
-//                val intent = Intent(applicationContext, IdentifySoundActivity::class.java)
-//                startActivity(intent)
-//            }
-//            R.id.nav_event -> {
-//                val intent = Intent(applicationContext, EventsListActivity::class.java)
-//                startActivity(intent)
-//            }
-//            R.id.nav_record -> {
-//                val intent = Intent(applicationContext, VoiceRecorderActivity::class.java)
-//                startActivity(intent)
-//            }
+            R.id.nav_game -> {
+                startActivity(Intent(applicationContext, RouletteActivity::class.java))
+            }
             R.id.nav_eq -> {
-                val intent = Intent(applicationContext, EqActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(applicationContext, EqActivity::class.java))
             }
             R.id.nav_settings -> {
-                val i = Intent(applicationContext, SettingsActivity::class.java)
-                startActivity(i)
+                startActivity(Intent(applicationContext, SettingsActivity::class.java))
+            }
+            R.id.nav_about -> {
+                startActivity(Intent(applicationContext, AboutUsActivity::class.java))
             }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
+    private val mConnectionCallbacks = object:MediaBrowserCompat.ConnectionCallback() {
+        override fun onConnected() {
+            super.onConnected()
+            Log.e(this.javaClass.name, "i am connected")
+            try {
+                // Get the token for the MediaSession
+                val token: MediaSessionCompat.Token = mMediaBrowserCompat!!.sessionToken
+                // Create a MediaControllerCompat
+                val mediaController = MediaControllerCompat(applicationContext, // Context
+                        token)
+                // Save the controller
+                MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
+                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
+                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.pause()
 
-    private val mProgressCallback = Runnable {
-        //
+                buildTransportControls()
+
+            } catch (e: RemoteException) {
+                Log.e(this.javaClass.name, e.localizedMessage)
+            }
+
+        }
+    }
+
+    fun buildTransportControls() {
+
+        val mediaController = MediaControllerCompat.getMediaController(this)
+        // Register a Callback to stay in sync
+        mediaController.registerCallback(controllerCallback)
+
+        // Display the initial state
+        val metadata = mediaController.metadata
+        if(metadata != null){
+            val name = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE)
+            val artistname = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
+            if (name != null) {
+                namePlayback!!.text = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE)
+            }
+            if (artistname != null){
+                artistPlayback!!.text = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
+            }
+
+        }
+        val pbState = mediaController.playbackState
+        when (pbState.state) {
+            PlaybackStateCompat.STATE_PLAYING -> {
+                mCurrentState = STATE_PLAYING
+                button_play_toggle.setImageResource(R.drawable.ic_pause)
+
+            }
+            PlaybackStateCompat.STATE_PAUSED -> {
+                mCurrentState = STATE_PAUSED
+                button_play_toggle.setImageResource(R.drawable.ic_play)
+            }
+            PlaybackStateCompat.STATE_BUFFERING -> {
+
+            }
+            PlaybackStateCompat.STATE_CONNECTING -> {
+
+            }
+        }
+
+        //load resently played
+        loadResent()
+
+        //on clicking the speaker load the music activity
+        mini_control_player.setOnClickListener {
+            openPlayBack()
+        }
+
+        // Attach a listener to the button
+        //Play/Pause button
+        button_play_toggle.setOnClickListener{
+            val playbackState = MediaControllerCompat.getMediaController(this).playbackState.state
+            onPlayToggleAction(playbackState)
+        }
+
+        //play Next
+        button_play_next.setOnClickListener{
+            onPlayNextAction()
+        }
+
+    }
+
+    private var controllerCallback:MediaControllerCompat.Callback = object:MediaControllerCompat.Callback() {
+        override fun onMetadataChanged(metadata: MediaMetadataCompat) {
+            namePlayback!!.text = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE)
+            artistPlayback!!.text = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
+        }
+        override fun onPlaybackStateChanged(state:PlaybackStateCompat) {
+            super.onPlaybackStateChanged(state)
+            when (state.state) {
+                PlaybackStateCompat.STATE_PLAYING -> {
+                    mCurrentState = STATE_PLAYING
+                    button_play_toggle.setImageResource(R.drawable.ic_pause)
+                }
+                PlaybackStateCompat.STATE_PAUSED -> {
+                    mCurrentState = STATE_PAUSED
+                    button_play_toggle.setImageResource(R.drawable.ic_play)
+                }
+                PlaybackStateCompat.STATE_BUFFERING -> {
+
+                }
+                PlaybackStateCompat.STATE_CONNECTING -> {
+
+                }
+            }
+        }
     }
 
 
     var fragment: Fragment? = null
 
     private fun tablayout(){
-        library_tablayout.addTab(library_tablayout.newTab().setIcon(R.drawable.ic_home).setText("Browse"))
-        library_tablayout.addTab(library_tablayout.newTab().setIcon(R.drawable.library_songs).setText("Songs"))
-        library_tablayout.addTab(library_tablayout.newTab().setIcon(R.drawable.library_album).setText("Albums"))
-        library_tablayout.addTab(library_tablayout.newTab().setIcon(R.drawable.library_artist).setText("Artists"))
-        library_tablayout.addTab(library_tablayout.newTab().setIcon(R.drawable.library_playlist).setText("Playlists"))
         library_tablayout.tabGravity = TabLayout.GRAVITY_FILL
-        library_tablayout.getTabAt(0)!!.icon!!.setColorFilter(resources.getColor(R.color.red_dim), PorterDuff.Mode.SRC_IN)
+        library_tablayout.getTabAt(0)!!.icon!!.setColorFilter(applicationContext.getColor(R.color.red_dim), PorterDuff.Mode.SRC_IN)
 
         library_tablayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -314,176 +380,96 @@ class MainActivity : BaseActivity(),
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab!!.icon!!.setColorFilter(resources.getColor(R.color.red_dim), PorterDuff.Mode.SRC_IN)
+                tab!!.icon!!.setColorFilter(applicationContext.getColor(R.color.red_dim), PorterDuff.Mode.SRC_IN)
                 library_view_pager.setCurrentItem(tab.position , false)
             }
 
         })
-    }
 
-    private fun viewPager(){
         val adapter = LibraryAdapter(supportFragmentManager,library_tablayout.tabCount)
         library_view_pager.disableScroll(true)
         library_view_pager.offscreenPageLimit = 5
         library_view_pager.adapter = adapter
         library_view_pager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(library_tablayout))
-    }
 
-    override fun onClick(v: View) {
-        //nothing
-    }
-
-    fun indicator(){
-        val player = Player.instance!!.mPlayer
-        //MediaSession
-        player?.setOnBufferingUpdateListener { mp, percent ->
-            if (percent == 100){
-                //Log.e(this.javaClass.name, "$percent")
-            }
-            val ratio: Double = percent / 100.0
-            val bufferedLevel  = mp?.duration?.times(ratio)?.toInt()
-            //Log.e(this.javaClass.name, "$bufferedLevel")
-        }
-
-        player?.setOnPreparedListener {
-            it.start()
-            updatePlayToggle(it.isPlaying)
-        }
-
-    }
-
-    // RXBus Events
-    override fun subscribeEvents(): Subscription {
-        return RxBus.instance?.toObservable()
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.doOnNext({ o ->
-                    when (o) {
-                        is PlaySongEvent -> onPlaySongEvent(o)
-                        is PlayListNowEvent -> onPlayListNowEvent(o)
-                        is PlayAlbumNowEvent -> onPlayAlbumNowEvent(o)
-                    }
-                })?.subscribe(RxBus.defaultSubscriber())!!
-    }
-
-    private fun onPlaySongEvent(event: PlaySongEvent) {
-        val song = event.song
-        playSong(song)
-    }
-
-    private fun onPlayListNowEvent(event: PlayListNowEvent) {
-        val playList = event.playList
-        val playIndex = event.playIndex
-        playSong(playList, playIndex)
-    }
-
-    private fun onPlayAlbumNowEvent(event: PlayAlbumNowEvent) {
-        val playList = event.song
-        playSong(playList)
     }
 
     // Music Controls
-    private fun playSong(song: Song) {
-        val playList = PlayList(song)
-        playSong(playList, 0)
-    }
-
     override fun updateFavoriteToggle(favorite: Boolean) {
         //
-    }
-
-    private fun playSong(songs: List<Song>) {
-        val playList = PlayList(songs as java.util.ArrayList<Song>)
-        playSong(playList, 0)
     }
 
     private fun playSong(playList: PlayList?, playIndex: Int) {
         if (playList == null) return
 
         playList.playMode = PreferenceManager.lastPlayMode(applicationContext)
-        val result = Player.instance!!.play(playList, playIndex)
-        val song = playList.currentSong
-        // Step 1: Song name and artist
-        if (song != null) {
-            namePlayback!!.text = song.displayName
-            artistPlayback!!.text = song.artist
-        }
-        //update playback button
-        if (result) {
-            indicator()
-            //gain focus
-            audioFocus!!.play()
-            button_play_toggle.setImageResource(R.drawable.ic_pause)
-        } else {
-            button_play_toggle.setImageResource(R.drawable.ic_play)
-        }
-        //finished updating
-        onSongUpdated(song)
-        mHandler.removeCallbacks(mProgressCallback)
-        mHandler.post(mProgressCallback)
+        mediaPlayer?.play(playList, playIndex)
     }
 
     private fun onPlayNextAction() {
-        if (mPlayer == null) return
+        if (Player.instance == null) return
 
-        mPlayer!!.playNext()
+        MediaControllerCompat.getMediaController(this).transportControls.skipToNext()
     }
 
     // Click Events
-    private fun onPlayToggleAction() {
+    private fun onPlayToggleAction(playerState: Int) {
         //if (mediaPlayer == null) return
-        if (mPlayer!!.playingList == null || mPlayer!!.playingList!!.numOfSongs == 0){
-            val recentPlayList = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
-            recentPlayList?.observe(this, object: Observer<PlayList> {
-                override fun onChanged(it: PlayList?) {
-                    recentPlayList?.removeObserver(this)
-                    if (it?.songs?.size != 0) {
-                        playSong(it, it?.playingIndex!!)
-                    } else {
-                        if (mPlayer!!.isPlaying) {
-                            audioFocus!!.pause()
-                            mPlayer!!.pause()
+        if (Player.instance!!.playingList == null || Player.instance!!.playingList!!.numOfSongs == 0){
+            AppExecutors.instance?.diskIO()?.execute {
+                val recentPlayList = playlistDatabase?.playlistDAO()?.fetchOnePlayListMxpId("nowplaying")
+                recentPlayList?.observe(this, object : Observer<PlayList> {
+                    override fun onChanged(it: PlayList?) {
+                        recentPlayList.removeObserver(this)
+                        if (it?.tracks?.size != 0) {
+                            playSong(it, it?.playingIndex!!)
                         } else {
-                            audioFocus!!.play()
-                            mPlayer!!.play()
+                            runOnUiThread {
+                                if (playerState == PlaybackStateCompat.STATE_PLAYING) {
+                                    MediaControllerCompat.getMediaController(this@MainActivity).transportControls.pause()
+                                    button_play_toggle.setImageResource(R.drawable.ic_play)
+                                } else {
+                                    MediaControllerCompat.getMediaController(this@MainActivity).transportControls.play()
+                                    button_play_toggle.setImageResource(R.drawable.ic_pause)
+                                }
+                            }
                         }
                     }
-                }
-            })
+                })
+            }
+        }else{
+            if (playerState == PlaybackStateCompat.STATE_PLAYING) {
+                MediaControllerCompat.getMediaController(this).transportControls.pause()
+                button_play_toggle.setImageResource(R.drawable.ic_play)
+            } else {
+                MediaControllerCompat.getMediaController(this).transportControls.play()
+                button_play_toggle.setImageResource(R.drawable.ic_pause)
+            }
         }
-
-        //test MediaSession
-        testMediaSession()
     }
 
     // Player Callbacks
-    override fun onSwitchLast(last: Song?) {
+    override fun onSwitchLast(last: Track?) {
         onSongUpdated(last)
     }
 
-    override fun onSwitchNext(next: Song?) {
+    override fun onSwitchNext(next: Track?) {
         onSongUpdated(next)
     }
 
-    override fun onComplete(next: Song?) {
+    override fun onComplete(next: Track?) {
         onSongUpdated(next)
     }
 
     override fun onPlayStatusChanged(isPlaying: Boolean) {
         //testMediaSession()
         if (Player.instance!!.mPlayList != null) {
-            if (Player.instance!!.mPlayList!!.currentSong != null) {
-                namePlayback!!.text = Player.instance!!.mPlayList!!.currentSong?.displayName
-                artistPlayback!!.text = Player.instance!!.mPlayList!!.currentSong?.artist
-            }
+            Player.instance!!.mPlayList!!.currentTrack?.observe(this, Observer<Track> { t ->
+                namePlayback!!.text = t?.displayName
+                artistPlayback!!.text = t?.artist
+            })
         }
         updatePlayToggle(isPlaying)
-        indicator()
-        if (isPlaying) {
-            mHandler.removeCallbacks(mProgressCallback)
-            mHandler.post(mProgressCallback)
-        } else {
-            mHandler.removeCallbacks(mProgressCallback)
-        }
     }
 
     // MVP View
@@ -501,28 +487,26 @@ class MainActivity : BaseActivity(),
         mPlayer = null
     }
 
-    override fun onSongSetAsFavorite(song: Song) {
+    override fun onSongSetAsFavorite(track: Track) {
         //
     }
 
-    override fun onSongUpdated(song: Song?) {
-        if (song == null) {
+    override fun onSongUpdated(track: Track?) {
+        if (track == null) {
             button_play_toggle.setImageResource(R.drawable.ic_play)
-            mHandler.removeCallbacks(mProgressCallback)
             return
         }
-        mHandler.removeCallbacks(mProgressCallback)
 
-        namePlayback!!.text = song.displayName
-        artistPlayback!!.text = song.artist
-
-        if (mPlayer!!.isPlaying) {
-            mHandler.post(mProgressCallback)
-            button_play_toggle.setImageResource(R.drawable.ic_pause)
-        }
-        doAsync {
-            //update
-            loadNowPlayingTable(mPlayer!!.playingList!!)
+        namePlayback!!.text = track.displayName
+        artistPlayback!!.text = track.artist
+        if (mPlayer != null) {
+            if (mPlayer!!.isPlaying) {
+                button_play_toggle.setImageResource(R.drawable.ic_pause)
+            }
+            doAsync {
+                //update
+                loadNowPlayingTable(mPlayer!!.playingList!!)
+            }
         }
     }
 
@@ -531,7 +515,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onTriggerLoading(isLoading: Boolean) {
-        button_play_toggle!!.visibility = View.INVISIBLE
+        button_play_toggle!!.visibility = View.GONE
         loading!!.visibility = View.VISIBLE
     }
 
@@ -541,7 +525,7 @@ class MainActivity : BaseActivity(),
 
     override fun updatePlayToggle(play: Boolean) {
         button_play_toggle!!.visibility = View.VISIBLE
-        loading!!.visibility = View.INVISIBLE
+        loading!!.visibility = View.GONE
         button_play_toggle.setImageResource(
                 if (play){
                     R.drawable.ic_pause
@@ -556,34 +540,26 @@ class MainActivity : BaseActivity(),
     }
 
     private fun loadResent(){
-        val result = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
-
-        result?.observe(this, object: Observer<PlayList> {
-            override fun onChanged(t: PlayList?) {
-                result?.removeObserver(this)
-                if(t == null ) {
-                    val playList = PlayList()
-                    playList.name = "Recently Played"
-                    playList.mxp_id = "nowplaying"
-                    playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
-                }else{
-                    if (t.songs?.size!! > 0) {
-                        lastPlayed(t)
+        AppExecutors.instance?.diskIO()?.execute {
+            val result = playlistDatabase?.playlistDAO()?.fetchOnePlayListMxpId("nowplaying")
+            result?.observe(this, object : Observer<PlayList> {
+                override fun onChanged(t: PlayList?) {
+                    result.removeObserver(this)
+                    if (t == null) {
+                        val playList = PlayList()
+                        playList.name = "Recently Played"
+                        playList.mxp_id = "nowplaying"
+                        AppExecutors.instance?.diskIO()?.execute {
+                            playlistDatabase?.playlistDAO()?.insertOnePlayList(playList)
+                        }
                     } else {
-                        if (mPlayer!!.isPlaying) {
-                            audioFocus!!.pause()
-                            mPlayer!!.pause()
-                        } else {
-                            audioFocus!!.play()
-                            mPlayer!!.play()
+                        if (t.tracks?.size!! > 0) {
+                            lastPlayed(t)
                         }
                     }
                 }
-            }
-
-        })
-
-
+            })
+        }
     }
 
     private fun lastPlayed(playlist: PlayList){
@@ -591,16 +567,20 @@ class MainActivity : BaseActivity(),
         //update player playing list
         playlist.name = "Recently Played"
         playlist.mxp_id = "nowplaying"
-        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playlist)
-
-        val song = playlist.currentSong
-        if (song != null) {
-            // Step 1: Song name and artist
-            namePlayback!!.text = song.displayName
-            artistPlayback!!.text = song.artist
-        }else{
-            return
+        AppExecutors.instance?.diskIO()?.execute {
+            playlistDatabase?.playlistDAO()?.updatePlayList(playlist)
         }
+
+        val song = playlist.currentTrack
+        song?.observe(this, Observer<Track> { t ->
+            if (t != null) {
+                // Step 1: Track name and artist
+                namePlayback!!.text = t.displayName
+                artistPlayback!!.text = t.artist
+            }
+        })
+
+
         //display the palyback control panel
         mini_control_player.visibility = View.VISIBLE
     }
@@ -608,14 +588,18 @@ class MainActivity : BaseActivity(),
     private fun loadNowPlayingTable(playList: PlayList) {
         playList.name = "Recently Played"
         playList.mxp_id = "nowplaying"
-        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
+        AppExecutors.instance?.diskIO()?.execute {
+            playlistDatabase?.playlistDAO()?.updatePlayList(playList)
+        }
     }
 
 
     private fun openPlayBack(){
-        if(mPlayer!!.playingSong != null){
-            val intent = Intent(applicationContext, MusicPlayerActivity::class.java)
-            startActivity(intent)
+        if(Player.instance!!.playingTrack != null){
+            val bottomSheetDialog = MusicPlayerActivity().getInstance()
+            bottomSheetDialog.show(supportFragmentManager, "Playback Bottom Sheet")
+//            val intent = Intent(applicationContext, MusicPlayerActivity::class.java)
+//            startActivity(intent)
         }
     }
 
@@ -632,8 +616,10 @@ class MainActivity : BaseActivity(),
                     override fun onPermissionGranted(response: PermissionGrantedResponse) {
                         // permission is granted
                         // Inflate ViewPager
-                        viewPager()
-
+                        tablayout()
+                        //Application Settings
+                        com.musicplayer.aow.utils.Settings.instance!!.intialization()
+                        StorageUtil(applicationContext).storageLocationDir()
                     }
 
                     override fun onPermissionDenied(response: PermissionDeniedResponse) {
@@ -658,11 +644,11 @@ class MainActivity : BaseActivity(),
         val builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
         builder.setTitle("Need Permissions")
         builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.")
-        builder.setPositiveButton("GOTO SETTINGS", { dialog, which ->
+        builder.setPositiveButton("GOTO SETTINGS", { dialog, _ ->
             dialog.cancel()
             openSettings()
         })
-        builder.setNegativeButton("Cancel", { dialog, which ->
+        builder.setNegativeButton("Cancel", { dialog, _ ->
             dialog.cancel()
             finish()
         })
@@ -686,19 +672,19 @@ class MainActivity : BaseActivity(),
 
     //Force Update Firebase
     override fun onUpdateNeeded(updateUrl:String) {
-        val dialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
-        dialog.setTitle("New update available")
-        dialog.setMessage("Please, update app to new version to continue.")
-        dialog.setPositiveButton("Update",
-                        { dialog, which ->
+        val dialogN = AlertDialog.Builder(applicationContext, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
+        dialogN.setTitle("New update available")
+        dialogN.setMessage("Please, update app to new version to continue.")
+        dialogN.setPositiveButton("Update",
+                        { _, _ ->
                             redirectStore(updateUrl)
                         })
 
-        dialog.setNegativeButton("Cancel",
-                        {dialog, which ->
+        dialogN.setNegativeButton("Cancel",
+                        { _, _ ->
 
                         }).create()
-        dialog.show()
+        //dialogN.show()
     }
 
     //Force Update Firebase
@@ -708,122 +694,36 @@ class MainActivity : BaseActivity(),
         startActivity(intent)
     }
 
+    private val OVERLAY_PERMISSION_REQ_CODE: Int = 1000
 
-    /**
-     * MEDIASESSION INTEGRATION
-     */
-    private val mMediaBrowserCompatConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
-        override fun onConnected() {
-            super.onConnected()
-            try {
-                // Get the token for the MediaSession
-                val token: MediaSessionCompat.Token = mMediaBrowserCompat!!.sessionToken
-                // Create a MediaControllerCompat
-                mMediaControllerCompat = MediaControllerCompat(applicationContext, // Context
-                        token)
-                // Save the controller
-                MediaControllerCompat.setMediaController(this@MainActivity, mMediaControllerCompat)
-                mCurrentState == STATE_PAUSED
-                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.playFromMediaId(1.toString(), null)
-                //MediaControllerCompat.getMediaController(this@MainActivity).transportControls.pause()
-                mMediaControllerCompat?.registerCallback(mMediaControllerCompatCallback)
-
-            } catch (e: RemoteException) {
-                Log.e(this.javaClass.name, "error")
-                Log.e(this.javaClass.name, e.localizedMessage)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+                // now you can show audio widget
+                //
             }
-
-        }
-
-        override fun onConnectionFailed() {
-            super.onConnectionFailed()
-            Log.e(this.javaClass.name, "connection error")
-        }
-
-        override fun onConnectionSuspended() {
-            super.onConnectionSuspended()
-            Log.e(this.javaClass.name, "connection suspended")
-        }
-    }
-
-    private val mMediaControllerCompatCallback = object : MediaControllerCompat.Callback() {
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            super.onPlaybackStateChanged(state)
-            if (state == null) {
-                return
-            }
-
-            when (state.state) {
-                PlaybackStateCompat.STATE_PLAYING -> {
-                    mCurrentState = STATE_PLAYING
-                }
-                PlaybackStateCompat.STATE_PAUSED -> {
-                    mCurrentState = STATE_PAUSED
-                }
-                PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> {
-                    mCurrentState = STATE_PLAYING
-                }
-                PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> {
-                    mCurrentState = STATE_PLAYING
-                }
-            }
-        }
-    }
-
-    fun testMediaSession(){
-        
-        if (mMediaBrowserCompat?.isConnected!!) {
-            if (mCurrentState == STATE_PAUSED) {
-                MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).transportControls.play()
-                mCurrentState = STATE_PLAYING
-            } else {
-                if (MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
-                    MediaControllerCompat(applicationContext, mMediaBrowserCompat!!.sessionToken).transportControls.pause()
-                }
-
-                mCurrentState = STATE_PAUSED
-            }
-
-        } else {
-            Log.e(this.javaClass.name, "not connected")
         }
     }
 
 
     override fun onStart() {
         super.onStart()
-        if (mPlayer != null && mPlayer!!.isPlaying) {
-            mHandler.removeCallbacks(mProgressCallback)
-            mHandler.post(mProgressCallback)
+        if (mMediaBrowserCompat != null) {
+            if (!mMediaBrowserCompat?.isConnected!!) {
+                mMediaBrowserCompat?.connect()
+            }
         }
-        //mediasession connect
-        if(!mMediaBrowserCompat!!.isConnected){
-            mMediaBrowserCompat!!.connect()
-        }
-    }
-
-    override fun onResume() {
-        ApplicationSettings().ShakeWithSensorDetectorResume()
-        super.onResume()
-    }
-
-    override fun onStop() {
-        mHandler.removeCallbacks(mProgressCallback)
-        ApplicationSettings().ShakeWithSensorDetectorStop()
-        super.onStop()
     }
 
     override fun onDestroy() {
         mPresenter!!.unsubscribe()
         //sensey gesture
         Sensey.getInstance().stop()
-        ApplicationSettings.instance?.ShakeWithSensorDetectorDestroy()
-        //mediasession connect
-        if(mMediaBrowserCompat!!.isConnected){
-            if (MediaControllerCompat.getMediaController(this) != null) {
-                MediaControllerCompat.getMediaController(this).unregisterCallback(mMediaControllerCompatCallback)
+        if (mMediaBrowserCompat != null) {
+            if (mMediaBrowserCompat!!.isConnected) {
+                mMediaBrowserCompat!!.disconnect()
             }
-            mMediaBrowserCompat!!.disconnect()
         }
         super.onDestroy()
     }
@@ -831,9 +731,6 @@ class MainActivity : BaseActivity(),
     companion object {
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-        }
-        fun newIntent(context: Context): Intent {
-            return Intent(context.applicationContext, MainActivity::class.java)
         }
     }
 }

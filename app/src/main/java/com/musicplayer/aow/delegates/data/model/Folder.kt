@@ -31,7 +31,7 @@ class Folder : Parcelable {
 //    @MapCollection(ArrayList<*>::class)
     @MapCollection(Collection::class)
     @Mapping(Relation.OneToMany)
-    var songs: MutableList<Song>? = ArrayList()
+    var tracks: MutableList<Track>? = ArrayList()
 
     var createdAt: Date? = null
 
@@ -57,7 +57,7 @@ class Folder : Parcelable {
         dest.writeString(this.name)
         dest.writeString(this.path)
         dest.writeInt(this.numOfSongs)
-        dest.writeTypedList(this.songs)
+        dest.writeTypedList(this.tracks)
         dest.writeLong(if (this.createdAt != null) this.createdAt!!.time else -1)
     }
 
@@ -66,7 +66,7 @@ class Folder : Parcelable {
         this.name = `in`.readString()
         this.path = `in`.readString()
         this.numOfSongs = `in`.readInt()
-        this.songs = `in`.createTypedArrayList(Song.CREATOR)
+        this.tracks = `in`.createTypedArrayList(Track.CREATOR)
         val tmpCreatedAt = `in`.readLong()
         this.createdAt = if (tmpCreatedAt == (-1).toLong()) null else Date(tmpCreatedAt)
     }

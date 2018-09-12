@@ -22,6 +22,7 @@ import com.musicplayer.aow.R
 import com.musicplayer.aow.ui.auth.google.model.User
 import com.musicplayer.aow.utils.user.UserDetails
 import kotlinx.android.synthetic.main.activity_auth.*
+import org.jetbrains.anko.toast
 import java.util.regex.Pattern
 
 
@@ -159,8 +160,7 @@ class AuthActivity : AppCompatActivity(){
 
 
     //GOOGLE LOGIN
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
@@ -180,6 +180,7 @@ class AuthActivity : AppCompatActivity(){
 
         }
     }
+
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         // [START_EXCLUDE silent]
@@ -236,10 +237,12 @@ class AuthActivity : AppCompatActivity(){
             val intent = Intent(applicationContext, ProfileActivity::class.java)
             startActivity(intent)
             finish()
+        }else{
+            toast("Error.")
         }
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth?.currentUser

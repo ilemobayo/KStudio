@@ -1,414 +1,1 @@
-package com.musicplayer.aow.delegates.player
-
-import android.media.MediaPlayer
-import android.media.audiofx.Equalizer
-import android.net.Uri
-import android.util.Log
-import android.webkit.URLUtil
-import com.google.android.exoplayer2.*
-import com.musicplayer.aow.application.Injection
-import com.musicplayer.aow.delegates.data.model.PlayList
-import com.musicplayer.aow.delegates.data.model.Song
-import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
-import java.io.IOException
-import java.util.*
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.Player.DefaultEventListener
-
-/**
- * Created with Android Studio.
- * User:
- * Date:
- * Time:
- * Desc: Player
- */
-class Player private constructor() : IPlayback,
-        MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnBufferingUpdateListener,DefaultEventListener() {
-
-    //room for resntly played
-    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
-
-    override var mPlayer: MediaPlayer? = null
-
-    var mPlayList: PlayList? = PlayList()
-
-    // Default size 2: for service and UI
-    private val mCallbacks = ArrayList<IPlayback.Callback>(2)
-
-    // Player status
-    private var isPaused: Boolean = false
-
-    override val isPlaying: Boolean
-        get() = if (mPlayer != null){mPlayer!!.isPlaying}else{ false }
-
-    override val progress: Int
-        get() = mPlayer!!.currentPosition
-
-    override val playingSong: Song?
-        get() = if (mPlayList!!.currentSong == null){ null }else{mPlayList!!.currentSong}
-
-    override var playingList: PlayList? = null
-        get() = mPlayList
-
-    init {
-        mPlayer = MediaPlayer()
-        Equalizer(0, mPlayer!!.audioSessionId)
-        mPlayList = PlayList()
-        mPlayer!!.setOnCompletionListener(this)
-        mPlayer!!.setAuxEffectSendLevel(1.0f)
-        //mediaPlayer!!.setOnBufferingUpdateListener(this)
-    }
-
-
-
-    //EXOplayer
-    var playWhenReady: Boolean = false
-    var player: SimpleExoPlayer? = null
-    var playbackPosition = 0L
-    
-    private fun initializePlayer() {
-        player = ExoPlayerFactory.newSimpleInstance(
-                DefaultRenderersFactory(Injection.provideContext()),
-                DefaultTrackSelector(), DefaultLoadControl())
-        player!!.setPlayWhenReady(playWhenReady)
-        //player.seekTo(currentWindow, playbackPosition)
-        //OR
-        val uri = Uri.parse("")
-        val mediaSource = buildMediaSource(uri)
-        player!!.prepare(mediaSource, true, false)
-    }
-
-    private fun releaseExoPlayer() {
-        if (player != null) {
-            playbackPosition = player!!.getCurrentPosition();
-            //currentWindow = player!!.getCurrentWindowIndex();
-            playWhenReady = player!!.getPlayWhenReady();
-            player!!.release();
-            player = null;
-        }
-    }
-
-    override fun onPlayerStateChanged(playWhenReady: Boolean,
-                                      playbackState: Int) {
-        val stateString: String
-        when (playbackState) {
-            ExoPlayer.STATE_IDLE -> stateString = "ExoPlayer.STATE_IDLE      -"
-            ExoPlayer.STATE_BUFFERING -> stateString = "ExoPlayer.STATE_BUFFERING -"
-            ExoPlayer.STATE_READY -> stateString = "ExoPlayer.STATE_READY     -"
-            ExoPlayer.STATE_ENDED -> stateString = "ExoPlayer.STATE_ENDED     -"
-            else -> stateString = "UNKNOWN_STATE             -"
-        }
-        Log.d(TAG, "changed state to " + stateString
-                + " playWhenReady: " + playWhenReady)
-    }
-
-    private fun buildMediaSource(uri: Uri): MediaSource {
-        return ExtractorMediaSource.Factory(
-                DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri)
-    }
-
-    override fun setPlayList(list: PlayList) {
-        mPlayList = list
-    }
-
-    override fun play(): Boolean {
-        if (isPaused) {
-            if (mPlayer != null) {
-                isPaused = false
-                mPlayer!!.start()
-                notifyPlayStatusChanged(true)
-                return true
-            }
-        }
-        if (mPlayList!!.prepare()) {
-            val song = mPlayList!!.currentSong
-            try {
-                isPaused = true
-                notifyPlayStatusChanged(false)
-                mPlayer!!.reset()
-                val stream: Boolean = URLUtil.isHttpUrl(song?.path) || URLUtil.isHttpsUrl(song?.path)
-                if(stream){
-                    notifyTriggerLoading(true)  //trigger loading
-                    mPlayer!!.setDataSource(song?.path)
-                    mPlayer!!.prepareAsync()
-                    mPlayer!!.setOnPreparedListener({ mp ->
-                        mPlayList!!.currentSong?.duration = mp.duration
-                        notifyPrepared(true)
-                        mp.start()
-                        isPaused = false
-                        notifyPlayStatusChanged(true)
-                    })
-                }else {
-                    val url = song?.path
-                    mPlayer!!.setDataSource(url)
-                    mPlayer!!.prepare()
-                    mPlayer!!.setOnPreparedListener({ mp ->
-                        notifyPrepared(true)
-                        mp.start()
-                        isPaused = false
-                        notifyPlayStatusChanged(true)
-                    })
-//                    mPlayer!!.start()
-//                    isPaused = false
-//                    notifyPlayStatusChanged(true)
-                }
-                return true
-            } catch (e: IOException) {
-                isPaused = true
-                mPlayer!!.pause()
-                notifyPlayStatusChanged(false)
-                playNext()
-                return false
-            }
-        }else{
-            isPaused = true
-            notifyPlayStatusChanged(false)
-        }
-        return false
-    }
-
-
-    override fun play(list: PlayList): Boolean {
-        isPaused = false
-        setPlayList(list)
-        return play()
-    }
-
-    override fun play(list: PlayList, startIndex: Int): Boolean {
-
-        if (startIndex < 0 || startIndex >= list.songs?.size!!) return false
-
-        isPaused = false
-        list.playingIndex = startIndex
-        setPlayList(list)
-        val playList = PlayList(list.songs)
-        playList.name = "Recently Played"
-        playList.mxp_id = "nowplaying"
-        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
-        return play()
-    }
-
-
-    override fun play(song: Song): Boolean {
-        isPaused = false
-        mPlayList!!.songs?.clear()
-        mPlayList!!.songs?.add(song)
-        return play()
-    }
-
-    override fun playLast(): Boolean {
-        isPaused = false
-        val hasLast = mPlayList!!.hasLast()
-        if (hasLast) {
-            val last = mPlayList!!.last()
-            play()
-            notifyPlayLast(last)
-            return true
-        }
-        return false
-    }
-
-    override fun playNext(): Boolean {
-        isPaused = false
-        val hasNext = mPlayList!!.hasNext(true)
-        if (hasNext) {
-            val next = mPlayList!!.nextWithIndex()
-            //play()
-            play(mPlayList!!, next.playingIndex!!)
-            notifyPlayNext(next.song!!)
-            return true
-        }
-        return false
-    }
-
-    override fun pause(): Boolean {
-        if (mPlayer == null) return false
-        
-        if (mPlayer!!.isPlaying) {
-            mPlayer!!.pause()
-            isPaused = true
-            notifyPlayStatusChanged(false)
-            return true
-        }
-        return false
-    }
-
-    override fun seekTo(progress: Int): Boolean {
-        if (mPlayList!!.songs == null) return false
-
-        val currentSong = mPlayList!!.currentSong
-        if (currentSong != null) {
-            if (currentSong.duration <= progress) {
-                onCompletion(mPlayer)
-            } else {
-                mPlayer!!.seekTo(progress)
-            }
-            return true
-        }
-        return false
-    }
-
-
-    override fun setPlayMode(playMode: PlayMode) {
-        mPlayList!!.playMode = playMode
-    }
-
-    // Listeners
-    override fun onCompletion(mp: MediaPlayer?) {
-        var next: Song? = null
-        // There is only one limited play mode which is list, player should be stopped when hitting the list end
-        if (mPlayList!!.playMode === PlayMode.LIST && mPlayList!!.playingIndex == (mPlayList!!.numOfSongs - 1)) {
-            // In the end of the list
-            // Do nothing, just deliver the callback
-        } else if (mPlayList!!.playMode === PlayMode.SINGLE) {
-            next = mPlayList!!.currentSong
-            play()
-        } else {
-            val hasNext = mPlayList!!.hasNext(true)
-            if (hasNext) {
-                next = mPlayList!!.next()
-                play()
-            }
-        }
-        notifyComplete(next)
-    }
-
-    override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
-        //
-    }
-
-    override fun releasePlayer() {
-        mPlayList = null
-        mPlayer!!.reset()
-        mPlayer!!.release()
-        mPlayer = null
-        sInstance = null
-    }
-
-    //add to playlist
-    fun insertnext(index: Int, value: Song) {
-        //var queue = Queue(mPlayList!!.songs)
-        val playIndex = index + 1
-        val body = mPlayList!!.songs as ArrayList
-        val queue = ArrayList<Song>()
-        if (body.size >= playIndex) {
-            if (body.size == playIndex - 1) {
-                queue.addAll(body)
-                queue.add(value)
-            }else{
-                queue.addAll(body.subList(0, playIndex))
-                queue.add(value)
-                queue.addAll(body.subList(playIndex, body.size))
-            }
-        }else{
-            queue.addAll(body)
-            queue.add(value)
-        }
-        mPlayList!!.songs = queue
-        val playList = PlayList(mPlayList!!.songs)
-        playList.name = "Recently Played"
-        playList.mxp_id = "nowplaying"
-        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
-    }
-
-    fun insertnext(index: Int, value: ArrayList<Song>) {
-        val playIndex = index + 1
-        val body = mPlayList!!.songs as ArrayList
-        val queue = ArrayList<Song>()
-        if (body.size >= playIndex) {
-            if (body.size == playIndex - 1) {
-                queue.addAll(body)
-                queue.addAll(value)
-            }else{
-                queue.addAll(body.subList(0, playIndex))
-                queue.addAll(value)
-                queue.addAll(body.subList(playIndex, body.size))
-            }
-        }else{
-            queue.addAll(body)
-            queue.addAll(value)
-        }
-        mPlayList!!.songs = queue
-        val playList = PlayList(mPlayList!!.songs)
-        playList.name = "Recently Played"
-        playList.mxp_id = "nowplaying"
-        playListFavDatabase?.playlistFavDAO()?.updatePlayListFav(playList)
-    }
-
-    fun updatePlaylist(value: ArrayList<Song>){
-        mPlayList!!.songs = value
-    }
-
-    // Callbacks
-
-    override fun registerCallback(callback: IPlayback.Callback) {
-        mCallbacks.add(callback)
-    }
-
-    override fun unregisterCallback(callback: IPlayback.Callback) {
-        mCallbacks.remove(callback)
-    }
-
-    override fun removeCallbacks() {
-        mCallbacks.clear()
-    }
-
-    private fun notifyPlayStatusChanged(isPlaying: Boolean) {
-        for (callback in mCallbacks) {
-            callback.onPlayStatusChanged(isPlaying)
-        }
-    }
-
-    private fun notifyTriggerLoading(isLoading: Boolean){
-       for (callback in mCallbacks){
-           callback.onTriggerLoading(isLoading)
-       }
-    }
-
-    private fun notifyPrepared(isPlaying: Boolean) {
-        for (callback in mCallbacks) {
-            callback.onPrepared(isPlaying)
-        }
-    }
-
-    private fun notifyPlayLast(song: Song) {
-        for (callback in mCallbacks) {
-            callback.onSwitchLast(song)
-        }
-    }
-
-    private fun notifyPlayNext(song: Song) {
-        for (callback in mCallbacks) {
-            callback.onSwitchNext(song)
-        }
-    }
-
-    private fun notifyComplete(song: Song?) {
-        for (callback in mCallbacks) {
-            callback.onComplete(song)
-        }
-    }
-
-    companion object {
-
-        private const val TAG = "Player"
-
-        @Volatile private var sInstance: Player? = null
-
-        val instance: Player?
-            get() {
-                if (sInstance == null) {
-                    synchronized(Player.Companion) {
-                        if (sInstance == null) {
-                            sInstance = Player()
-                        }
-                    }
-                }
-                return sInstance
-            }
-    }
-}
+package com.musicplayer.aow.delegates.playerimport android.media.audiofx.Equalizerimport android.media.session.MediaSessionimport android.support.v4.media.session.MediaSessionCompatimport android.support.v7.app.AlertDialogimport android.util.Logimport android.webkit.URLUtilimport com.google.android.exoplayer2.*import com.google.android.exoplayer2.Player.*import com.google.android.exoplayer2.Player.EventListenerimport com.google.android.exoplayer2.audio.AudioRendererEventListenerimport com.google.android.exoplayer2.decoder.DecoderCountersimport com.google.android.exoplayer2.source.TrackGroupArrayimport com.google.android.exoplayer2.trackselection.DefaultTrackSelectorimport com.google.android.exoplayer2.trackselection.TrackSelectionArrayimport com.musicplayer.aow.application.Injectionimport com.musicplayer.aow.delegates.data.db.AppExecutorsimport com.musicplayer.aow.delegates.data.db.database.PlaylistDatabaseimport com.musicplayer.aow.delegates.data.model.PlayListimport com.musicplayer.aow.delegates.data.model.Trackimport com.musicplayer.aow.delegates.data.source.PreferenceManagerimport com.musicplayer.aow.ui.eq.model.EqModelimport com.musicplayer.aow.utils.StorageUtilimport org.jetbrains.anko.doAsyncimport java.util.*class Player : IPlayback{    //mediasession token    var mediaSessionToken: MediaSessionCompat.Token? = null    //room for resntly played    private var playlistDatabase = PlaylistDatabase.getsInstance(Injection.provideContext()!!)    override var mPlayer: SimpleExoPlayer? = ExoPlayerFactory.newSimpleInstance(Injection.provideContext(), DefaultTrackSelector())    var mEqualizer: Equalizer? = null;    var mPlayList: PlayList? = PlayList()    val storageUtil = StorageUtil()    // Default size 2: for service and UI    private val mCallbacks = ArrayList<IPlayback.Callback>(2)    // Player status    private var isPaused: Boolean = false    override val isPlaying: Boolean        get() = if (mPlayer != null){mPlayer?.playWhenReady!!}else{ false }    override val progress: Int        get() = mPlayer!!.currentPosition.toInt()    override val playingTrack: Track?        get() = if (mPlayList!!.currentTrack == null){ null }else{            mPlayList!!.currentTrack?.value        }    override var playingList: PlayList? = null        get() = mPlayList    init {        mPlayList = PlayList()        val componentListener = ComponentListener()        mPlayer?.addListener(componentListener)        updatePlayMode(PreferenceManager.lastPlayMode(Injection.provideContext()!!))        //mediaPlayer!!.setOnBufferingUpdateListener(this)    }    fun reInit(){        mPlayer = ExoPlayerFactory.newSimpleInstance(Injection.provideContext(), DefaultTrackSelector())    }    class ComponentListener: DefaultEventListener() {        //if (playWhenReady && playbackState == Player.STATE_READY) {            // actually playing media        //}    }    fun attachEventListener(){        mPlayer?.addListener(eventListener)    }    fun initEQ(){        mPlayer?.setAudioDebugListener(object: AudioRendererEventListener {            override fun onAudioSinkUnderrun(bufferSize: Int, bufferSizeMs: Long, elapsedSinceLastFeedMs: Long) {                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.            }            override fun onAudioEnabled(counters: DecoderCounters?) {                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.            }            override fun onAudioInputFormatChanged(format: Format?) {                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.            }            override fun onAudioDecoderInitialized(decoderName: String?, initializedTimestampMs: Long, initializationDurationMs: Long) {                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.            }            override fun onAudioDisabled(counters: DecoderCounters?) {                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.            }            override fun onAudioSessionId(audioSessionId: Int) {                val MAX_SLIDERS = 5                mEqualizer = Equalizer(1000, audioSessionId)                mEqualizer?.setEnabled(true)//That's it, this will initialize the Equalizer and set it to the //default preset                for (i in 0 until MAX_SLIDERS) {                    var level = storageUtil.loadStringValue("Band$i")                    if (mEqualizer != null) {                        if (level.equals("empty", true)) {                            level = mEqualizer?.getBandLevel(i.toShort()).toString()                            storageUtil.saveStringValue("Band$i", level.toString())                            mEqualizer?.setBandLevel(i.toShort(), level.toShort())                        } else {                            if (level.equals("empty", true)) {                                level = 0.toString()                            }                            mEqualizer?.setBandLevel(i.toShort(), level?.toShort()!!)                        }                    } else {                        mEqualizer?.setBandLevel(i.toShort(), 0.toShort())                    }                }                    //mEqualizer?.usePreset(1)            }        })    }    private val eventListener = object: EventListener {        override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {            if (mPlayer == null || mPlayer!!.playbackState == com.google.android.exoplayer2.Player.STATE_IDLE) {                return            }            when (reason){                TIMELINE_CHANGE_REASON_PREPARED -> {                    /**                     * Timeline and manifest changed as a result of a player initialization with new media.                     */                }                TIMELINE_CHANGE_REASON_RESET -> {                    /**                     * Timeline and manifest changed as a result of a player reset.                     */                }                TIMELINE_CHANGE_REASON_DYNAMIC -> {                    /**                     * Timeline or manifest changed as a result of an dynamic update introduced by the played media.                     */                }            }        }        override fun onPositionDiscontinuity(reason: Int) {            when(reason){                DISCONTINUITY_REASON_PERIOD_TRANSITION ->{                    Log.e(TAG, "onPositionDiscontinuity 0")                    //garbage collection                    System.gc()                    mPlayList?.playingIndex = mPlayer?.currentWindowIndex!!                    notifyComplete(mPlayList?.tracks?.get(mPlayList?.playingIndex!!))                }                DISCONTINUITY_REASON_SEEK -> {                }                DISCONTINUITY_REASON_SEEK_ADJUSTMENT -> {                }                DISCONTINUITY_REASON_AD_INSERTION -> {                }                DISCONTINUITY_REASON_INTERNAL -> {                }            }        }        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {        }        override fun onSeekProcessed() {        }        override fun onRepeatModeChanged(repeatMode: Int) {        }        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {        }        override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {            //Log.e(TAG, "onTracksChanged")        }        override fun onLoadingChanged(isLoading:Boolean) {            //Log.e(TAG, "onLoadingChanged")            if (isLoading) {                if (isPlaying){                    notifyPlayStatusChanged(isPlaying)                }else {                    notifyTriggerLoading(isLoading)                }            }else{                if (isPlaying){                    notifyPlayStatusChanged(isPlaying)                }else {                    notifyTriggerLoading(isLoading)                }            }        }        override fun onPlayerStateChanged(playWhenReady:Boolean, playbackState:Int) {            when (playbackState) {                STATE_ENDED -> {                    //Stop playback and return to start position                    //setPlayPause(false)                    notifyPlayStatusChanged(playWhenReady)                    //onCompletion(mPlayer)                }                STATE_READY -> {                    notifyPlayStatusChanged(playWhenReady)                }                STATE_BUFFERING -> {                    notifyTriggerLoading(true)  //trigger loading                }                STATE_IDLE ->{                }            }        }        override fun onPlayerError(error:ExoPlaybackException) {            val dialogN = AlertDialog.Builder(Injection.provideContext()!!, android.R.style.Theme_Material_Light_Dialog_NoActionBar)            dialogN.setTitle("Please wait, An error encounter.")            dialogN.setMessage("Should we start all over again? but this time with strategy!")            dialogN.setPositiveButton("Yes",                    { _, _ ->                    })            dialogN.setNegativeButton("No",                    { _, _ ->                    }).create()        }    }    override fun setPlayList(list: PlayList) {        if (mPlayList == null){            mPlayList = PlayList()        }        mPlayList = list        var online = false        val track = mPlayList?.tracks?.first()        if (track != null){            if(URLUtil.isHttpUrl(track.path) || URLUtil.isHttpsUrl(track.path)){                online = true            }        }        if (online) {            mPlayer?.prepare(mPlayList?.getConcatenatedPlaylist(Injection.provideContext()!!))        } else {            mPlayer?.prepare(mPlayList?.getConcatenatedPlaylistLocal())        }    }    fun updatePlayMode(playMode: PlayMode) {        when (playMode) {            PlayMode.LIST -> {                mPlayer?.shuffleModeEnabled = false                mPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_OFF            }            PlayMode.LOOP -> {                mPlayer?.shuffleModeEnabled = false                mPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_ALL            }            PlayMode.SHUFFLE -> {                mPlayer?.shuffleModeEnabled = true                mPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_ALL            }            PlayMode.SINGLE -> {                mPlayer?.shuffleModeEnabled = false                mPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_ONE            }            PlayMode.default -> {                mPlayer?.shuffleModeEnabled = false                mPlayer?.repeatMode = ExoPlayer.REPEAT_MODE_ALL            }        }    }    override fun play(): Boolean {        //garbage collection        System.gc()        if (isPaused) {            if (mPlayer != null) {                isPaused = false                mPlayer!!.playWhenReady = true                notifyPlayStatusChanged(true)                return true            }        }        if (mPlayList!!.prepare()) {            isPaused = true            mPlayer?.seekTo(mPlayList?.playingIndex!!, 0L)            mPlayer?.playWhenReady = true            isPaused = false            notifyPlayStatusChanged(true)            AppExecutors.instance?.diskIO()?.execute {                try {                    EqModel.instance?.updateEqualizer(mPlayer?.audioSessionId!!)                } catch (e: Exception){                }            }            return true        }else{            isPaused = true            notifyPlayStatusChanged(false)        }        //garbage collection        System.gc()        return false    }    override fun play(list: PlayList): Boolean {        isPaused = false        setPlayList(list)        return play()    }    override fun play(list: PlayList, startIndex: Int): Boolean {        if (startIndex < 0 || startIndex >= list.tracks?.size!!) return false        isPaused = false        list.playingIndex = startIndex        setPlayList(list)        val playList = PlayList(list.tracks)        playList.name = "Recently Played"        playList.mxp_id = "nowplaying"        AppExecutors.instance?.diskIO()?.execute {            playlistDatabase?.playlistDAO()?.updatePlayList(playList)        }        return play()    }    override fun play(track: Track): Boolean {        isPaused = false        mPlayList!!.tracks?.clear()        mPlayList!!.tracks?.add(track)        return play()    }    override fun playLast(): Boolean {        isPaused = false        val hasLast = mPlayList!!.hasLast()        if (hasLast) {            val last = mPlayList!!.last(mPlayer?.previousWindowIndex!!).value!!            play()            notifyPlayLast(last)            return true        }        return false    }    override fun playNext(): Boolean {        if (!isPaused){            isPaused = true        }        isPaused = false        val hasNext = mPlayList!!.hasNext()        if (hasNext) {            val next = mPlayList!!.next(mPlayer?.nextWindowIndex!!).value!!            play()            notifyPlayNext(next)            return true        }        return false    }    override fun pause(): Boolean {        if (mPlayer == null) return false                if (mPlayer!!.playWhenReady) {            mPlayer!!.playWhenReady = false            isPaused = true            notifyPlayStatusChanged(false)            return true        }        return false    }    override fun seekTo(progress: Int): Boolean {        if (mPlayList!!.tracks == null) return false        val currentSong = mPlayList!!.currentTrack?.value        if (currentSong != null) {            if (currentSong.duration <= progress) {                //onCompletion(mPlayer)            } else {                mPlayer?.seekTo(progress.toLong())            }            return true        }        return false    }    override fun setPlayMode(playMode: PlayMode) {        mPlayList!!.playMode = playMode    }    override fun releasePlayer() {        //mPlayList = null        mPlayer?.stop(false)        mPlayer?.release()        mPlayer = null        sInstance = null    }    fun duration(): Long {        return mPlayer?.duration ?: 0L    }    //add to playlist    fun insertnext(index: Int, value: Track) {        //var queue = Queue(mPlayList!!.tracks)        val playIndex = index + 1        val body = mPlayList!!.tracks as ArrayList        val queue = ArrayList<Track>()        if (body.size >= playIndex) {            if (body.size == playIndex - 1) {                queue.addAll(body)                queue.add(value)            }else{                queue.addAll(body.subList(0, playIndex))                queue.add(value)                queue.addAll(body.subList(playIndex, body.size))            }        }else{            queue.addAll(body)            queue.add(value)        }        mPlayList!!.tracks = queue        val playList = PlayList(mPlayList!!.tracks)        playList.name = "Recently Played"        playList.mxp_id = "nowplaying"        AppExecutors.instance?.diskIO()?.execute {            playlistDatabase?.playlistDAO()?.updatePlayList(playList)        }    }    fun insertnext(index: Int, value: ArrayList<Track>) {        val playIndex = index + 1        val body = mPlayList!!.tracks as ArrayList        val queue = ArrayList<Track>()        if (body.size >= playIndex) {            if (body.size == playIndex - 1) {                queue.addAll(body)                queue.addAll(value)            }else{                queue.addAll(body.subList(0, playIndex))                queue.addAll(value)                queue.addAll(body.subList(playIndex, body.size))            }        }else{            queue.addAll(body)            queue.addAll(value)        }        mPlayList!!.tracks = queue        val playList = PlayList(mPlayList!!.tracks)        playList.name = "Recently Played"        playList.mxp_id = "nowplaying"        AppExecutors.instance?.diskIO()?.execute {            playlistDatabase?.playlistDAO()?.updatePlayList(playList)        }    }    fun stringForTime(timeMs: Int): String {        val mFormatBuilder = StringBuilder()        val mFormatter: Formatter        mFormatter = Formatter(mFormatBuilder, Locale.getDefault())        val totalSeconds = timeMs / 1000        val seconds = totalSeconds % 60        val minutes = totalSeconds / 60 % 60        val hours = totalSeconds / 3600        mFormatBuilder.setLength(0)        return if (hours > 0) {            mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString()        } else {            mFormatter.format("%02d:%02d", minutes, seconds).toString()        }    }    fun updatePlaylist(value: ArrayList<Track>){        mPlayList!!.tracks = value    }    // Callbacks    override fun registerCallback(callback: IPlayback.Callback) {        mCallbacks.add(callback)    }    override fun unregisterCallback(callback: IPlayback.Callback) {        mCallbacks.remove(callback)    }    override fun removeCallbacks() {        mCallbacks.clear()    }    private fun notifyPlayStatusChanged(isPlaying: Boolean) {        for (callback in mCallbacks) {            callback.onPlayStatusChanged(isPlaying)        }    }    private fun notifyTriggerLoading(isLoading: Boolean){       for (callback in mCallbacks){           callback.onTriggerLoading(isLoading)       }    }    private fun notifyPrepared(isPlaying: Boolean) {        for (callback in mCallbacks) {            callback.onPrepared(isPlaying)        }    }    private fun notifyPlayLast(track: Track) {        for (callback in mCallbacks) {            callback.onSwitchLast(track)        }    }    private fun notifyPlayNext(track: Track) {        for (callback in mCallbacks) {            callback.onSwitchNext(track)        }    }    private fun notifyComplete(track: Track?) {        for (callback in mCallbacks) {            callback.onComplete(track)        }    }    companion object {        private const val TAG = "Player"        @Volatile private var sInstance: Player? = null        val instance: Player?            get() {                if (sInstance == null) {                    synchronized(Player.Companion) {                        if (sInstance == null) {                            sInstance = Player()                        }                    }                }                return sInstance            }    }}

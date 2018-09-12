@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.GsonBuilder
 import com.musicplayer.aow.R
 import com.musicplayer.aow.delegates.softcode.adapters.placeholder.PlaceholderData
@@ -32,16 +33,15 @@ class SectionListDataAdapter(private val mContext: Context, private val itemsLis
         holder.tvTitle.text = singleItem.name
         holder.artist.text = singleItem.owner
 
-        doAsync {
-            val img = Glide.with(mContext)
-                    .load(singleItem.picture).asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(150, 150)
-                    .get()
-            onComplete {
-                holder.itemImage.setImageBitmap(img)
-            }
-        }
+        Glide.with(mContext)
+                .load(singleItem.picture)
+                .apply(
+                        RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .dontAnimate()
+                                .dontTransform()
+                )
+                .into(holder.itemImage)
 
         val gsonBuilder = GsonBuilder().create()
         val jsonFromPojo = gsonBuilder.toJson(singleItem)

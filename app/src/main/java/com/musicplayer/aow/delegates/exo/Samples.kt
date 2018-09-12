@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.support.annotation.DrawableRes
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
+import com.musicplayer.aow.R
 
 object Samples {
 
@@ -31,17 +32,17 @@ object Samples {
             "audio_1",
             "Jazz in Paris",
             "Jazz for the masses",
-            R.drawable.album_art_1), Sample(
+            R.drawable.nigerian_artists), Sample(
             "http://storage.googleapis.com/automotive-media/The_Messenger.mp3",
             "audio_2",
             "The messenger",
             "Hipster guide to London",
-            R.drawable.album_art_2), Sample(
+            R.drawable.nigerian_artists), Sample(
             "http://storage.googleapis.com/automotive-media/Talkies.mp3",
             "audio_3",
             "Talkies",
             "If it talks like a duck and walks like a duck.",
-            R.drawable.album_art_3))
+            R.drawable.nigerian_artists))
 
     class Sample(
             uri: String, val mediaId: String, val title: String, val description: String, val bitmapResource: Int) {

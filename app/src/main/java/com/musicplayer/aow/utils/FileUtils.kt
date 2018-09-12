@@ -3,7 +3,7 @@ package com.musicplayer.aow.utils
 import android.media.MediaMetadataRetriever
 import android.text.TextUtils
 import com.musicplayer.aow.delegates.data.model.Folder
-import com.musicplayer.aow.delegates.data.model.Song
+import com.musicplayer.aow.delegates.data.model.Track
 import java.io.File
 import java.text.DecimalFormat
 import java.util.*
@@ -41,8 +41,8 @@ object FileUtils {
         return file.name.toLowerCase().endsWith(".lrc")
     }
 
-    fun scanDir(dir: File?): List<Song> {
-        val songs = ArrayList<Song>()
+    fun scanDir(dir: File?): List<Track> {
+        val songs = ArrayList<Track>()
         if (dir != null && dir.isDirectory) {
             val files = dir.listFiles { item ->
                 item.isFile && isMusic(item)
@@ -50,7 +50,7 @@ object FileUtils {
             }
             for (file in files) {
                 if (file.isDirectory) {
-                    //                    songs.addAll(scanDir(file));
+                    //                    tracks.addAll(scanDir(file));
                 } else if (file.isFile && isMusic(file)) {
                     val song = fileToMusic(file)
                     if (song != null) {
@@ -62,7 +62,7 @@ object FileUtils {
         return songs
     }
 
-    fun musicFiles(dir: File): List<Song> {
+    fun musicFiles(dir: File): List<Track> {
         val songs = scanDir(dir)
         if (songs.size > 1) {
             Collections.sort(songs) { left, right -> left.title!!.compareTo(right.title!!) }
@@ -70,7 +70,7 @@ object FileUtils {
         return songs
     }
 
-    fun fileToMusic(file: File): Song? {
+    fun fileToMusic(file: File): Track? {
         if (file.length() == 0L) return null
 
         val metadataRetriever = MediaMetadataRetriever()
@@ -79,7 +79,7 @@ object FileUtils {
         val duration: Int
 
         val keyDuration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        // ensure the duration is a digit, otherwise return null song
+        // ensure the duration is a digit, otherwise return null track
         if (keyDuration == null || !keyDuration.matches("\\d+".toRegex())) return null
         duration = Integer.parseInt(keyDuration)
 
@@ -88,7 +88,7 @@ object FileUtils {
         val artist = extractMetadata(metadataRetriever, MediaMetadataRetriever.METADATA_KEY_ARTIST, UNKNOWN)
         val album = extractMetadata(metadataRetriever, MediaMetadataRetriever.METADATA_KEY_ALBUM, UNKNOWN)
 
-        val song = Song()
+        val song = Track()
         song.title = title
         song.displayName = displayName
         song.artist = artist
@@ -101,9 +101,9 @@ object FileUtils {
 
     fun folderFromDir(dir: File): Folder {
         val folder = Folder(dir.name, dir.absolutePath)
-//        val songs = musicFiles(dir)
-//        folder.songs = songs
-//        folder.numOfSongs = songs.size
+//        val tracks = musicFiles(dir)
+//        folder.tracks = tracks
+//        folder.numOfSongs = tracks.size
         return folder
     }
 

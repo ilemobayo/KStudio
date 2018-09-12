@@ -1,0 +1,266 @@
+Gambling Simulation
+
+A simple gambling simulation program is easy to write.  Even a simple program is fun to play with, but a more sophisticated program is more fun.
+
+The Internet now offers the possibility of gambling on-line, with "real money".  The software for this system is quite sophisticated.  There are several issues/problems involved:
+
+    What are the rules of the game being simulated (the exact rules)?
+    How can the game be represented inside the computer?
+    How can the user-interface be created (start with a highly simplified version)?
+    How can the game be connected to an E-cash system?
+    How can a larger casino system be created from many games?
+    How can multi-player games be created using a server?
+    How can the simulation be made more realistic, to increase the fun (animation, 3D, sounds)?
+
+Top-Level Design (tasks)
+
+Here is a list of tasks to be performed by an on-line roulette simulation:
+
+    Log-in (user identifies themselves)
+    Give user "chips" (money) to start with
+    User places bet(s)
+    Spin the wheel
+    - video simulation of spinning wheel (happens at the client)
+    - generate random result(s) (happens at the server)
+    - coordinate server and client by transmitting data
+    Decide whether the user wins or loses
+    Pay winnings or deduct losses
+
+Low-Level Design (modules)
+
+Here is a list of useful modules to solve problems in an on-line roulette program:
+
+    User-ID verification
+    Roulette-wheel animation
+    Matching red/black to numbers
+    Secure communication system for client/server exchanges
+    Background graphics and sound routines (e.g. chips "clunking" onto the table)
+    E-payment system
+
+Useful Standard Functions (Java)
+
+Random Numbers:         int number =  rand(0,36)    --  choose a random number between 1 and 36
+
+Grouping Numbers:       group =  number / 3     --  integer division, returns a whole number result
+
+Even or Odd   :         result =  group % 2     --  this result is 0 for even, 1 for odd numbers
+
+import java.awt.*;
+
+public class Roulette extends EasyApp
+{  public static void main(String[] args)
+   {
+      new Roulette();
+   }
+
+   Label lMoney = addLabel("Money",40,40,60,30,this);
+   TextField tMoney = addTextField("",100,40,100,30,this);
+   Button bBet = addButton("Bet",40,70,80,30,this);
+   Button bSpin = addButton("Spin",120,70,80,30,this);
+   TextField tBet = addTextField("",40,100,80,40,this);
+   TextField tChoice = addTextField("",40,140,80,40,this);
+   TextField tNumber = addTextField("",120,100,80,80,this);
+   int money = 1000;
+   int bet = 0;
+
+   int betting = 0;
+   String choice = "";
+
+   public void actions(Object source,String command)
+   {
+      if(source == bBet)
+      {  makeBet();  }
+      else if (source == bSpin)
+      {  spin(); }
+   }
+
+   public Roulette()
+   {
+      setTitle("Raging Roulette");
+      setSize(250,200);
+      setBackground(Color.green);
+      tNumber.setFont(new Font("Arial",0,50));
+      tNumber.setForeground(Color.white);
+      tNumber.setBackground(Color.green);
+      tBet.setFont(new Font("Arial",0,30));
+      tChoice.setFont(new Font("Arial",0,30));
+      tMoney.setFont(new Font("Arial",0,16));
+
+      tMoney.setText(money + "");
+   }
+
+   public void makeBet()
+   {
+      do
+      {
+         betting = inputInt("How much do you want to bet?");
+      }  while (betting < 0 || betting > money);
+
+      bet = betting;
+
+      choice = input("Betting on : Red, Black, or a Number");
+
+      tBet.setText(betting + "");
+      tChoice.setText(choice);
+   }
+
+   public int rand(int lowest, int highest)
+   {
+      return (int)(Math.floor(Math.random()*(highest-lowest+1)+lowest));
+   }
+
+   public void spin()
+   {
+      long start = System.currentTimeMillis();
+      do
+      {
+         int num = rand(0,36);
+         tNumber.setText( num + "");
+         if (num == 0)
+         {  tNumber.setBackground(Color.green); }
+         else if ( ((num-1)/3) % 2 == 0 )
+         {  tNumber.setBackground(Color.red); }
+         else
+         {  tNumber.setBackground(Color.black); }
+         repaint();
+      }  while (System.currentTimeMillis()-start < 3000);
+      money = money + checkWinner();
+      tMoney.setText(money + "");
+
+   }
+
+   public int checkWinner()
+   {
+      if ((tNumber.getBackground() == Color.red) && (tChoice.getText().equals("Red")))
+      {  return bet; }
+      else if ((tNumber.getBackground() == Color.black) && (tChoice.getText().equals("Black")))
+      {  return bet; }
+      else if (tNumber.getText().equals( tChoice.getText() ) )
+      {  return 36*bet; }
+      else
+      {  return -bet; }
+   }
+
+   public void pause(long millis)
+   {
+      long start = System.currentTimeMillis();
+      do
+      {
+      } while (System.currentTimeMillis() - start < millis) ;
+   }
+}
+Class Project
+
+The prototype Raging Roulette contains lots of ideas which are useful for other gambling simulations.  Slot machines, dice, card games, and any other gambling game can be simulated in a similar fashion.
+
+Our class project will concentrate on multi-player games rather than casino games.  A multi-player game has several players, all equal, and the winnings/losses are moved from player to player.  There is no "house".  This is more like how real people play games with friends - for example, card games like poker.
+
+Our project is to build several multi-player gambling games.  The players will exchange V-money (virtual money), kept in a virtual bank (managed by the teacher).
+
+Rather than implementing a standard game like roulette or poker, students will design their own gambling games.  Here is an example:
+Divide and Conquer - an Invented Game
+
+Each player places a bet and chooses a number between 2 and 12. The numbers and bets remain secret from the other players.  The minimum bet permitted is 50 dm.  The total of all the bets forms a "pot".  Two dice are then rolled. If one of the players guessed the result correctly, he/she wins the entire pot.  If more than one player bet on that number, the player who bet the most money wins the entire pot - the others lose.  If there is a tie, they split the pot.  If nobody bet on that number, the money remains in the pot for the next game.
+
+Example Games  ( Assume there are three players - Alice, Bob, Carla )
+
+Alice
+
+
+Bob
+
+
+Carla
+
+
+Pot
+
+
+Dice Roll
+
+
+Winner
+
+50 dm on #7
+
+
+100 dm on #6
+
+
+50 dm on #8
+
+
+200
+
+
+#7
+
+
+Alice
+
+50 dm on #7
+
+
+100 dm on #7
+
+
+50 dm on #8
+
+
+200
+
+
+#7
+
+
+Bob
+
+200 dm on #7
+
+
+100 dm on #6
+
+
+50 dm on #8
+
+
+350
+
+
+#9
+
+
+No Winner
+
+200 dm on #7
+
+
+150 dm on #7
+
+
+50 dm on #8
+
+
+400+350
+
+
+#8
+
+
+Carla
+Project Organization
+
+Each student creates a game (specifies the rules) and writes programs to implement the on-line version.  This includes a server program which generates the random results and makes payments to winners, as well as the client program which runs on the user's computer and takes bets and displays results. To prevent any cheating (secret "lucky numbers"), the program code must remain public (open source).  Also, the authors cannot win any V-money playing their own games.
+
+The teacher will implement the V-cash system.  This will include virtual salaries for all students on a daily basis, as well as bonuses for outstanding programs or clever ideas.  (Absent students forfeit their daily salary.)
+
+The server programs must be designed to interface properly with the V-cash system, so that winnings can be correctly posted to student accounts.  Incorrect payments may result in fines for the programmers.
+Development Steps
+
+    Try out the Raging Roulette simulation
+    Invent a new game, based on dice, cards, spinners, or some other random
+    Write a stand-alone version, like Raging Roulette, including a simple user-interface, the random-result generator, and simplified pay-off system (without an actual bank-file)
+    Connect to server-based E-cash and convert payoff system to "real" E-cash (the teacher will make the E-cash system
+    Integrate your program into the Our-Casino system
+    Improve the user-interface to be more realistic
+    Refactor into a multi-player, client-server game

@@ -30,7 +30,7 @@ class RecyclerViewFastScroller @JvmOverloads constructor(context: Context, attrs
     private var isDragging = false
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (!isDragging) {
                 updateBubbleAndHandlePosition()
             }
@@ -67,7 +67,7 @@ class RecyclerViewFastScroller @JvmOverloads constructor(context: Context, attrs
         val action = event.action
         when (action) {
             MotionEvent.ACTION_DOWN -> {
-                if (event.x < fastScroll!!.x - ViewCompat.getPaddingStart(fastScroll))
+                if (event.x < fastScroll!!.x - ViewCompat.getPaddingStart(fastScroll!!))
                     return false
                 if (currentAnimator != null)
                     currentAnimator!!.cancel()
@@ -114,7 +114,7 @@ class RecyclerViewFastScroller @JvmOverloads constructor(context: Context, attrs
 
     private fun setRecyclerViewPosition(y: Float) {
         if (recyclerView != null) {
-            val itemCount = recyclerView!!.adapter.itemCount
+            val itemCount = recyclerView!!.adapter!!.itemCount
             val proportion: Float
             proportion = y / (height - paddingTop).toFloat()
 

@@ -9,42 +9,26 @@ import android.support.v7.widget.Toolbar
 import android.support.v7.widget.helper.ItemTouchHelper
 import com.musicplayer.aow.R
 import com.musicplayer.aow.application.Injection
+import com.musicplayer.aow.delegates.data.db.database.PlaylistDatabase
 import com.musicplayer.aow.delegates.data.model.PlayList
 import com.musicplayer.aow.delegates.player.Player
-import com.musicplayer.aow.delegates.softcode.adapters.onlinefavorites.playlist.PlayListFavDatabase
 import com.musicplayer.aow.ui.nowplaying.draganddropinterface.SimpleItemTouchHelperCallback
 import com.musicplayer.aow.ui.widget.DividerItemDecoration
 import com.readystatesoftware.systembartint.SystemBarTintManager
 import kotlinx.android.synthetic.main.activity_now_playing.*
-import rx.subscriptions.CompositeSubscription
 
 
 class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartListener {
 
-    private val mSubscriptions: CompositeSubscription? = null
     private var mItemTouchHelper: ItemTouchHelper? = null
     var adapter: NowPlayingAdapter? = null
 
     //room for resntly played
-    private var playListFavDatabase = PlayListFavDatabase.getsInstance(Injection.provideContext()!!)
+    private var playlistDatabase = PlaylistDatabase.getsInstance(Injection.provideContext()!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_now_playing)
-
-        val tintManager = SystemBarTintManager(this)
-        // enable status bar tint
-        tintManager.isStatusBarTintEnabled = true
-        // enable navigation bar tint
-        tintManager.setNavigationBarTintEnabled(true)
-
-        // set a custom tint color for all system bars
-        tintManager.setTintColor(R.color.translusent);
-        // set a custom navigation bar resource
-        tintManager.setNavigationBarTintResource(R.drawable.gradient_warning);
-        // set a custom status bar drawable
-        tintManager.setStatusBarTintResource(R.drawable.gradient_info);
-
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -61,17 +45,17 @@ class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartLis
     }
 
     private fun loadData(playList: PlayList) {
-        //sort the song list in ascending order
+        //sort the track list in ascending order
         val playingIndex = Player.instance!!.mPlayList!!.playingIndex
         playing_now_songs.setHasFixedSize(true)
         val lm = LinearLayoutManager(baseContext.applicationContext)
         lm.scrollToPosition(playingIndex)
         playing_now_songs.layoutManager = lm
 
-        adapter = NowPlayingAdapter(Injection.provideContext()!!, playList, mSubscriptions, this, this)
+        adapter = NowPlayingAdapter(Injection.provideContext()!!, playList,this, this)
         val callback = SimpleItemTouchHelperCallback(adapter)
         mItemTouchHelper = ItemTouchHelper(callback)
-        mItemTouchHelper!!.attachToRecyclerView(playing_now_songs);
+        mItemTouchHelper!!.attachToRecyclerView(playing_now_songs)
         playing_now_songs.addItemDecoration(
                 DividerItemDecoration(
                         applicationContext!!.getDrawable(
@@ -89,22 +73,20 @@ class NowPlayingActivity : AppCompatActivity(), NowPlayingAdapter.OnDragStartLis
 
 
     private fun loadResent(){
-        val resultPlaylist = playListFavDatabase?.playlistFavDAO()?.fetchOnePlayListMxpId("nowplaying")
-        resultPlaylist?.observe(this, object: Observer<PlayList> {
-            override fun onChanged(result: PlayList?) {
-                if(result != null ) {
-                    if (result.songs?.size!! > 0) {
-                        loadData(result)
-                    } else {
-                        //loadAllSongs()
-                    }
-                }else{
-                    val playList = PlayList()
-                    playList.name = "Recently Played"
-                    playList.mxp_id = "nowplaying"
-                    playListFavDatabase?.playlistFavDAO()?.insertOnePlayList(playList)
-                    loadData(playList)
+        val resultPlaylist = playlistDatabase?.playlistDAO()?.fetchOnePlayListMxpId("nowplaying")
+        resultPlaylist?.observe(this, Observer<PlayList> { result ->
+            if(result != null ) {
+                if (result.tracks?.size!! > 0) {
+                    loadData(result)
+                } else {
+                    //loadAllSongs()
                 }
+            }else{
+                val playList = PlayList()
+                playList.name = "Recently Played"
+                playList.mxp_id = "nowplaying"
+                playlistDatabase?.playlistDAO()?.insertOnePlayList(playList)
+                loadData(playList)
             }
         })
 

@@ -18,7 +18,6 @@ import com.musicplayer.aow.R
 class VideoViewActivity : Activity(){
 
     // Declare variables
-    private lateinit var pDialog: ProgressDialog
     private lateinit var videoview: VideoView
 
     // Insert your Video URL
@@ -29,7 +28,7 @@ class VideoViewActivity : Activity(){
         // Get the layout from video_main.xml
         setContentView(R.layout.activity_videoplayer)
         // Find your VideoView in your video_main.xml layout
-        videoview = findViewById<VideoView>(R.id.VideoView)
+        videoview = findViewById(R.id.VideoView)
         // Execute StreamVideo AsyncTask
 
         try {
@@ -50,11 +49,12 @@ class VideoViewActivity : Activity(){
                 val data = intent.data
                 if (data != null) {
                     video = parse(data.path)!!
+                    //val video = parse(VideoURL)
+                    videoview.setMediaController(mediacontroller)
+                    videoview.setVideoURI(video)
                 }
             }
-            //val video = parse(VideoURL)
-            videoview.setMediaController(mediacontroller)
-            videoview.setVideoURI(video)
+
 
         } catch (e: Exception) {
             Log.e("Error", e.message)
@@ -63,7 +63,7 @@ class VideoViewActivity : Activity(){
 
         videoview.requestFocus()
         videoview.setOnPreparedListener {
-            pDialog.dismiss()
+            //pDialog.dismiss()
             videoview.start()
         }
 

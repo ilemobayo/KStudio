@@ -21,7 +21,7 @@
                         android:paddingEnd="20dp"
                         android:textAlignment="center"
                         android:gravity="center"
-                        android:text="Network connection error."
+                        android:text="@string/network_connection_error"
                         android:textSize="14sp"
                         android:textStyle="normal"
                         android:shadowColor="@color/grey_light"
@@ -29,7 +29,7 @@
                         android:shadowDy="0"
                         android:shadowDx="0"
                         android:drawableStart="@android:drawable/presence_offline"
-                        android:visibility="invisible"/>
+                        android:visibility="gone"/>
                 </ScrollView>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/music_update_recycler_view_body"

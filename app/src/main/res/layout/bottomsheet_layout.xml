@@ -25,10 +25,41 @@
             app:tabPaddingTop="5dp"
             app:tabIndicatorColor="@color/transparent"
             app:tabTextAppearance="@style/MyTextAppearanceTablayout"
-            app:tabTextColor="@color/black"
+            app:tabTextColor="@color/grey_light_a"
             app:tabSelectedTextColor="@color/red_dim"
             app:tabMode="fixed"
             app:tabGravity="fill"
-            android:elevation="40dp"/>
+            android:elevation="40dp">
+            <android.support.design.widget.TabItem
+                android:id="@+id/browse_tab"
+                android:icon="@drawable/ic_home"
+                android:text="@string/browse"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+            <android.support.design.widget.TabItem
+                android:id="@+id/songs_tab"
+                android:icon="@drawable/library_songs"
+                android:text="@string/songs"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+            <android.support.design.widget.TabItem
+                android:id="@+id/album_tab"
+                android:icon="@drawable/library_album"
+                android:text="@string/album"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+            <android.support.design.widget.TabItem
+                android:id="@+id/artist_tab"
+                android:icon="@drawable/library_artist"
+                android:text="@string/artist"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+            <android.support.design.widget.TabItem
+                android:id="@+id/playlist_tab"
+                android:icon="@drawable/library_playlist"
+                android:text="@string/playlist"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+        </android.support.design.widget.TabLayout>
     </LinearLayout>
 </LinearLayout>

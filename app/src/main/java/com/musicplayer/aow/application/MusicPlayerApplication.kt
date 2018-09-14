@@ -17,10 +17,7 @@ import com.birbit.android.jobqueue.log.CustomLogger
 import com.birbit.android.jobqueue.scheduling.FrameworkJobSchedulerService
 import com.birbit.android.jobqueue.scheduling.GcmJobSchedulerService
 import com.github.nisrulz.sensey.Sensey
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.musicplayer.aow.delegates.firebase.ForceUpdateChecker
 import com.musicplayer.aow.delegates.player.PlaybackService
 import com.musicplayer.aow.delegates.player.Player

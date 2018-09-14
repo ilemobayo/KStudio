@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tool="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/apk/res-auto"
     package="com.musicplayer.aow">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -58,11 +59,12 @@
 
     <application
         android:name=".application.MusicPlayerApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:banner="@drawable/ic_logo"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/mp.app.name"
+        tool:replace="android:label"
         android:largeHeap="true"
         android:restoreAnyVersion="true"
         android:roundIcon="@mipmap/ic_launcher_round"

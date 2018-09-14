@@ -2,7 +2,6 @@ package com.musicplayer.aow.delegates.player.mediasession;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import com.google.android.exoplayer2.ui.PlayerNotificationManager.*;
 
 import com.google.android.exoplayer2.Player;
 
